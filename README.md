@@ -1,4 +1,4 @@
-# Đề tài tiểu luận chuyên ngành
+# Đề tài tiểu luận chuyên ngành Kỹ thuật dữ liệu (Hệ đại trà)
 # Platform-recommedation
 # Topic name: Building a recommendation website based on Recommendation System
 ## Implementation team:
