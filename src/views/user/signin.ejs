@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../layouts/header') -%>
+    <style>
+        .custom-checkbox .custom-control-input:checked ~ .custom-control-label::before
+        {
+        background-color:#ff8333!important;
+        border:0;
+        width:15px;
+        height:15px;
+        }
+        .forget-link,.login-link,.register-link
+        {
+        color:#000;
+        font-weight:500;
+        }
+        .login-or {
+        position: relative;
+        color: #aaa;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        }
+        .span-or {
+        display: block;
+        position: absolute;
+        left: 50%;
+        top: -2px;
+        margin-left: -25px;
+        background: #fff;
+        width: 50px;
+        text-align: center;
+        }
+        .hr-or {
+        height: 1px;
+        margin-top: 0px !important;
+        margin-bottom: 0px !important;
+        }
+        .infinity-social-btn ul
+        {
+        padding-left: 0;
+        display : flex;
+        flex-direction: row;
+        justify-content: space-around;
+        }
+        .infinity-social-btn ul li
+        {
+        position:relative;
+        list-style:none;
+        width:50px;
+        height:50px;
+        top: 5px;
+        background: #fff;
+        border:4px solid transparent;
+        box-sizing:border-box;
+        border-radius:50%;
+        transition:.5s;
+        overflow:hidden;
+        margin-bottom:10px;
+        }
+        .infinity-social-btn ul li .facebook .fa
+        {
+        color:#3b5999;
+        }
+        .infinity-social-btn ul li .google .fa
+        {
+        color:#dd4b39;
+        }
+        .infinity-social-btn ul li .twitter .fa
+        {
+        color:#3cf;
+        }
+        .infinity-social-btn ul li:hover:nth-child(1)
+        {
+        background-color:#3b5999;
+        }
+        .infinity-social-btn ul li:hover:nth-child(2)
+        {
+        background-color:#dd4b39;
+        }
+        .infinity-social-btn ul li:hover:nth-child(3)
+        {
+        background-color:#55acee;
+        }
+        .infinity-social-btn ul li .fa
+        {
+        position:absolute;
+        top:50%;
+        left:50%;
+        transform:translate(-50%,-50%);
+        font-size:24px;
+        color:#2196f3;
+        transition:.5s;
+        }
+        .infinity-social-btn ul li .fa:nth-child(1)
+        {
+        left:-50%;
+        opacity:0;
+        }
+        .infinity-social-btn ul li:hover .fa:nth-child(1)
+        {	
+        left:50%;
+        opacity:1;
+        color:#fff;
+        }
+        .infinity-social-btn ul li:hover .fa:nth-child(2)
+        {
+        left:150%;
+        opacity:0;
+        }
+  </style>
+<body>
+    <div class="container-fluid bg-light pb-5 pt-5">
+        <div class="row">
+          <div class="col-md-5 mx-auto ps-5 py-5">
+            <div class="position-relative d-xl-flex flex-column p-2" style="border: 1px solid rgba(0,0,0,.2); border-radius: 1.1rem; max-width: 500px; min-width: 300px; background-color: #fff">
+              <div class="logo mb-3">
+                <div class="col-md-12 text-center">
+                  <h2 style="font-family:Lobster; font-size: 50px;">Login</h2>
+                </div>
+              </div>
+              <form method= "POST" action="/auth/login-user" class = "form-box">
+                <div class="form-floating mb-3 form-group">
+                  <input type="text" class="form-control" id="username" name="username" required>
+                  <label for="floatingInput"><span><i class="fa fa-user"></i></span> Username</label>
+                </div>
+                <div class="form-floating form-group">
+                  <input type="password" class="form-control" id="password" name="password" required>
+                  <label for="floatingPassword"><span><i class="fa fa-lock"></i></span> Password</label>
+                </div>
+                <div class="row mb-2 form-group" style="margin-top: .5rem;">
+                    <!--Remember Checkbox -->
+                    <div class="col-6 d-flex align-items-center">
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="cb1">
+                        <label class="custom-control-label text-start" for="cb1">Remember me</label>
+                      </div>
+                    </div>
+                    <!-- Forget Password -->
+                    <div class="col-6 text-end text-sm">
+                      <a href="#" class="forget-link">Forgot password? </a>
+                    </div>
+                  </div>
+                <div class="col-md-12 text-center ">
+                  <button type="submit" class="btn btn-block rounded-pill btn-primary">Login</button>
+                </div>
+              </form>
+                <div class="col-md-12 ">
+                  <div class="login-or">
+                    <hr class="hr-or">
+                      <span class="span-or">or</span>
+                  </div>
+                </div>
+                <div class="infinity-social-btn text-center">
+                    <ul class="text-center">
+                      <li class="text-center"><a href="#" class="facebook"><i class="fa fa-facebook"></i><i class="fa fa-facebook"></i></a>
+                      </li>
+                      <li class="text-center"><a href="#" class="google">
+                          <i class="fa fa-google"></i><i class="fa fa-google"></i></a>
+                      </li>
+                      <li class="text-center"><a href="#" class="twitter">
+                          <i class="fa fa-twitter"></i><i class="fa fa-twitter"></i></a>
+                      </li>
+                    </ul>
+                  </div>
+                <div class="text-center">Don't have an account?
+                  <a class="register-link" href="/auth/sign-up">Register here</a>
+                </div>
+            </div> 
+          </div>
+        </div>
+    </div>
+    
+    <%- include('../layouts/scripts')  -%>
+</body>
+</html>

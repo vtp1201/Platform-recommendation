@@ -13,9 +13,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
-app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
-app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/jquery/dist')));
+app.use('/css', express.static(path.join('node_modules', 'bootstrap', 'dist', 'css')));
+app.use('/js', express.static(path.join('node_modules', 'bootstrap', 'dist', 'js')));
+app.use('/js', express.static(path.join('node_modules', 'bootstrap', 'jquery', 'dist')));
+app.use('/fonts', express.static(path.join('node_modules', '@fortawesome', 'fontawesome-free')));
 
 app.use(expressSession({
     secret: 'keyboard cat',
