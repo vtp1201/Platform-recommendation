@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express');
 const ejs = require('ejs');
+const flash = require('connect-flash');
 const expressSession = require('express-session');
 
 const app = express();
@@ -16,13 +17,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/css', express.static(path.join('node_modules', 'bootstrap', 'dist', 'css')));
 app.use('/js', express.static(path.join('node_modules', 'bootstrap', 'dist', 'js')));
 app.use('/js', express.static(path.join('node_modules', 'bootstrap', 'jquery', 'dist')));
-app.use('/fonts', express.static(path.join('node_modules', '@fortawesome', 'fontawesome-free')));
 
 app.use(expressSession({
     secret: 'keyboard cat',
     resave: true,
     saveUninitialized: true,
 }));
+app.use(flash());
 
 db.connect();
 

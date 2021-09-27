@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+    
     <%- include('layouts/header') -%>
     <style>
         * {
@@ -26,8 +27,8 @@
         }
 
         .container {
-        width: 90%;
-        max-width: 1100px;
+        width: 100%;
+        max-width: 1450px;
         margin: auto;
         }
 
@@ -103,7 +104,7 @@
         .showcase {
         width: 100%;
         height: 400px;
-        background: url('https://i.ibb.co/zGSDGCL/slide1.png') no-repeat center center/cover;
+        background: url('/img/main.svg') no-repeat center center/cover;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -124,9 +125,8 @@
         /* Home cards */
         .home-cards {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
         grid-gap: 20px;
-        margin-bottom: 40px;
+        margin-bottom: 20px;
         }
 
         .home-cards img {
@@ -154,7 +154,7 @@
         .xbox {
         width: 100%;
         height: 350px;
-        background: url('https://i.ibb.co/tBJGPD9/xbox.png') no-repeat center center/cover;
+        background: url('/img/main.svg') no-repeat center center/cover;
         margin-bottom: 20px;
         }
 
@@ -171,7 +171,7 @@
         .carbon {
         width: 100%;
         height: 350px;
-        background: url('https://i.ibb.co/72cgtsz/carbon.jpg') no-repeat center center/cover;
+        background: url('/img/main.svg') no-repeat center center/cover;
         }
 
         .carbon .content {
@@ -363,52 +363,63 @@
     
         <!-- Showcase -->
         <header class="showcase">
-          <h2>Surface Deals</h2>
+          <h2>Artificial Intelligence Powered</h2>
+          <h2>Recommender as a Service</h2>
           <p>
-            Select Surfaces are on sale now - save while supplies last
+            with an intuitive RESTful API & SDKs tailored by data scientists
           </p>
-          <a href="#" class="btn">
-            Shop Now <i class="fas fa-chevron-right"></i>
-          </a>
+          <div class="d-flex justify-content-around">
+            <a href="#" class="btn me-3">
+              Shop Now <i class="fas fa-chevron-right"></i>
+            </a>
+            <a href="#" class="btn ms-3">
+              Shop Now <i class="fas fa-chevron-right"></i>
+            </a>
+          </div>
         </header>
     
         <!-- Home cards 1 -->
         <section class="home-cards">
-          <div>
-            <img src="https://i.ibb.co/LZPVKq9/card1.png" alt="">
-            <h3>New Surface Pro 7</h3>
-            <p>
-              See how Katie Sowers, Asst. Coach for the 49ers, uses Surface Pro 7
-                to put her plans into play.
-            </p>
-            <a href="#">Learn More <i class="fas fa-chevron-right"></i></a>
-          </div>
-          <div>
-            <img src="https://i.ibb.co/KjGFHVJ/card2.png" alt="" />
-            <h3>New Surface Laptop 3</h3>
-            <p>
-              Express yourself powerfully with a thin, light, and elegant design,
-              faster performance, and up to 11.5 hours battery life.
-            </p>
-            <a href="#">Learn More <i class="fas fa-chevron-right"></i></a>
-          </div>
-          <div>
-            <img src="https://i.ibb.co/2cnshH6/card3.png" alt="" />
-            <h3>Save $150 + free controller</h3>
-            <p>
-              Buy an Xbox One X console and double your fun with a free select
-              extra controller. Starting at $349.
-            </p>
-            <a href="#">Learn More <i class="fas fa-chevron-right"></i></a>
-          </div>
-          <div>
-            <img src="https://i.ibb.co/G57P0Pb/card4.png" alt="" />
-            <h3>The new Microsoft Edge</h3>
-            <p>
-              Expect more. World class performance, with more privacy, more
-              productivity, and more value.
-            </p>
-            <a href="#">Learn More <i class="fas fa-chevron-right"></i></a>
+          <div class="container">
+            <div class="row">
+              <div class="col-6">
+                <img src="/img/wtu.png" alt="">
+              </div>
+              <div class="col-6 my-5">
+                <h3>New Surface Pro 7</h3>
+                <p>
+                  See how Katie Sowers, Asst. Coach for the 49ers, uses Surface Pro 7
+                    to put her plans into play.
+                </p>
+                <a href="#">Learn More <i class="fas fa-chevron-right"></i></a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6 my-5">
+                <h3>New Surface Pro 7</h3>
+                <p>
+                  See how Katie Sowers, Asst. Coach for the 49ers, uses Surface Pro 7
+                    to put her plans into play.
+                </p>
+                <a href="#">Learn More <i class="fas fa-chevron-right"></i></a>
+              </div>
+              <div class="col-6">
+                <img src="/img/product.png" alt="">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <img src="/img/wtu.png" alt="">
+              </div>
+              <div class="col-6 my-5">
+                <h3>New Surface Pro 7</h3>
+                <p>
+                  See how Katie Sowers, Asst. Coach for the 49ers, uses Surface Pro 7
+                    to put her plans into play.
+                </p>
+                <a href="#">Learn More <i class="fas fa-chevron-right"></i></a>
+              </div>
+            </div>
           </div>
         </section>
     

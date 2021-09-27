@@ -2,55 +2,85 @@
 <html lang="en">
 <%- include('../layouts/header') -%>
     <style>
-        .login-or {
-        position: relative;
-        color: #aaa;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        }
-        .span-or {
-        display: block;
+      .container-fluid
+      {
+        margin: auto;
+        padding: auto;
+        background: url('/img/main.svg') no-repeat center center/cover;
+      }
+      .footer{
         position: absolute;
-        left: 50%;
-        top: -2px;
-        margin-left: -25px;
-        background: #fff;
-        width: 50px;
-        text-align: center;
-        }
-        .hr-or {
-        height: 1px;
-        margin-top: 0px !important;
-        margin-bottom: 0px !important;
-        }
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+      .alert
+      {
+        position: absolute;
+        top: 0; 
+      }
+      .login-or {
+      position: relative;
+      color: #aaa;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      }
+      .span-or {
+      display: block;
+      position: absolute;
+      left: 50%;
+      top: -2px;
+      margin-left: -25px;
+      background: #fff;
+      width: 50px;
+      text-align: center;
+      }
+      .hr-or {
+      height: 1px;
+      margin-top: 0px !important;
+      margin-bottom: 0px !important;
+      }
     </style>
 <body>
-    <div class="container-fluid bg-light pb-5 pt-5">
+    <div class="container-fluid bg-light pt-5 pb-3">
         <div class="row">
-          <div class="col-md-5 mx-auto ps-5 py-3">
-            <div class="position-relative d-xl-flex flex-column p-2" style="border: 1px solid rgba(0,0,0,.2); border-radius: 1.1rem; max-width: 500px; min-width: 300px; background-color: #fff">
+          <% if(messageType == 'success') { %>
+            <div class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
+              <strong><%= message %></strong>
+              <a href="/auth/sign-in" class="alert-link">click to sign in</a>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <% } %>
+          <% if(messageType == 'danger') { %>
+            <div class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
+              <strong><%= message %></strong>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <% } %>
+          <div class="col-md-4 mx-auto pt-4 pb-3">
+            <div class="position-relative d-xl-flex flex-column p-2" style="border: 1px solid rgba(0,0,0,.2); border-radius: 1.1rem; min-width: 300px; background-color: #fff">
               <div class="logo mb-3">
                 <div class="col-md-12 text-center my-3">
                   <h2 style="font-family:Lobster; font-size: 50px;">Create account</h2>
                 </div>
               </div>
-              <form method="POST" action="/auth/register-user" class = "form-box">
+              <form method="POST" action="/auth/sign-up" class = "form-box">
                 <div class="form-floating mb-3 form-group">
-                  <input type="text" class="form-control" id="username" name ="username" required>
+                  <input type="text" class="form-control" id="username" name ="username" placeholder="Username" required>
                   <label for="floatingInput"><span><i class="fa fa-user"></i></span> Username</label>
                 </div>
                 <div class="form-floating mb-3 form-group">
-                  <input type="email" class="form-control" id="email" name ="email" required>
+                  <input type="email" class="form-control" id="email" name ="email" placeholder="E-mail" required>
                   <label for="floatingInput"><span><i class="fa fa-envelope"></i></span> E-mail</label>
                 </div>
                 <div class="form-floating mb-3 form-group">
-                  <input type="password" class="form-control" id="password" name ="password" required>
+                  <input type="password" class="form-control" id="password" name ="password" placeholder="Password" required>
                   <label for="floatingPassword"><span><i class="fa fa-lock"></i></span> Password</label>
                 </div>
                 <div class="form-floating form-group">
-                  <input type="password" class="form-control" id="re-password" required>
+                  <input type="password" class="form-control" id="re-password" name="re_password" placeholder="Password-confirmation" required>
                   <label for="floatingPassword"><span><i class="fa fa-lock"></i></span> Password-confirmation</label>
                 </div>
                 <div class="px-0 py-2">
@@ -59,7 +89,7 @@
                     <label class="custom-control-label text-start" for="services"> I have read and agree to the terms. </label> 
                   </div>
                 </div>
-                <div class="col-md-12 text-center ">
+                <div class="d-grid gap-2">
                   <button type="submit" class="btn btn-block rounded-pill btn-primary">Signup</button>
                 </div>
               </form>
@@ -76,7 +106,10 @@
           </div>
         </div>
       </div>
-    
+      
+      <div class="footer">
+        <%- include('../layouts/footer') -%>
+      </div>
       <%- include('../layouts/scripts')  -%>
     
 </body>
