@@ -5,7 +5,7 @@
         <!-- Brand -->
         <a class="navbar-brand me-2 mb-1 d-flex align-items-center" href="#">
           <img
-            src="img/pasted image 0.png"
+            src="https://mdbootstrap.com/img/logo/mdb-transaprent-noshadows.png"
             height="20"
             alt=""
             loading="lazy"
@@ -21,19 +21,20 @@
             placeholder="Search"
             style="min-width: 125px;"
           />
-          <span class="input-group-text border-0 text-white d-none d-lg-flex"
+          <span class="input-group-text border-0 text-black d-none d-lg-flex"
             ><i class="fas fa-search"></i
           ></span>
         </form>
       </div>
       <!-- Left elements -->
       <!-- Right elements -->
+      <% if(loggedIn) { %>
       <ul class="navbar-nav flex-row">
-        <% if(loggedIn) { %>
+        
         <li class="nav-item me-3 me-lg-1">
-          <a class="nav-link" href="#">
+          <a class="nav-link" href="/job/new-job">
             <span><i class="fas fa-pen"></i></span>
-            New Article
+            New Job
           </a>
         </li>
         <li class="nav-item dropdown me-3 me-lg-1">
@@ -79,33 +80,39 @@
               alt=""
               loading="lazy"
             />
-            <strong class="d-none d-sm-block ms-1">John</strong>
+            <strong class="d-none d-sm-block ms-1"><%=loggedName %></strong>
           </a>
           <ul
             class="dropdown-menu dropdown-menu-end"
             aria-labelledby="navbarDropdownMenuLink"
           >
             <li>
-              <a class="dropdown-item" href="#">Profile</a>
+              <a class="dropdown-item" href="/user/home">Profile</a>
             </li>
             <li>
-              <a class="dropdown-item" href="#">Setting accounts</a>
+              <a class="dropdown-item" href="/user/edit-profile">Setting accounts</a>
             </li>
             <li>
-              <a class="dropdown-item" href="#">Logout</a>
+              <a class="dropdown-item" href="/job/managers">Managers Jobs</a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="/auth/sign-out">Logout</a>
             </li>
           </ul>
         </li>
-        <% } %>
-        <% if(!loggedIn) { %>
-          <li class="nav-item">
-            <a class="nav-link" href="/auth/sign-in">Login</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/auth/sign-up">New User</a>
-          </li>
-          <% } %> 
       </ul>
-      <!-- Right elements -->
+      <% } %>
+      <% if(!loggedIn) { %>
+        <ul class="navbar-nav flex-row">
+          <li class="nav-item">
+            <a class="me-3 btn btn-dark rounded-pill" 
+            href="/auth/sign-in">Sign In</a>
+          </li>
+          <li class="nav-item">
+            <a class="me-3 btn rounded-pill" style="background-color: #3bc4a1; color:white" 
+            href="/auth/sign-up">Free Instant Account</a>
+          </li>
+        </ul>
+      <% } %> 
     </div>
   </nav>

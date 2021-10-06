@@ -24,6 +24,7 @@ class AuthController {
                 bcrypt.compare(password, user.password, (err, same) => {
                     if (same) {
                         req.session.userId = user._id;
+                        req.session.username = user.username;
                         req.flash('message', 'Sign in successfully');
                         res.redirect('/');
                         return;

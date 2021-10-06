@@ -1,8 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
     <%- include('../layouts/header') -%>
+    <style>
+        .footer{
+        position: fixed;
+        margin-top: 50px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        }
+        textarea {
+        height: 70px !important;
+        resize: none;
+        }
+    </style>
+    <%- include('../layouts/navbar') -%>
 <body>
-    <%- include('../layouts/footer') -%>
+    <header class="masthead img-fluid" style="background-image: url('/img/main.svg')">
+        <div class="container position-relative px-4 px-lg-5 py-3">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+                    <div class="site-heading">
+                        <h1>Job id: <%=job._id%></h1>
+                        <span class="subheading"><%=job.createdAt%></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="">
+                    <form method= "POST" action="/job/new-job" class="needs-validation" novalidate="">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" value="<%=job.title%>" placeholder="Title">
+                        </div>
+                        <div class="col-12">
+                            <label for="username" class="form-label">Description</label>
+                            <div class="input-group has-validation">
+                                <textarea class="form-control" id="description" name="description" value="<%=job.description%>" placeholder="Description"></textarea>
+                            </div>
+                        </div>
+            
+                        <div class="col-md-9">
+                            <label for="service" class="form-label">Service</label>
+                            <select class="form-select" id="service" name="service" aria-disabled="true">
+                                <option value="">Choose...</option>
+                                <option value="user to item">User to item</option>
+                                <option value="user to user">User to user</option>
+                                <option value="user to content">User to content</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select a valid country.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dataSource" class="form-label">Data source</label>
+                            <input type="file" class="form-control" aria-label="file example" required>
+                            <div class="invalid-feedback">Example invalid form file feedback</div>
+                        </div>
+                    <hr class="my-2">
+                    <button class="w-100 btn btn-primary btn-lg" type="submit">Create Job</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <%- include('../layouts/footer') -%>
+    </div>
     <%- include('../layouts/scripts')  -%>
 </body>
 </html>

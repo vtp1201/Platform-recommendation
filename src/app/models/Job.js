@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const Job = new Schema(
     {
         userId: { type: String, required: true,},
-        name: { type: String, required:true,},
+        title: { type: String, required: true,},
         description: { type: String,},
         service: String,
         dataSource: String,

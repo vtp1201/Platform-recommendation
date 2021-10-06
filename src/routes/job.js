@@ -4,8 +4,8 @@ const router = express.Router();
 
 const jobController = require('../app/controllers/JobController');
 
-router.get('/', checkNotLogged, jobController.showManager);
-router.get('/:id', checkNotLogged, jobController.showJob);
+router.get('/managers', checkNotLogged, jobController.showManager);
+//router.get('/:id', checkNotLogged, jobController.showJob);
 router.get('/new-job', checkNotLogged, jobController.newJob);
 router.post('/new-job', checkNotLogged, jobController.create);
 router.delete('/:id', checkNotLogged, jobController.delete);

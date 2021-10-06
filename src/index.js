@@ -14,10 +14,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/css', express.static(path.join('node_modules', 'bootstrap', 'dist', 'css')));
-app.use('/js', express.static(path.join('node_modules', 'bootstrap', 'dist', 'js')));
-app.use('/js', express.static(path.join('node_modules', 'bootstrap', 'jquery', 'dist')));
-
 app.use(expressSession({
     secret: 'keyboard cat',
     resave: true,
@@ -31,8 +27,10 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 global.loggedIn = null;
+global.loggedName = null;
 app.use("*", (req, res, next) => {
     loggedIn = req.session.userId;
+    loggedName = req.session.username;
     next()
 });
 

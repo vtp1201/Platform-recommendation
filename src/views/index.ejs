@@ -1,88 +1,436 @@
 <!DOCTYPE html>
-
 <html lang="en">
-    <%- include('layouts/header') -%>
-    <body>
-        <!-- Navigation-->
-        <%- include('layouts/navbar') -%>
-        <!-- Page Header-->
-        <header class="masthead" style="background-image: url('img/pasted image 0.png')">
-            <div class="container position-relative px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-md-10 col-lg-8 col-xl-7">
-                        <div class="site-heading">
-                            <h1>Clean Blog</h1>
-                            <span class="subheading">A Blog Theme by Start Bootstrap</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    
+  <%- include('layouts/header') -%>
+    <style>
+        * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        }
+        body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #fff;
+        color: #000;
+        font-size: 15px;
+        line-height: 1.5;
+        }
+
+        a {
+        color: #262626;
+        text-decoration: none;
+        }
+
+        ul {
+        list-style: none;
+        }
+
+        .container {
+        width: 100%;
+        max-width: 1450px;
+        margin: auto;
+        }
+
+        /* Nav */
+        .main-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 60px;
+        padding: 20px 0;
+        font-size: 13px;
+        }
+
+        .main-nav .logo {
+        width: 110px;
+        }
+
+        .main-nav ul {
+        display: flex;
+        }
+
+        .main-nav ul li {
+        padding: 0 10px;
+        }
+
+        .main-nav ul li a {
+        padding-bottom: 2px;
+        }
+
+        .main-nav ul li a:hover {
+        border-bottom: 2px solid #262626;
+        }
+
+        .main-nav ul.main-menu {
+        flex: 1;
+        margin-left: 20px;
+        }
+
+        .menu-btn {
+        cursor: pointer;
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        z-index: 2;
+        display: none;
+        }
+
+        .btn {
+        cursor: pointer;
+        display: inline-block;
+        border: 0;
+        font-weight: bold;
+        padding: 10px 20px;
+        background: #262626;
+        color: #fff;
+        font-size: 15px;;
+        }
+
+        .btn:hover {
+        opacity: 0.9;
+        }
+
+        .dark {
+        color: #fff;
+        }
+
+        .dark .btn {
+        background: #f4f4f4;
+        color: #333;
+        }
+
+        /* Showcase */
+        .showcase {
+        width: 100%;
+        height: 400px;
+        background: url('/img/main.svg') no-repeat center center/cover;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        justify-content: flex-end;
+        padding-bottom: 50px;
+        margin-bottom: 20px;
+        }
+
+        .showcase h2, .showcase p {
+        margin-bottom: 10px;
+        }
+
+        .showcase .btn {
+        margin-top: 20px;
+        }
+
+        /* Home cards */
+        .home-cards {
+        display: grid;
+        grid-gap: 20px;
+        margin-bottom: 20px;
+        }
+
+        .home-cards img {
+        width: 100%;
+        margin-bottom: 20px;
+        }
+
+        .home-cards h3 {
+        margin-bottom: 5px;
+        }
+
+        .home-cards a {
+        display: inline-block;
+        padding-top: 10px;
+        color: #0067b8;
+        text-transform: uppercase;
+        font-weight: bold;
+        }
+
+        .home-cards a:hover i {
+        margin-left: 10px;
+        }
+
+        /* Xbox */
+        .xbox {
+        width: 100%;
+        height: 350px;
+        background: url('/img/main.svg') no-repeat center center/cover;
+        margin-bottom: 20px;
+        }
+
+        .xbox .content {
+        width: 40%;
+        padding: 50px 0 0 30px;
+        }
+
+        .xbox p, .carbon p {
+        margin: 10px 0 20px;
+        }
+
+        /* Carbon */
+        .carbon {
+        width: 100%;
+        height: 350px;
+        background: url('/img/main.svg') no-repeat center center/cover;
+        }
+
+        .carbon .content {
+        width: 55%;
+        padding: 100px 0 0 30px;
+        }
+
+        /* Follow */
+        .follow {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin: 30px 0 30px;
+        }
+
+        .follow * {
+        margin-right: 10px;
+        }
+
+        /* Links */
+        .links {
+        background: #f2f2f2;
+        color: #616161;
+        font-size: 12px;
+        padding: 35px 0;
+        }
+
+        .links-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        grid-gap: 10px;
+        align-items: flex-start;
+        justify-content: center;
+        }
+
+        .links li {
+        line-height: 2.8;
+        }
+
+        /* Footer */
+        .footer {
+        background: #f2f2f2;
+        color: #616161;
+        font-size: 12px;
+        padding: 20px 0;
+        }
+
+        .footer-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 20px 0 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        }
+
+        .footer div {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        }
+
+        .footer div i {
+        margin-right: 10px;
+        }
+
+        .footer ul {
+        display: flex;
+        flex-wrap: wrap;
+        }
+
+        .footer li {
+        margin-right: 30px;
+        margin-bottom: 20px;
+        }
+
+        @media(max-width: 700px) {
+        .menu-btn {
+            display: block;
+        }
+
+        .menu-btn:hover {
+            opacity: 0.5;
+        }
+
+        .main-nav ul.right-menu {
+            margin-right: 50px;
+        }
+
+        .main-nav ul.main-menu {
+            display: block;
+            position: absolute;
+            top:0;
+            left: 0;
+            background: #f2f2f2;
+            width: 50%;
+            height: 100%;
+            border-right: #ccc 1px solid;
+            opacity: 0.9;
+            padding: 30px;
+            transform: translateX(-500px);
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .main-nav ul.main-menu li {
+            padding: 10px;
+            border-bottom: #ccc solid 1px;
+            font-size: 14px;
+        }
+
+        .main-nav ul.main-menu li:last-child {
+            border-bottom: 0;
+        }
+
+        .main-nav ul.main-menu.show {
+            transform: translateX(-20px);
+        }
+
+        .home-cards {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .xbox .content p {
+            display: none;
+        }
+
+        .xbox .content h2 {
+            margin-bottom: 20px;
+        }
+
+        .carbon .content {
+            width: 85%;
+        }
+
+        .links .links-inner {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        }
+
+        @media(max-width: 500px) {
+        .home-cards {
+            grid-template-columns: 1fr;
+        }
+
+        .links .links-inner {
+            grid-template-columns: 1fr;
+        }
+
+        .links .links-inner ul {
+            margin-bottom: 20px;
+        }
+        }
+    </style>
+<body>
+  <%- include('layouts/navbar') -%>
+    
+        <!-- Showcase -->
+        <header class="showcase">
+          <h2>Artificial Intelligence Powered</h2>
+          <h2>Recommender as a Service</h2>
+          <p>
+            with an intuitive RESTful API & SDKs tailored by data scientists
+          </p>
+          <div class="d-flex justify-content-around">
+            <a href="#" class="btn me-3 rounded-pill" style="background-color: #3bc4a1">
+              Free Instant Account <i class="fas fa-chevron-right"></i>
+            </a>
+            <a href="#" class="btn ms-3 rounded-pill">
+              Contact us for more info <i class="fas fa-chevron-right"></i>
+            </a>
+          </div>
         </header>
-        <!-- Main Content-->
-        <div class="container px-4 px-lg-5">
-            <div class="row gx-4 gx-lg-5 justify-content-center">
-                <div class="col-md-10 col-lg-8 col-xl-7">
-                    <!-- Post preview-->
-                    <div class="post-preview">
-                        <a href="post.html">
-                            <h2 class="post-title">Man must explore, and this is exploration at its greatest</h2>
-                            <h3 class="post-subtitle">Problems look mighty small from 150 miles up</h3>
-                        </a>
-                        <p class="post-meta">
-                            Posted by
-                            <a href="#!">Start Bootstrap</a>
-                            on September 24, 2021
-                        </p>
-                    </div>
-                    <!-- Divider-->
-                    <hr class="my-4" />
-                    <!-- Post preview-->
-                    <div class="post-preview">
-                        <a href="post.html"><h2 class="post-title">I believe every human has a finite number of heartbeats. I don't intend to waste any of mine.</h2></a>
-                        <p class="post-meta">
-                            Posted by
-                            <a href="#!">Start Bootstrap</a>
-                            on September 18, 2021
-                        </p>
-                    </div>
-                    <!-- Divider-->
-                    <hr class="my-4" />
-                    <!-- Post preview-->
-                    <div class="post-preview">
-                        <a href="post.html">
-                            <h2 class="post-title">Science has not yet mastered prophecy</h2>
-                            <h3 class="post-subtitle">We predict too much for the next year and yet far too little for the next ten.</h3>
-                        </a>
-                        <p class="post-meta">
-                            Posted by
-                            <a href="#!">Start Bootstrap</a>
-                            on August 24, 2021
-                        </p>
-                    </div>
-                    <!-- Divider-->
-                    <hr class="my-4" />
-                    <!-- Post preview-->
-                    <div class="post-preview">
-                        <a href="post.html">
-                            <h2 class="post-title">Failure is not an option</h2>
-                            <h3 class="post-subtitle">Many say exploration is part of our destiny, but it’s actually our duty to future generations.</h3>
-                        </a>
-                        <p class="post-meta">
-                            Posted by
-                            <a href="#!">Start Bootstrap</a>
-                            on July 8, 2021
-                        </p>
-                    </div>
-                    <!-- Divider-->
-                    <hr class="my-4" />
-                    <!-- Pager-->
-                    <div class="d-flex justify-content-end mb-4"><a class="btn btn-primary text-uppercase" href="#!">Older Posts →</a></div>
-                </div>
+    
+        <!-- Home cards 1 -->
+        <section class="home-cards">
+          <div class="container">
+            <div class="row">
+              <div class="col-6">
+                <img src="/img/wtu.png" alt="">
+              </div>
+              <div class="col-6 my-5 p-5">
+                <h3>Personalize Content With Highly Versatile and Scalable Solution</h3>
+                <p>
+                  Building on our vast experience from various domains and site sizes, we write our own algorithms to fit clients needs.
+                </p>
+                <a href="#">Learn More <i class="fas fa-chevron-right"></i></a>
+              </div>
             </div>
+            <div class="row">
+              <div class="col-6 my-5 p-5">
+                <h3>Recommender Engine
+                  That Drives You Forward</h3>
+                <p>
+                  Increase your customer satisfaction and spending with AI powered recommendations. 
+                  Applicable to your home page, product detail, emailing campaigns and much more.
+                </p>
+                <a href="#">Learn More <i class="fas fa-chevron-right"></i></a>
+              </div>
+              <div class="col-6">
+                <img src="/img/product.png" alt="">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <img src="/img/main.png" alt="">
+              </div>
+              <div class="col-6 my-5 p-5">
+                <h3>Real Time Analytics and Seamless Configuration</h3>
+                <p>
+                  Explore performance metrics and configure recommendations to reflect your personalization needs. 
+                  Use simple and user-friendly interface designed for all your team members.
+                </p>
+                <a href="#">Learn More <i class="fas fa-chevron-right"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6 my-5 p-5">
+              <h3>Quick and Easy Integration
+                into Your Environment</h3>
+              <p>
+                The recommendation engine is provided by RESTful API and SDKs for multiple programming languages.
+              </p>
+              <a href="#">Learn More <i class="fas fa-chevron-right"></i></a>
+            </div>
+            <div class="col-6">
+              <img src="/img/sdks.png" alt="">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <img src="/img/wtu.png" alt="">
+            </div>
+            <div class="col-6 my-5 p-5">
+              <h3>Real Time Analytics and Seamless Configuration</h3>
+              <p>
+                Explore performance metrics and configure recommendations to reflect your personalization needs. 
+                Use simple and user-friendly interface designed for all your team members.
+              </p>
+              <a href="#">Learn More <i class="fas fa-chevron-right"></i></a>
+            </div>
+          </div>
         </div>
-        <!-- Footer-->
-        <%- include('layouts/footer') -%>
-        <!-- Bootstrap core JS-->
-        <%- include('layouts/scripts') -%>
-    </body>
+        </section>
+          <!-- Carbon -->
+          <section class="carbon dark">
+            <div class="content">
+              <h2>Commiting To Carbon Negative</h2>
+              <p>Microsoft will be carbon negative by 2030 and by 2050 we will remove
+                all carbon the company has emitted since it was founded in 1975</p>
+                <a href="#" class="btn">
+                  Learn More <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+          </section>
+          <!-- Footer -->
+          <%- include('layouts/footer') -%>
+    <%- include('layouts/scripts') -%>
+</body>
 </html>
