@@ -2,6 +2,19 @@
 <html lang="en">
     <%- include('../layouts/header') -%>
     <%- include('../layouts/navbar') -%>
+    <style>
+        .footer{
+        position: fixed;
+        margin-top: 50px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        }
+        textarea {
+        height: 70px !important;
+        resize: none;
+        }
+    </style>
 <body>
     <div class="container-fluid">
         <div class="p-3 " style="box-shadow: 0px 0px 4px 0px #b0b3b7;">
@@ -70,7 +83,9 @@
             </div>	
         </div>
     </div>
-    <%- include('../layouts/footer') -%>
+    <div class="footer">
+        <%- include('../layouts/footer') -%>
+    </div>
     <%- include('../layouts/scripts')  -%>
 </body>
 </html>

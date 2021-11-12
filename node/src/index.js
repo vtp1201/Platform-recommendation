@@ -3,12 +3,14 @@ const express = require('express');
 const ejs = require('ejs');
 const flash = require('connect-flash');
 const expressSession = require('express-session');
+const methodOverride = require('method-override');
 
 const app = express();
 
 const db = require('./config/db/index');
 const route = require('./routes/index');
 
+app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(express.json());

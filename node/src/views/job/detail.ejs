@@ -3,8 +3,9 @@
     <%- include('../layouts/header') -%>
     <style>
         .footer{
-        position: fixed;
+        position: absolute;
         margin-top: 50px;
+        top: 720px;
         bottom: 0;
         left: 0;
         right: 0;
@@ -32,23 +33,23 @@
         <div class="row gx-4 gx-lg-5 justify-content-center">
             <div class="col-md-10 col-lg-8 col-xl-7">
                 <div class="">
-                    <form method= "POST" action="/job/new-job" class="needs-validation" novalidate="">
+                    <form method= "POST" action="/job/<%= job._id %>?_method=DELETE" class="needs-validation" novalidate="">
                     <div class="row g-3">
                         <div class="col-sm-6">
                             <label for="title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" value="<%=job.title%>" placeholder="Title">
+                            <input type="text" class="form-control" id="title" name="title" value="<%=job.title%>" placeholder="Title" disabled>
                         </div>
                         <div class="col-12">
                             <label for="username" class="form-label">Description</label>
                             <div class="input-group has-validation">
-                                <textarea class="form-control" id="description" name="description" value="<%=job.description%>" placeholder="Description"></textarea>
+                                <textarea class="form-control" id="description" name="description" placeholder="Description"><%=job.description%></textarea>
                             </div>
                         </div>
             
                         <div class="col-md-9">
                             <label for="service" class="form-label">Service</label>
-                            <select class="form-select" id="service" name="service" aria-disabled="true">
-                                <option value="">Choose...</option>
+                            <select class="form-select" id="service" name="service" placeholder="" aria-disabled="true" disabled>
+                                <option value=""><%=job.service%></option>
                                 <option value="user to item">User to item</option>
                                 <option value="user to user">User to user</option>
                                 <option value="user to content">User to content</option>
@@ -57,13 +58,37 @@
                                 Please select a valid country.
                             </div>
                         </div>
-                        <div class="mb-3">
+                        <div class="col-md-4">
+                            <label for="object" class="form-label">Object</label>
+                            <input type="text" class="form-control" id="object" name="object" value="<%=job.object%>" placeholder="EX: user_id" disabled>
+                            <div class="invalid-feedback">
+                              Please provide a valid city.
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="key" class="form-label">Key</label>
+                            <input type="text" class="form-control" id="key" name="key" value="<%=job.key%>" placeholder="EX: buy" disabled>
+                            <div class="invalid-feedback">
+                              Please provide a valid zip.
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="request" class="form-label">Request</label>
+                            <input type="text" class="form-control" id="request" name="request" value="<%=job.request%>" placeholder="EX: product_id" disabled>
+                            <div class="invalid-feedback">
+                              Please provide a valid zip.
+                            </div>
+                        </div>
+                        <div class="col-md-6">
                             <label for="dataSource" class="form-label">Data source</label>
-                            <input type="file" class="form-control" aria-label="file example" required>
-                            <div class="invalid-feedback">Example invalid form file feedback</div>
+                            <a href="<%= job.DSLocation %>" download="<%= job.dataSource %>"><%= job.dataSource %></a>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dataDestination" class="form-label">Data destination</label>
+                            <a href="<%= job.DDLocation %>" download="<%= job.dataDestination %>"><%= job.dataDestination %></a>
                         </div>
                     <hr class="my-2">
-                    <button class="w-100 btn btn-primary btn-lg" type="submit">Create Job</button>
+                    <button class="w-100 btn btn-danger btn-lg" type="submit">Delete Job</button>
                     </form>
                 </div>
             </div>

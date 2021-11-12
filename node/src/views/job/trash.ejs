@@ -16,30 +16,26 @@
         }
     </style>
 <body>
-<div>
     <header class="masthead img-fluid" style="background-image: url('/img/main.svg')">
         <div class="container position-relative px-4 px-lg-5 py-3">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-7">
                     <div class="site-heading">
-                        <h1>Managers jobs</h1>
-                        <span class="subheading">
-                            <a href="/job/trash"><i class="fas fa-trash"></i></a> Trash
-                        </span>
+                        <h3><i class="fas fa-trash"> Trash</i></h3>
+                        <span class="subheading">Restore or destroy jobs</span>
                     </div>
                 </div>
             </div>
         </div>
     </header>
-    <table id="table" class="table mt-4">
+    <table class="table mt-4">
         <thead>
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Title</th>
                 <th scope="col">Description</th>
                 <th scope="col">Service</th>
-                <th scope="col">Source</th>
-                <th scope="col">Destination</th>
+                <th scope="col">deleted at</th>
             </tr>
         </thead>
         <tbody>
@@ -50,15 +46,10 @@
                     <td><%= job.title %></td>
                     <td><%= job.description %></td>
                     <td><%= job.service %></td>
+                    <td><%= job.deletedAt %></a></td>
                     <td>
-                        <a href="<%= job.DSLocation %>" download="<%= job.dataSource %>"><%= job.dataSource %></a>
-                    </td>
-                    <td>
-                        <a href="<%= job.DDLocation %>" download="<%= job.dataDestination %>"><%= job.dataDestination %></a>
-                    </td>
-                    <td>
-                        <a href="/job/detail/<%= job._id %>" class="btn btn-link">Detail</a>
-                        <a href="" class="btn btn-danger" data-mdb-toggle="modal" data-id="<%= job._id %>" data-mdb-target="#delete-job-modal">Delete</a>
+                        <a href="" class="btn btn-primary btn-restore" data-id="<%= job._id %>">Restore</a>
+                        <a href="" class="btn btn-danger" data-mdb-toggle="modal" data-id="<%= job._id %>" data-mdb-target="#delete-job-modal">Destroy</a>
                     </td>
                 </tr>
                 <% }); %> 
@@ -66,57 +57,68 @@
             <% if(jobs.length == 0){ %>
             <tr>
               <td colspan="5" class="text-center">
-                You don't have a job yet.
-                <a href="/job/new-job">Create a new job</a>
+                Trash is empty
+                <a href="/job/managers">Managers job</a>
               </td>
             </tr>
             <% } %>
         </tbody>
     </table>
-</div>
-<div id="delete-job-modal" class="modal fade" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Delete Job</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure to delete this job?</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-        <button id="btn-delete-job" type="button" class="btn btn-danger">Delete</button>
-      </div>
+    <div id="delete-job-modal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Delete Job</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>This action cannot be undone. Do you still want to delete this job?</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button id="btn-delete-job" type="button" class="btn btn-danger">Destroy</button>
+            </div>
+          </div>
+        </div>
     </div>
-  </div>
-</div>
+    <form name="delete-job-form" method="POST"></form>
+    <form name="restore-job-form" method="POST"></form>  
 
-<form name="delete-job-form" method="POST"></form>
     <div class="footer">
         <%- include('../layouts/footer') -%>
     </div>
+
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var jobId;
             var deleteForm = document.forms['delete-job-form'];
+            var restoreForm = document.forms['restore-job-form'];
             var btnDeleteJob = document.getElementById('btn-delete-job');
+            var restoreBtn = $('.btn-restore');
             // When dialog confirm clicked
             $('#delete-job-modal').on('show.bs.modal', function (event) {
                 var button = $(event.relatedTarget);
                 jobId = button.data('id');
             });
             
-            // When delete course btn clicked
+            // When delete job btn clicked
             btnDeleteJob.onclick = function () {
-                deleteForm.action = '/job/' + jobId + '?_method=DELETE';
+                deleteForm.action = '/job/' + jobId + '/destroy?_method=DELETE';
                 deleteForm.submit();
             }
+            // Restore btn clicked
+            restoreBtn.click(function (e) {
+              e.preventDefault();
+              
+              var jobId = $(this).data('id');
+              restoreForm.action = '/job/' + jobId + '/restore?_method=PATCH';
+              restoreForm.submit();
+            });
         });
     </script>
-
     <%- include('../layouts/scripts')  -%>
 </body>
 </html>

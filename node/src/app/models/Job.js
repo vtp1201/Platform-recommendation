@@ -9,8 +9,13 @@ const Job = new Schema(
         title: { type: String, required: true,},
         description: { type: String,},
         service: String,
+        object: String,
+        key: String,
+        request: String,
         dataSource: String,
+        DSLocation: String,
         dataDestination: String,
+        DDLocation: String,
     },
     {
         timestamps: true,
@@ -18,7 +23,7 @@ const Job = new Schema(
 )
 
 Job.plugin(mongooseDelete, {
-    deleteAt: true,
+    deletedAt: true,
     overrideMethods: 'all',
 });
 

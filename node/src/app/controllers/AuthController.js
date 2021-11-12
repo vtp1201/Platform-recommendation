@@ -63,7 +63,9 @@ class AuthController {
     }
     // [GET] auth/sign-out
     logOut (req, res, next) {
-        req.session.destroy(() => res.redirect('/'));
+        req.session.destroy(() => {
+            res.redirect('/');
+        });
     }
 }
 
