@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt');
-const { mongooseToObject } = require('../../util/mongoose');
 const User = require('../models/User');
 
 class AuthController {

@@ -10,4 +10,8 @@ class Job(models.Model):
     dataDestination = models.CharField(max_length=20)
 
     def __str__(self):
+<<<<<<< HEAD
         return self.name
+=======
+        return self.name
+>>>>>>> 322b8cdcbb9db79deace14223a86783fa17464e0

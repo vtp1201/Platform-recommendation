@@ -1,6 +1,6 @@
 """src URL Configuration
 
-The `urlpatterns` list routes URLs to views. For more information please see:
+The urlpatterns list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.2/topics/http/urls/
 Examples:
 Function views
@@ -19,4 +19,8 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('recommend.urls'))
+<<<<<<< HEAD
 ]
+=======
+]
+>>>>>>> 322b8cdcbb9db79deace14223a86783fa17464e0

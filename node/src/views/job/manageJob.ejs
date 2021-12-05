@@ -18,7 +18,7 @@
 <body>
 <div>
     <header class="masthead img-fluid" style="background-image: url('/img/main.svg')">
-        <div class="container position-relative px-4 px-lg-5 py-3">
+        <div class="containerposition-relative px-4 px-lg-5 py-3">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-7">
                     <div class="site-heading">
@@ -31,48 +31,128 @@
             </div>
         </div>
     </header>
-    <table id="table" class="table mt-4">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Title</th>
-                <th scope="col">Description</th>
-                <th scope="col">Service</th>
-                <th scope="col">Source</th>
-                <th scope="col">Destination</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% if(jobs.length > 0){ %>
-                <% jobs.forEach(function(job, index) { %>
-                <tr>
-                    <th scope="row"><%= index+1 %></th>
-                    <td><%= job.title %></td>
-                    <td><%= job.description %></td>
-                    <td><%= job.service %></td>
-                    <td>
-                        <a href="<%= job.DSLocation %>" download="<%= job.dataSource %>"><%= job.dataSource %></a>
+    <div class="container-fluid">
+        <div class = "mt-2 mx-2 p-2 bg-white border rounded-5">
+            <table id="table" class="table table-hover table-borderless align-middle caption-top mt-3 p-2">
+                <caption>
+                    List of jobs
+                </caption>
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Service</th>
+                        <th scope="col">Source</th>
+                        <th scope="col">Destination</th>
+                        <th class="text-center" scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if(jobs.length > 0){ %>
+                        <% jobs.forEach(function(job, index) { %>
+                        <tr>
+                            <th scope="row"><%= current*4+index-3 %></th>
+                            <td><%= job.title %></td>
+                            <td><%= job.description %></td>
+                            <td><%= job.service %></td>
+                            <td>
+                                <a href="<%= job.DSLocation %>" download="<%= job.dataSource %>"><%= job.dataSource %></a>
+                            </td>
+                            <td>
+                                <a href="<%= job.DDLocation %>" download="<%= job.dataDestination %>"><%= job.dataDestination %></a>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-evenly">
+                                    <a href="/job/detail/<%= job._id %>" class="btn btn-link">Detail</a>
+                                    <a href="" class="btn btn-danger" data-mdb-toggle="modal" data-id="<%= job._id %>" data-mdb-target="#delete-job-modal">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <% }); %> 
+                    <% } %>
+                    <% if(jobs.length == 0){ %>
+                    <tr>
+                    <td colspan="5" class="text-center">
+                        You don't have a job yet.
+                        <a href="/job/new-job">Create a new job</a>
                     </td>
-                    <td>
-                        <a href="<%= job.DDLocation %>" download="<%= job.dataDestination %>"><%= job.dataDestination %></a>
-                    </td>
-                    <td>
-                        <a href="/job/detail/<%= job._id %>" class="btn btn-link">Detail</a>
-                        <a href="" class="btn btn-danger" data-mdb-toggle="modal" data-id="<%= job._id %>" data-mdb-target="#delete-job-modal">Delete</a>
-                    </td>
-                </tr>
-                <% }); %> 
-            <% } %>
-            <% if(jobs.length == 0){ %>
-            <tr>
-              <td colspan="5" class="text-center">
-                You don't have a job yet.
-                <a href="/job/new-job">Create a new job</a>
-              </td>
-            </tr>
-            <% } %>
-        </tbody>
-    </table>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+            <div class="row p-2">
+                <% if(pages > 0) { %>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination pagination-circle justify-content-center">
+                    <% if(current == 1) { %>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="/job/managers">First</a>
+                        </li>
+                    <% } else { %>
+                        <li class="page-item">
+                            <a class="page-link" href="/job/managers?page=<%= current-1 %>" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="/job/managers">First</a>
+                        </li>
+                    <% } %>
+                    <!-- ITEMS  -->
+                    <% var i = (Number(current) > 3 ? Number(current) - 2 : 1) %>
+                    <% if(i !== 1) { %>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">...</a>
+                        </li>
+                    <% } %>
+                    <% for(; i <= (Number(current) + 2) && i <= pages; i++) { %>
+                    <% if(i == current) { %>
+                        <li class="page-item active">
+                            <a class="page-link" href="/job/managers?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } else { %>
+                        <li class="page-item">
+                            <a class="page-link" href="/job/managers?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+                    <% if (i == Number(current) + 2 && i < pages) { %>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">...</a>
+                        </li>
+                    <% } %>
+                    <% } %>
+                    <!-- LAST ITEM -->
+                    <% if(current == pages) { %>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">Last</a>
+                        </li>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    <% } else { %>
+                        <li class="page-item">
+                            <a class="page-link" href="/job/managers?page=<%= pages %>">Last</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="/job/managers?page=<%= current+1 %>" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    <% } %>
+                    </ul>
+                </nav>
+                <% } %>
+            </div>
+        </div>
+    </div>
 </div>
 <div id="delete-job-modal" class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">

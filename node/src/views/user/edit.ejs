@@ -1,10 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
+    <style>
+        .mb-10 {
+            margin-bottom: 40px;
+        }
+    </style>
 <%- include('../layouts/header') -%>
 <%- include('../layouts/navbar') -%>
 <body>
-    
-    <%- include('../layouts/footer') -%>
+    <div>
+        <header class="masthead img-fluid" style="background-image: url('/img/main.svg')">
+            <div class="containerposition-relative px-4 px-lg-5 py-3">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="site-heading">
+                            <h1>Edit profile</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div id= "main" class="container px-4 px-lg-5 my-2">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7 pt-2 pb-4 bg-white border rounded-5">
+                    <% if(messageType == 'success') { %>
+                        <div class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
+                            <strong><%= message %></strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
+                    <% if(messageType == 'danger') { %>
+                        <div class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
+                          <strong><%= message %></strong>
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
+                    <div class="row g-3">
+                        <div class="col-sm-8">
+                            <label for="_id" class="form-label">User ID</label>
+                            <input type="text" class="form-control" id="_id" name="_id" value="<%=user._id%>" disabled>
+                        </div>
+                        <div class="col-sm-8">
+                            <label for="username" class="form-label">User name</label>
+                            <input type="text" class="form-control" id="username" name="username" value="<%=user.username%>" disabled>
+                        </div>
+                        <div class="accordion" id="accordionExample">
+                            <div class="accordion-item">
+                              <h2 class="accordion-header" id="headingOne">
+                                <button
+                                  class="accordion-button"
+                                  type="button"
+                                  data-mdb-toggle="collapse"
+                                  data-mdb-target="#collapseOne"
+                                  aria-expanded="false"
+                                  aria-controls="collapseOne"
+                                  id="btn1"
+                                >
+                                  Change Password
+                                </button>
+                              </h2>
+                              <div
+                                id="collapseOne"
+                                class="accordion-collapse collapse"
+                                aria-labelledby="headingOne"
+                                data-mdb-parent="#accordionExample"
+                              >
+                                <div class="accordion-body">
+                                    <form method= "POST" action="/user/edit-profile?_method=PUT" class="needs-validation" novalidate="">
+                                    <div class="col-sm-6">
+                                        <label for="old_password" class="form-label">Password</label>
+                                        <input type="password" class="form-control" id="old_password" name="old_password" required>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="password" class="form-label">New password</label>
+                                        <input type="password" class="form-control" id="password" name="password" required>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="re_password" class="form-label">Enter the new password</label>
+                                        <input type="password" class="form-control" id="re_password" name="re_password" required>
+                                    </div>
+                                    <button class="w-80 btn btn-primary btn-lg mt-3" type="submit">Change password</button>
+                                    </form>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="foot" class="mt-3 fixed-bottom"> 
+        <%- include('../layouts/footer') -%>
+    </div>
     <%- include('../layouts/scripts')  -%>
+    <script>
+        $(document).ready(function(){
+            $("#btn1").click(function(){
+                $("#main").toggleClass("mb-10");
+            });
+        });
+    </script>
 </body>
 </html>
