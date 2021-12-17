@@ -47,16 +47,16 @@
     <div class="container-fluid bg-light pt-5 pb-3">
         <div class="row">
           <% if(messageType == 'success') { %>
-            <div class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
+            <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
               <strong><%= message %></strong>
               <a href="/auth/sign-in" class="alert-link">click to sign in</a>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
           <% } %>
           <% if(messageType == 'danger') { %>
-            <div class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
+            <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
               <strong><%= message %></strong>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
           <% } %>
           <div class="col-md-4 mx-auto pt-4 pb-3">
@@ -111,6 +111,12 @@
         <%- include('../layouts/footer') -%>
       </div>
       <%- include('../layouts/scripts')  -%>
-    
+      <script>
+        $(document).ready(function() {
+          $("#btn-alert").click(function(){
+            $('#alert').hide();
+          });
+        });
+      </script>
 </body>
 </html>

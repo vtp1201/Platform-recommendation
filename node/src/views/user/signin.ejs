@@ -131,9 +131,9 @@
     <div class="container-fluid bg-light justify-content-center py-5">
         <div class="row py-1">
           <% if(message.length > 0) { %>
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <div id='alert' class="alert alert-warning alert-dismissible fade show" role="alert">
               <strong><%= message %></strong>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
           <% } %>
           <div class="col-md-4 mx-auto py-5">
@@ -203,5 +203,12 @@
       <%- include('../layouts/footer') -%>
     </div>
     <%- include('../layouts/scripts')  -%>
+    <script>
+      $(document).ready(function() {
+        $("#btn-alert").click(function(){
+          $('#alert').hide();
+        });
+      });
+    </script>
 </body>
 </html>

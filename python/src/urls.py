@@ -18,9 +18,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('recommend.urls'))
-<<<<<<< HEAD
+    path('api/', include('recommend.urls')),
 ]
-=======
-]
->>>>>>> 322b8cdcbb9db79deace14223a86783fa17464e0

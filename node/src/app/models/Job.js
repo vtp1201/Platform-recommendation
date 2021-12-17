@@ -12,8 +12,16 @@ const Job = new Schema(
         object: String,
         key: String,
         request: String,
-        dataSource: String,
-        DSLocation: String,
+        dataSource: {
+            object: String,
+            key: String,
+            request: String,
+        },
+        DSLocation: { 
+            object: String,
+            key: String,
+            request: String,
+        },
         dataDestination: String,
         DDLocation: String,
     },

@@ -6,12 +6,10 @@ class Job(models.Model):
     object = models.CharField(max_length=20)
     key = models.CharField(max_length=20)
     request = models.CharField(max_length=20)
-    dataSource = models.CharField(max_length=50)
+    dataSourceObject = models.CharField(max_length=50)
+    dataSourceKey = models.CharField(max_length=50)
+    dataSourceRequest = models.CharField(max_length=50)
     dataDestination = models.CharField(max_length=20)
 
     def __str__(self):
-<<<<<<< HEAD
         return self.name
-=======
-        return self.name
->>>>>>> 322b8cdcbb9db79deace14223a86783fa17464e0

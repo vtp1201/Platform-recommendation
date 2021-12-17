@@ -9,8 +9,10 @@ class UserController {
         const user = await User.findOne({ slug: req.params.slug });
         Job.find({userId: req.session.userId})
             .then((jobs) => {
+                jobs = mutipleMongooseToObject(jobs);
+                jobs.forEach((job) => job.createdAt = job.createdAt.toLocaleString("en-US"));
                 res.render('user/home', {
-                    jobs: mutipleMongooseToObject(jobs),
+                    jobs: jobs,
                     user: mongooseToObject(user),
                 });
             })

@@ -1,9 +1,15 @@
 const Job = require('../models/Job');
 const User = require('../models/User');
 const fetch = require('cross-fetch');
-const multer = require("multer");
 const { mutipleMongooseToObject, mongooseToObject } = require('../../util/mongoose');
 
+function check(dataSource, obj, toObj) {
+    if(dataSource) {
+        obj[toObj] = dataSource[0].firebaseUrl;
+        return true;
+    }
+    return false;
+}
 class JobController {
     // [GET] job/managers
     showManager(req, res, next) {
@@ -15,8 +21,10 @@ class JobController {
             .exec((err, jobs) => 
                 Job.where({userId: req.session.userId}).countDocuments ((err, count) => {
                 if (err) return next(err);
+                jobs = mutipleMongooseToObject(jobs);
+                jobs.forEach((job) => job.createdAt = job.createdAt.toLocaleString("en-US"));
                 res.render('job/manageJob', {
-                    jobs: mutipleMongooseToObject(jobs),
+                    jobs: jobs,
                     current: page,
                     pages: Math.ceil(count / perPage),
                 });
@@ -25,9 +33,16 @@ class JobController {
     // [GET] job/detail/:id
     showJob(req, res, next) {
         Job.findById(req.params.id)
-            .then( job => res.render('job/detail', {
-                job: mongooseToObject(job),
-            }))
+            .then( job => {
+                job = mongooseToObject(Job(job));
+                job.createdAt = job.createdAt.toLocaleString("en-US");
+                if (job.userId != req.session.userId) {
+                    return res.render('notfound');
+                }
+                res.render('job/detail', {
+                    job: job,
+                })
+            })
             .catch(next);
     }
     // [GET] job/new-job
@@ -38,75 +53,83 @@ class JobController {
         });
     }
     // [POST] job/new-job
-    async create(req, res, next) {
-        const upload = multer({
-            storage: multer.diskStorage({
-                        destination: "../../public/uploads",  // Storage location
-                        filename: (req, res, (cb) => {
-                                cb(null, Date.now() + path.extname(file.originalname))
-                                // return a unique file name for every file             
-                        })
-                }),
-            limits: {fileSize: 2000000000},
-            // This limits file size to 2 million bytes(2mb)    fileFilter: 
-            fileFilter: (req, file, cb) => {
-                // Create regex to match jpg and png
-                const validFileTypes = /csv|xlsx|json/
-        
-                // Do the regex match to check if file extension match
-                const extname = fileTypes.test(path.extname(file.originalname).toLowerCase())
-                    if(mimetype && extname){
-                        // Return true and file is saved
-                return cb(null, true)
-            }else{
-                        // Return error message if file extension does not match
-               return cb("Error: Images Only!")
-            }
-        }
-        }).single("dataSource");
-        upload(req, res, (err) => {
-            if(err){
-                res.send(err)
-                // This will display the error message to the user
-            }
-        })
-        req.body.userId = req.session.userId;
-        if ( req.file) {
-            console.log(req.file);
-        }
-        //req.body.DSLocation = req.file.path.split('/').slice(1).join('/');
+    create(req, res, next) {
         const jobApi = {
             service: req.body.service,
             object: req.body.object,
             key: req.body.key,
             request: req.body.request,
-            dataSource: req.body.dataSource,
+        };
+        if (!req.files.dataSourceKey) {
+            req.flash('messageType', 'danger');
+            req.flash('message', "please enter interactions files. Try again.");
+            return res.redirect('back');
         }
-        await fetch('http://127.0.0.1:8000/api/recommend', {
-            method: 'POST',
-            body: JSON.stringify(jobApi),
-        })
-            .then( res => res.json())
-            .then( json => {
-                req.body.dataDestination = json.dataDestination;
-                req.body.DDLocation = json.DDLocation;
-            })
-            .catch( err => {
-                req.flash('messageType', 'danger');
-                req.flash('message', "can't create. Try again.");
-                res.redirect('back');
-                return;
-            })
-        const job = new Job(req.body);
-        job.save()
-            .then( job => {
-                res.redirect(`/job/detail/${job._id}`);
-            })
-            .catch(err => {
-                req.flash('messageType', 'danger');
-                req.flash('message', "can't create. Try again.");
-                res.redirect('back');
-            })
+        else {
+            jobApi.dataSourceKey = req.files.dataSourceKey[0].firebaseUrl;
+        }
+        check(req.files.dataSourceObject, jobApi, 'dataSourceObject');
+        check(req.files.dataSourceRequest, jobApi, 'dataSourceRequest');
+        try {
+            setTimeout(() => {
+                fetch('http://127.0.0.1:8000/api/recommend', {
+                    method: 'POST',
+                    body: JSON.stringify(jobApi),
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then( res => res.json())
+                .then( json => {
+                    if(json.status != 'Done') {
+                        req.flash('messageType', 'danger');
+                        req.flash('message' + json.status + " Try again.");
+                        return res.redirect('back');
+                    }
+                    const newJob = {
+                        userId: req.session.userId,
+                        title: req.body.title,
+                        description: req.body.description,
+                        service: req.body.service,
+                        object: req.body.object,
+                        key: req.body.key,
+                        request: req.body.request,
+                        dataSource: { 
+                            key: req.files.dataSourceKey[0].originalname,
+                        },
+                        DSLocation: { 
+                            key: req.files.dataSourceKey[0].firebaseUrl,
+                        },
+                        dataDestination: json.dataDestination,
+                        DDLocation: json.DDLocation
+                    }
+                    if (check(req.files.dataSourceObject, newJob.DSLocation, 'object') == true) {
+                        newJob.dataSource.object = req.files.dataSourceObject[0].originalname;
+                    }
+                    if (check(req.files.dataSourceRequest, newJob.DSLocation, 'request') == true) {
+                        newJob.dataSource.request = req.files.dataSourceRequest[0].originalname;
+                    }
+                    const job = new Job(newJob);
+                    job.save()
+                        .then( job => {
+                            return res.redirect(`/job/detail/${job._id}`);
+                        })
+                        .catch(err => {
+                            console.log(err);
+                            req.flash('messageType', 'danger');
+                            req.flash('message', "can't create. Try again.");
+                            return res.redirect('back');
+                        })
+                })
+                .catch( err => {
+                    req.flash('messageType', 'danger');
+                    req.flash('message', "can't create. Try again.");
+                    return res.redirect('back');
+                })
+            }, 10000)
+        } catch (error) {
+            req.flash('messageType', 'danger');
+            req.flash('message', "server down. Try again later!");
+            return res.redirect('back');
+        }
     }
     // [GET] job/trash
     trash(req, res, next) {
@@ -118,8 +141,13 @@ class JobController {
             .exec((err, jobs) => 
                 Job.countDocumentsDeleted (({userId: req.session.userId}), (err, count) => {
                 if (err) return next(err);
+                jobs = mutipleMongooseToObject(jobs);
+                jobs.forEach((job) => {
+                    job.createdAt = job.createdAt.toLocaleString("en-US");
+                    job.deletedAt = job.deletedAt.toLocaleString("en-US");
+                });
                 res.render('job/trash', {
-                    jobs: mutipleMongooseToObject(jobs),
+                    jobs: jobs,
                     current: page,
                     pages: Math.ceil(count / perPage),
                 });
@@ -143,75 +171,50 @@ class JobController {
             .then(() => res.redirect('back'))
             .catch(next);
     }
-    // [POST] job/api/new-job
-    async newJobAPI(req, res, next) {
-        User.findById(req.body.userId)
-            .catch(err => {
-                res.status(500).json(err);
-                return;
-            })
-        const upload = multer({
-            storage: multer.diskStorage({
-                        destination: "../../public/uploads",  // Storage location
-                        filename: (req, res, (cb) => {
-                                cb(null, Date.now() + path.extname(file.originalname))
-                                // return a unique file name for every file             
-                        })
-                }),
-            limits: {fileSize: 2000000000},
-            // This limits file size to 2 million bytes(2mb)    fileFilter: 
-            fileFilter: (req, file, cb) => {
-                // Create regex to match jpg and png
-                const validFileTypes = /csv|xlsx|json/
-                // Do the regex match to check if file extension match
-                const extname = fileTypes.test(path.extname(file.originalname).toLowerCase())
-                    if(mimetype && extname){
-                        // Return true and file is saved
-                return cb(null, true)
-            }else{
-                        // Return error message if file extension does not match
-               return cb("Error: Images Only!")
-            }
+    // [POST] job/api/extract
+    extract(req, res, next) {
+        if (req.body.object === undefined || req.body.jobId === undefined) {
+            res.status(500).json({
+                message: "jobId or object is undefined!"
+            });
+            return;
         }
-        }).single("dataSource");
-        upload(req, res, (err) => {
-            if(err){
-                res.send(err)
-                // This will display the error message to the user
-            }
-        })
-        req.body.userId = req.session.userId;
-        if ( req.file) {
-            console.log(req.file);
-        }
-        //req.body.DSLocation = req.file.path.split('/').slice(1).join('/');
-        const jobApi = {
-            service: req.body.service,
-            object: req.body.object,
-            key: req.body.key,
-            request: req.body.request,
-            dataSource: req.body.dataSource,
-        }
-        await fetch('http://127.0.0.1:8000/api/recommend', {
-            method: 'POST',
-            body: JSON.stringify(jobApi),
-        })
-            .then( res => res.json())
-            .then( json => {
-                req.body.dataDestination = json.dataDestination;
-                req.body.DDLocation = json.DDLocation;
+        Job.findOne({ _id : req.body.jobId})
+            .then(job => {
+                const ddLocation = job.DDLocation;
+                fetch( ddLocation, {
+                    method: 'GET',
+                })
+                .then( res => res.json())
+                .then( json => {
+                    const key = Object.keys(json[0]);
+                    const personId = key[0];
+                    function isUser(Id) {
+                        return Id[`${personId}`] === req.body.object;
+                    }
+                    const dt = json.find(isUser);
+                    if (dt === undefined) {
+                        res.status(400).json({
+                            message: "userId does not exist!"
+                        });
+                        return;
+                    }
+                    if (req.body.limits === undefined || Number.isInteger(req.body.limits) === false) {
+                        res.status(200).json(dt.recommends)
+                        return;
+                    }
+                    res.status(200).json(dt.recommends.slice(0,req.body.limits));
+                })
+                .catch(err => {
+                    res.status(500).json(err);
+                    console.log(err);
+                    return;
+                });
             })
             .catch(err => {
-                res.status(500).json(err);
-                return; 
-            })
-        const job = new Job(req.body);
-        job.save()
-            .then( job => {
-                res.status(201).json(job);
-            })
-            .catch(err => {
-                res.status(500).json(err);
+                res.status(400).json({
+                    message: "jobId does not exist!"
+                });
                 return;
             })
     }

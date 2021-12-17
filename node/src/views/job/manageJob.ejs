@@ -57,7 +57,15 @@
                             <td><%= job.description %></td>
                             <td><%= job.service %></td>
                             <td>
-                                <a href="<%= job.DSLocation %>" download="<%= job.dataSource %>"><%= job.dataSource %></a>
+                                <% if (job.dataSource.object) { %>
+                                <a href="<%= job.DSLocation.object %>" download="<%= job.DSLocation.object %>"><%= job.dataSource.object %></a> ||
+                                <% } %>
+                                <% if (job.dataSource.key) { %>
+                                <a href="<%= job.DSLocation.key %>" download="<%= job.DSLocation.key %>"><%= job.dataSource.key %></a> ||
+                                <% } %>
+                                <% if (job.dataSource.request) { %>
+                                <a href="<%= job.DSLocation.request %>" download="<%= job.DSLocation.request %>"><%= job.dataSource.request %></a>
+                                <% } %>
                             </td>
                             <td>
                                 <a href="<%= job.DDLocation %>" download="<%= job.dataDestination %>"><%= job.dataDestination %></a>

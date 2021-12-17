@@ -1,27 +1,26 @@
-FROM python:3.8-alpine
+# For more information, please refer to https://aka.ms/vscode-docker-python
+FROM python:slim
 
-# set our working directory inside the container (when its finally created from this image)
-# depending on your environment you may need to 
-# RUN mkdir -p /app
+EXPOSE 8000
+
+# Keeps Python from generating .pyc files in the container
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Turns off buffering for easier container logging
+ENV PYTHONUNBUFFERED=1
+
+# Install pip requirements
+COPY requirements.txt .
+RUN python -m pip install -r requirements.txt
+
 WORKDIR /app
-
-# set environment variables
-# Prevents Python from writing pyc files to disc
-ENV PYTHONDONTWRITEBYTECODE 1
-#Prevents Python from buffering stdout and stderr
-ENV PYTHONUNBUFFERED 1
-
-#install psycopg2 dependencies
-RUN apk update \
-    && apk add postgresql-dev gcc python3-dev musl-dev
-
-# upgrade our version of pip
-RUN pip install --upgrade pip
-
-# copy requirements to the image
-COPY ./requirements.txt /app/requirements.txt
-
-RUN pip3 install -r requirements.txt
-
-#Copy the project
 COPY . /app
+
+# Creates a non-root user with an explicit UID and adds permission to access the /app folder
+# For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
+RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
+USER appuser
+
+# During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
+# File wsgi.py was not found in subfolder: 'Platform_recommedation'. Please enter the Python path to wsgi file.
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "pythonPath.to.wsgi"]

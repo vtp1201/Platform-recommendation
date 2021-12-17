@@ -20,6 +20,10 @@ services:
     restart: unless-stopped
     ports: 
       - '27017:27017'
- 
+  python:
+    image: python
+    build: 
+      context: python
+      dockerfile: ./python/Dockerfile
 volumes:
   mongodata:

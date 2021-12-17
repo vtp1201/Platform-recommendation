@@ -2,22 +2,38 @@
 <html lang="en">
     <%- include('../layouts/header') -%>
     <style>
-        .footer{
-        position: absolute;
-        margin-top: 50px;
-        top: 700px;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        }
         textarea {
         height: 70px !important;
         resize: none;
         }
+        .mb-10 {
+            margin-bottom: 2px;
+        }
+        .hide{
+            width: 100%;
+            height: 100%;
+            display: none;
+            background-color: #fff;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+        }
+        .hide img{
+            width: 800px;
+            height: 284px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -142px;
+            margin-left: -400px;
+        }
+        .body-hide {
+            overflow: hidden;
+        }
     </style>
     <%- include('../layouts/navbar') -%>
 <body>
-    
     <header class="masthead img-fluid" style="background-image: url('/img/main.svg')">
         <div class="container position-relative px-4 px-lg-5 py-3">
             <div class="row gx-4 gx-lg-5 justify-content-center">
@@ -30,11 +46,23 @@
             </div>
         </div>
     </header>
-    <div class="container px-4 px-lg-5">
+    <div id= "main" class="container px-4 px-lg-5 mb-10">
         <div class="row gx-4 gx-lg-5 justify-content-center">
             <div class="col-md-10 col-lg-8 col-xl-7">
                 <div class="">
-                    <form method= "POST" action="/job/new-job" class="needs-validation" novalidate="">
+                    <form method= "POST" action="/job/new-job" class="needs-validation" novalidate="" enctype="multipart/form-data">    
+                    <% if(messageType == 'success') { %>
+                        <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
+                            <strong><%= message %></strong>
+                            <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
+                    <% if(messageType == 'danger') { %>
+                        <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
+                            <strong><%= message %></strong>
+                            <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
                     <div class="row g-3">
                         <div class="col-sm-6">
                             <label for="title" class="form-label">Title</label>
@@ -52,7 +80,6 @@
                                 </div>
                             </div>
                         </div>
-            
                         <div class="col-md-9">
                             <label for="service" class="form-label">Service</label>
                             <select class="form-select" id="service" name="service" required>
@@ -65,42 +92,116 @@
                                 Please select a service.
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <label for="object" class="form-label">Object</label>
-                            <input type="text" class="form-control" id="object" name="object" placeholder="EX: user_id" required>
-                            <div class="invalid-feedback">
-                              Please provide a valid city.
+                        <div class="accordion" id="accordionExample">
+                            <div class="accordion-item">
+                              <h2 class="accordion-header" id="headingOne">
+                                <button
+                                  class="accordion-button collapsed"
+                                  type="button"
+                                  data-mdb-toggle="collapse"
+                                  data-mdb-target="#collapseOne"
+                                  aria-expanded="false"
+                                  aria-controls="collapseOne"
+                                  id="btn1"
+                                >
+                                  Add Information
+                                </button>
+                              </h2>
+                              <div
+                                id="collapseOne"
+                                class="accordion-collapse collapse"
+                                aria-labelledby="headingOne"
+                                data-mdb-parent="#accordionExample"
+                              >
+                                <div class="accordion-body">
+                                    <div class="col-sm-3">
+                                        <label for="object" class="form-label">Object</label>
+                                        <input type="text" class="form-control" id="object" name="object" placeholder="EX: user_id" required>
+                                        <div class="invalid-feedback">
+                                          Please provide a valid city.
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label for="key" class="form-label">Key</label>
+                                        <input type="text" class="form-control" id="key" name="key" placeholder="EX: buy" required>
+                                        <div class="invalid-feedback">
+                                          Please provide a valid zip.
+                                        </div>
+                                    </div>
+                                    <div id="text_request" class="col-sm-3">
+                                        <label for="request" class="form-label">Request</label>
+                                        <input type="text" class="form-control" id="request" name="request" placeholder="EX: product_id" required>
+                                        <div class="invalid-feedback">
+                                          Please provide a valid zip.
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="dataSourceObject" class="form-label">Data source user</label>
+                                        <input type="file" name="dataSourceObject" id="dataSourceObject" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
+                                        <div class="invalid-feedback">Example invalid form file feedback</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="dataSourceKey" class="form-label">Data source interactions</label>
+                                        <input type="file" name="dataSourceKey" id="dataSourceKey" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
+                                        <div class="invalid-feedback">Example invalid form file feedback</div>
+                                    </div>
+                                    <div id="dt_request" class="mb-3">
+                                        <label for="dataSourceRequest" class="form-label">Data source items/contents</label>
+                                        <input type="file" name="dataSourceRequest" id="dataSourceRequest" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
+                                        <div class="invalid-feedback">Example invalid form file feedback</div>
+                                    </div>
+                                </div>
+                              </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="key" class="form-label">Key</label>
-                            <input type="text" class="form-control" id="key" name="key" placeholder="EX: buy" required>
-                            <div class="invalid-feedback">
-                              Please provide a valid zip.
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="request" class="form-label">Request</label>
-                            <input type="text" class="form-control" id="request" name="request" placeholder="EX: product_id" required>
-                            <div class="invalid-feedback">
-                              Please provide a valid zip.
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="dataSource" class="form-label">Data source</label>
-                            <input type="file" name="dataSource" id="dataSource" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
-                            <div class="invalid-feedback">Example invalid form file feedback</div>
                         </div>
                     <hr class="my-2">
-                    <button class="w-100 btn btn-primary btn-lg" type="submit">Create Job</button>
+                    <button id="btn-submit" class="w-100 btn btn-primary btn-lg" type="submit">Create Job</button>
+                    </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    <div class="footer">
+    <div class ="hide" id="loading-page">
+        <img src="/img/1_CsJ05WEGfunYMLGfsT2sXA.gif" alt="" srcset="">
+    </div>
+    <div class="fixed-bottom">
         <%- include('../layouts/footer') -%>
     </div>
     <%- include('../layouts/scripts')  -%>
+    <script>
+        $(document).ready(function(){
+            $('.accordion-collapse').attr('id','');
+            $("#btn1").click(function(){
+                if(!$('#service').val()) {
+                    alert("please choose service first!");
+                }
+                else {
+                    $('.accordion-collapse').attr('id', 'collapseOne');
+                    if ($('#service').val() == "user to user") {
+                        $('#text_request').hide();
+                        $('#dt_request').hide();
+                    }
+                    else {
+                        $('#text_request').show();
+                        $('#dt_request').show();
+                    }
+                }
+            });
+            $('#service').on('change', () => {
+                $('.accordion-collapse').attr('id','');
+                $('#btn1').addClass('collapsed');
+                $('.accordion-collapse').removeClass('show');
+            });
+            $("#btn-alert").click(function(){
+                $('#alert').hide();
+            });
+            $('#btn-submit').click(function(){
+                $('body').addClass("preloading body-hide");
+                $('.fixed-bottom').hide();
+                $('#loading-page').show();
+            });
+        });
+    </script>
 </body>
 </html>

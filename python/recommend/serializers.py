@@ -6,4 +6,4 @@ class CarSerializer(serializers.ModelSerializer):
 
     class Meta: 
         model = Job
-        fields = ('service', 'object', 'key', 'request', 'dataSource', 'dataDestination')
+        fields = '__all__'
