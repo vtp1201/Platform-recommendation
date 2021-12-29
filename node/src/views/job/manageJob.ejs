@@ -79,13 +79,20 @@
                         </tr>
                         <% }); %> 
                     <% } %>
-                    <% if(jobs.length == 0){ %>
+                    <% if(jobs.length == 0 && current == 1){ %>
                     <tr>
                     <td colspan="5" class="text-center">
                         You don't have a job yet.
                         <a href="/job/new-job">Create a new job</a>
                     </td>
                     </tr>
+                    <% } %>
+                    <% if(jobs.length == 0 && current != 1){ %>
+                        <tr>
+                        <td colspan="5" class="text-center">
+                            pages don`t have data
+                        </td>
+                        </tr>
                     <% } %>
                 </tbody>
             </table>
@@ -119,7 +126,7 @@
                             <a class="page-link" href="#">...</a>
                         </li>
                     <% } %>
-                    <% for(; i <= (Number(current) + 2) && i <= pages; i++) { %>
+                    <% for(i ; i <= (Number(current) + 2) && i <= pages; i++) { %>
                     <% if(i == current) { %>
                         <li class="page-item active">
                             <a class="page-link" href="/job/managers?page=<%= i %>"><%= i %></a>

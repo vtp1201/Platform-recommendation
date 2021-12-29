@@ -2,6 +2,7 @@ const Job = require('../models/Job');
 const User = require('../models/User');
 const fetch = require('cross-fetch');
 const { mutipleMongooseToObject, mongooseToObject } = require('../../util/mongoose');
+const uploadMutipleFiles = require('../../config/firebase/firebase');
 
 function check(dataSource, obj, toObj) {
     if(dataSource) {
@@ -15,11 +16,11 @@ class JobController {
     showManager(req, res, next) {
         const perPage = 4;
         const page = parseInt(req.query.page) || 1;
-        Job.find({userId: req.session.userId})
+        Job.find({userId: req.session.userId , deleted: false})
             .skip((perPage * page) - perPage)
             .limit(perPage)
             .exec((err, jobs) => 
-                Job.where({userId: req.session.userId}).countDocuments ((err, count) => {
+                Job.where({userId: req.session.userId, deleted : false}).countDocuments ((err, count) => {
                 if (err) return next(err);
                 jobs = mutipleMongooseToObject(jobs);
                 jobs.forEach((job) => job.createdAt = job.createdAt.toLocaleString("en-US"));
@@ -53,25 +54,26 @@ class JobController {
         });
     }
     // [POST] job/new-job
-    create(req, res, next) {
-        const jobApi = {
-            service: req.body.service,
-            object: req.body.object,
-            key: req.body.key,
-            request: req.body.request,
-        };
-        if (!req.files.dataSourceKey) {
-            req.flash('messageType', 'danger');
-            req.flash('message', "please enter interactions files. Try again.");
-            return res.redirect('back');
-        }
-        else {
-            jobApi.dataSourceKey = req.files.dataSourceKey[0].firebaseUrl;
-        }
-        check(req.files.dataSourceObject, jobApi, 'dataSourceObject');
-        check(req.files.dataSourceRequest, jobApi, 'dataSourceRequest');
-        try {
-            setTimeout(() => {
+    create (req, res, next) {
+        uploadMutipleFiles(req, res, next)
+        .then((a) => {
+            const jobApi = {
+                service: req.body.service,
+                object: req.body.object,
+                key: req.body.key,
+                request: req.body.request,
+            };
+            if (!req.files.dataSourceKey) {
+                req.flash('messageType', 'danger');
+                req.flash('message', "please enter interactions files. Try again.");
+                return res.redirect('back');
+            }
+            else {
+                jobApi.dataSourceKey = req.files.dataSourceKey[0].firebaseUrl;
+            }
+            check(req.files.dataSourceObject, jobApi, 'dataSourceObject');
+            check(req.files.dataSourceRequest, jobApi, 'dataSourceRequest');
+            try {
                 fetch('http://127.0.0.1:8000/api/recommend', {
                     method: 'POST',
                     body: JSON.stringify(jobApi),
@@ -79,9 +81,9 @@ class JobController {
                 })
                 .then( res => res.json())
                 .then( json => {
-                    if(json.status != 'Done') {
+                    if(json.message != 'Done') {
                         req.flash('messageType', 'danger');
-                        req.flash('message' + json.status + " Try again.");
+                        req.flash('message', json.message + ", Try again.");
                         return res.redirect('back');
                     }
                     const newJob = {
@@ -109,27 +111,31 @@ class JobController {
                     }
                     const job = new Job(newJob);
                     job.save()
-                        .then( job => {
-                            return res.redirect(`/job/detail/${job._id}`);
-                        })
-                        .catch(err => {
-                            console.log(err);
-                            req.flash('messageType', 'danger');
-                            req.flash('message', "can't create. Try again.");
-                            return res.redirect('back');
-                        })
+                    .then( job => {
+                        return res.redirect(`/job/detail/${job._id}`);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        req.flash('messageType', 'danger');
+                        req.flash('message', "can't create. Try again.");
+                        return res.redirect('back');
+                    })
                 })
                 .catch( err => {
                     req.flash('messageType', 'danger');
                     req.flash('message', "can't create. Try again.");
                     return res.redirect('back');
                 })
-            }, 10000)
-        } catch (error) {
+            } catch (error) {
+                req.flash('messageType', 'danger');
+                req.flash('message', "server down. Try again later!");
+                return res.redirect('back');
+            }
+        }).catch(error => {
             req.flash('messageType', 'danger');
-            req.flash('message', "server down. Try again later!");
+            req.flash('message', "can't create(bad request). Try again.");
             return res.redirect('back');
-        }
+        })
     }
     // [GET] job/trash
     trash(req, res, next) {

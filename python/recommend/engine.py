@@ -29,6 +29,36 @@ class CFRecommender:
         
     def get_model_name(self):
         return self.MODEL_NAME
+
+    def recommend_users(self, user_id, users_ids, topn=10, verbose=False):
+        sorted_user_predictions = self.cf_predictions_df
+        user_df = self.cf_predictions_df[user_id]
+        sorted_user_predictions = sorted_user_predictions.drop(user_id, axis=1)
+        recommendations_df = pd.DataFrame(columns = users_ids, index = ['sum'])
+
+        for y in users_ids:
+            if y == user_id: continue
+            sorted_user_predictions[y] = sorted_user_predictions[y] - user_df
+
+        for y in users_ids:
+            if y == user_id: continue
+            idx = 0
+            sum = 0
+            for x in sorted_user_predictions[y]:
+                x = setValue(x)
+                sorted_user_predictions.at[sorted_user_predictions.index[idx], y] = x
+                idx = idx + 1
+                sum = sum + x
+            recommendations_df.at['sum', y] = sum
+        
+        recommendations_df.at['sum', user_id] = 0
+        recommendations_df = recommendations_df.transpose()
+
+        recommendations_df = recommendations_df['sum'].sort_values(ascending=False) \
+                                    .reset_index().rename(columns={'sum': 'recStrength'}).rename(columns={'index': person_id})  \
+                                    .head(topn)
+        return recommendations_df
+
     def recommend_items(self, user_id, items_to_ignore=[], topn=10, verbose=False):
         # Get and sort the user's predictions
         sorted_user_predictions = self.cf_predictions_df[user_id].sort_values(ascending=False) \
@@ -53,13 +83,34 @@ class CFRecommender:
 def smooth_user_preference(x):
     return math.log(1+x, 2)
 
-def newRecommend(person, cf_recommender_model):
+def itemsRecommend(person, cf_recommender_model):
     recommend_dict = {}
     recommend_dict[person_id] = person
     recommend_dict['recommends'] = cf_recommender_model.recommend_items(person, topn=20, verbose=True)[content_id].tolist()
     return recommend_dict
 
-def get_recommendations(userDf, interactionsDf, articlesDf):
+def usersRecommend(person, cf_recommender_model, users_ids):
+    recommend_dict = {}
+    recommend_dict[person_id] = person
+    recommend_dict['recommends'] = cf_recommender_model.recommend_users(person, users_ids=users_ids, topn=20)[person_id].tolist()
+    return recommend_dict
+
+def setValue(x):
+    y = 0
+    if x > -0.0001 and x < 0.0001:
+        y = 5
+    elif x > -0.001 and x < 0.001:
+        y = 4
+    elif x > -0.01 and x < 0.01:
+        y = 3
+    elif x > -0.1 and x < 0.1:
+        y = 2
+    elif x > -1 and x < 1:
+        y = 1
+    else: y  = 0
+    return y
+
+def get_recommendations(service, userDf, interactionsDf, articlesDf):
     path = os.path.dirname(os.path.abspath(__file__)) + "/files/"
     try:
         if userDf == '.csv':
@@ -138,15 +189,19 @@ def get_recommendations(userDf, interactionsDf, articlesDf):
 
         cf_recommender_model = CFRecommender(cf_preds_df, articles_df)
 
-        person_list = interactions_from_selected_users_df[person_id].tolist()
-        person_list = set(person_list)
-        person_list = list(person_list)
+        person_list = users_ids
         recommend_list = []
-
-        for idx, person in enumerate(person_list):
-            recommend_list.append(newRecommend(person, cf_recommender_model))
-            if idx == 3000:
-                break
+        if service == 'user to user':
+            for idx, person in enumerate(person_list):
+                recommend_list.append(usersRecommend(person, cf_recommender_model, users_ids))
+                print(idx)
+                if idx == 20:
+                    break
+        else:
+            for idx, person in enumerate(person_list):
+                recommend_list.append(itemsRecommend(person, cf_recommender_model))
+                if idx == 3000:
+                    break
     except:
         return "error, can't create recommends"
     

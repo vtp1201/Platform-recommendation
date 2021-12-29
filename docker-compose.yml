@@ -4,26 +4,29 @@ services:
   platformrecommendation:
     image: platformrecommendation
     build:
-      context: node
-      dockerfile: ./node/Dockerfile
-    environment:
-      NODE_ENV: production
+      context: .
+      dockerfile: node/Dockerfile
     ports:
-      - 3000:3000
+      - "5000:5000"
     restart: unless-stopped
     depends_on:
         - db
+        - python
   db:
     image: mongo
     volumes:
       - mongodata:/data/db
     restart: unless-stopped
     ports: 
-      - '27017:27017'
+      - "27017:27017"
   python:
     image: python
     build: 
-      context: python
-      dockerfile: ./python/Dockerfile
+      context: .
+      dockerfile: python/Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    ports: 
+      - "8000:8000"
+    restart: unless-stopped
 volumes:
   mongodata:

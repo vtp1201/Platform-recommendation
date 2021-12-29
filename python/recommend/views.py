@@ -25,7 +25,7 @@ def post(request):
         return JsonResponse({
             'message': 'import interactions file'
         }, status = status.HTTP_400_BAD_REQUEST)
-    if( service == 'user to user'):
+    """ if( service == 'user to user'):
         DDLocation = userToUsers(object, key, Request, dataSourceObject, dataSourceKey)
         if DDLocation == 'error':
             return JsonResponse({
@@ -35,11 +35,11 @@ def post(request):
             'message': 'Done',
             'dataDestination': "recommends.json",
             'DDLocation' : DDLocation,
-        }, status=status.HTTP_201_CREATED)
-    DDLocation = userToItems(object, key, Request, dataSourceObject, dataSourceKey, dataSourceRequest)
+        }, status=status.HTTP_201_CREATED) """
+    DDLocation = userToItems(service, object, key, Request, dataSourceObject, dataSourceKey, dataSourceRequest)
     if DDLocation == 'error':
         return JsonResponse({
-            'message': 'try again'
+            'message': 'bad request'
         }, status = status.HTTP_400_BAD_REQUEST)
     return JsonResponse({
         'message': 'Done',
@@ -100,10 +100,13 @@ def checkTypeFile(filename):
     name, extension = os.path.splitext(filename)
     return extension
 
-def userToItems(object, key, request, dataSourceObject, dataSourceKey, dataSourceRequest):
+def userToItems(service, Object, key, request, dataSourceObject, dataSourceKey, dataSourceRequest):
     path = os.path.dirname(os.path.abspath(__file__)) + "/files"
-    os.mkdir(path)
-
+    if (os.path.isdir(path) == False):
+        os.mkdir(path)
+    else:
+        shutil.rmtree(path)
+        os.mkdir(path)
     users_df = ''
     interactions_df = ''
     articles_df = ''
@@ -118,19 +121,20 @@ def userToItems(object, key, request, dataSourceObject, dataSourceKey, dataSourc
             articles_df = checkTypeFile(dataSourceRequest)
             downloadFile(dataSourceRequest, "articles_df" + articles_df)
     except :
+        print("cant download files")
         return "error"
 
-    engine.person_id = object
+    engine.person_id = Object
     engine.key = key
     engine.content_id = request
     
-    fileLocation = engine.get_recommendations(users_df, interactions_df, articles_df)
+    fileLocation = engine.get_recommendations(service, users_df, interactions_df, articles_df)
 
     if fileLocation.split(',')[0] == 'error':
         print(fileLocation)
         shutil.rmtree(path)
         return 'error'
-    fileName = 'user_to_' + request
+    fileName = "user_to_" + request
     DDLocation = uploadFile(fileName)
 
     shutil.rmtree(path)

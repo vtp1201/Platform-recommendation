@@ -175,17 +175,18 @@
             $("#btn1").click(function(){
                 if(!$('#service').val()) {
                     alert("please choose service first!");
+                    return;
                 }
                 else {
                     $('.accordion-collapse').attr('id', 'collapseOne');
-                    if ($('#service').val() == "user to user") {
+                    /* if ($('#service').val() == "user to user") {
                         $('#text_request').hide();
                         $('#dt_request').hide();
                     }
                     else {
                         $('#text_request').show();
                         $('#dt_request').show();
-                    }
+                    } */
                 }
             });
             $('#service').on('change', () => {

@@ -2,7 +2,6 @@ const express = require('express');
 const { checkNotLogged } = require('../app/middleware/authMiddleware');
 const router = express.Router();
 const multer = require('multer');
-const uploadMutipleFiles = require('../config/firebase/firebase');
 
 const upload = multer({
     storage: multer.memoryStorage()
@@ -21,7 +20,7 @@ const jobController = require('../app/controllers/JobController');
 router.get('/managers', checkNotLogged, jobController.showManager);
 router.get('/detail/:id', checkNotLogged, jobController.showJob);
 router.get('/new-job', checkNotLogged, jobController.newJob);
-router.post('/new-job', checkNotLogged, uploadMutiple, uploadMutipleFiles, jobController.create);
+router.post('/new-job', checkNotLogged, uploadMutiple, jobController.create);
 router.delete('/:id', checkNotLogged, jobController.delete);
 router.delete('/:id/destroy', checkNotLogged, jobController.destroy);
 router.patch('/:id/restore', checkNotLogged, jobController.restore);

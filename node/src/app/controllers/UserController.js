@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 class UserController {
     // [GET] user/home
     async show(req, res, next) {
-        const user = await User.findOne({ slug: req.params.slug });
+        const user = await User.findOne({ _id: req.session.userId });
         Job.find({userId: req.session.userId})
             .then((jobs) => {
                 jobs = mutipleMongooseToObject(jobs);
