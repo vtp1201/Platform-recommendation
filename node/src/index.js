@@ -23,7 +23,7 @@ app.use(expressSession({
 }));
 app.use(flash());
 
-db.connect();
+db.connectWithRetry();
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));

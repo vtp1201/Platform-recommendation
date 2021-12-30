@@ -74,7 +74,11 @@ class JobController {
             check(req.files.dataSourceObject, jobApi, 'dataSourceObject');
             check(req.files.dataSourceRequest, jobApi, 'dataSourceRequest');
             try {
-                fetch('http://127.0.0.1:8000/api/recommend', {
+                const pyHost = process.env.PYTHON_HOST || '127.0.0.1';
+                const pyPort = process.env.PYTHON_PORT || 8000;
+                const url = `http://${pyHost}:${pyPort}/api/recommend`;
+                console.log(url);
+                fetch(url, {
                     method: 'POST',
                     body: JSON.stringify(jobApi),
                     headers: { 'Content-Type': 'application/json' }

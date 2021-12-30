@@ -2,12 +2,18 @@ version: '3.4'
 
 services:
   platformrecommendation:
-    image: platformrecommendation
+    image: node
     build:
       context: .
       dockerfile: node/Dockerfile
+    environment: # phần này ta định nghĩa ở file .env nhé
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - PYTHON_HOST=${PYTHON_HOST}
+      - PYTHON_PORT=${PYTHON_PORT}
+      - PORT=${PORT}
     ports:
-      - "5000:5000"
+      - "${PORT}:${PORT}"
     restart: unless-stopped
     depends_on:
         - db
