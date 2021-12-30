@@ -13,6 +13,6 @@
 ### - CSDL: MongoDB
 ### - file: Firebase storage
 ## Hướng dẫn cài đặt:
-### - Bước 1:
-### - Bước 2:
-### - Bước 3:
+### - Bước 1: git clone: https://github.com/vtp1201/Platform-recommendation.git
+### - Bước 2: Dùng lệnh "docker-compose up -d" để khởi chạy app
+### - Bước 3: Để dừng app dùng lệnh "docker-compose down".
