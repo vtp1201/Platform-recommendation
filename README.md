@@ -14,4 +14,5 @@
 ### - Bước 1: git clone: https://github.com/vtp1201/Platform-recommendation.git
 ### - Bước 2: Dùng lệnh "docker-compose up -d" để khởi chạy app 
 (nếu có lỗi thì thực hiện : "cd node" -> "docker build -t node ." -> "cd .." -> "cd python" -> "docker build -t python ." -> "cd .." tiếp theo chạy lại lệnh ở bước 2)
-### - Bước 3: Để dừng app dùng lệnh "docker-compose down".
+### - Bước 3: Vào web với link: http://localhost:5000/
+### - Bước 4: Để dừng app dùng lệnh "docker-compose down".
