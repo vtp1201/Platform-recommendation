@@ -12,6 +12,7 @@ numpy = "*"
 scipy = "*"
 sklearn = "*"
 matplotlib = "*"
+pymongo = "*"
 
 [dev-packages]
 

@@ -6,9 +6,10 @@ services:
     build:
       context: .
       dockerfile: node/Dockerfile
-    environment: # phần này ta định nghĩa ở file .env nhé
+    environment:
       - DB_HOST=${DB_HOST}
       - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT}
       - PYTHON_HOST=${PYTHON_HOST}
       - PYTHON_PORT=${PYTHON_PORT}
       - PORT=${PORT}
@@ -30,9 +31,15 @@ services:
     build: 
       context: .
       dockerfile: python/Dockerfile
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
     command: python manage.py runserver 0.0.0.0:8000
     ports: 
       - "8000:8000"
     restart: unless-stopped
+    depends_on:
+      - db
 volumes:
   mongodata:

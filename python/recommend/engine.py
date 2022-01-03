@@ -13,11 +13,14 @@ from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 import json
 import os
+import pymongo
+
+myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+mydb = myclient["Platform_recommendation"]
 
 person_id = 'user_id'
 content_id = 'book_id'
 key = 'rating'
-
 class CFRecommender:
     
     MODEL_NAME = 'Collaborative Filtering'
@@ -109,9 +112,26 @@ def setValue(x):
     else: y  = 0
     return y
 
+def addMongo(name, data):
+    mycol = mydb[name]
+    for x in mydb.list_collection_names():
+        if (x == name):
+            mycol.drop()
+    try:
+        if isinstance(data, pd.DataFrame):
+            datadict = data.to_dict("records")
+            x = mycol.insert_many(datadict)
+        elif isinstance(data, list):
+            x = mycol.insert_many(data)
+        else:
+            print('data not is df or list')
+    except:
+        print ('can`t add df to mongo')
+
 def get_recommendations(service, userDf, interactionsDf, articlesDf):
     path = os.path.dirname(os.path.abspath(__file__)) + "/files/"
     try:
+        user_df = ''
         if userDf == '.csv':
             user_df = pd.read_csv(path + 'users_df' + userDf)
         if userDf == '.json':
@@ -132,7 +152,72 @@ def get_recommendations(service, userDf, interactionsDf, articlesDf):
             articles_df = pd.read_excel(path + 'articles_df' + articlesDf)
     except:
         return "error, can't read files"
+
+    recommend_list = engine(service, articles_df, interactions_df)
+
+    if  isinstance(recommend_list, str):
+        return recommend_list
+    
+    exportFile = path + "recommends.json" 
+    json_string = json.dumps(recommend_list)
+    jsonFile = open(exportFile, "w")
+    jsonFile.write(json_string)
+    jsonFile.close()
+
     try:
+        addMongo('object', user_df)
+    except:
+        print ("Waring, cant add articles_df")
+
+    try:
+        addMongo('request', articles_df)
+    except:
+        print ("Waring, cant add articles_df")
+    
+    try:
+        key_df = interactions_df.drop(columns='eventStrength')
+        addMongo('key', key_df)
+    except:
+        print ("Waring, cant add interactions_df")
+    
+    try:
+        addMongo('recommends', recommend_list)
+    except:
+        print ("Waring, cant add recommends")
+    
+    return "complete"
+
+def mongoToDf(name):
+    mycol = mydb[name]
+    find = False
+    for x in mydb.list_collection_names():
+        if (x == name):
+            find = True
+            break
+    if (find == True):
+        data = pd.DataFrame(list(mycol.find({},{"_id": 0, "eventStrength": 0})))
+        return data
+    else: return "error"
+
+def updateRecommendations(jobId, service):
+    articles_df = mongoToDf(jobId + "-request")
+    user_df = mongoToDf(jobId + "-object")
+    interactions_df = mongoToDf(jobId + "-key")
+
+    print(articles_df.head(5))
+    print(interactions_df.head(5))
+
+    recommend_list = engine(service, articles_df, interactions_df)
+
+    if isinstance(recommend_list, str):
+        return recommend_list
+
+    addMongo(name = jobId + "-recommends", data = recommend_list)
+    return "complete"
+
+def engine(service, articles_df, interactions_df):
+    try:
+        #print('set values')
         arrKey = key.split(',')
         event_Strength = 'eventStrength'
         event_Type = arrKey[0]
@@ -152,6 +237,7 @@ def get_recommendations(service, userDf, interactionsDf, articlesDf):
             interactions_df[event_Strength] = interactions_df[event_Type].apply(lambda x: event_type_strength[x])
     except:
         return "error, can't create event_type_strength"
+    
     try:
         users_interactions_count_df = interactions_df.groupby([person_id, content_id]).size().groupby(person_id).size()
         users_with_enough_interactions_df = users_interactions_count_df[users_interactions_count_df >= 5].reset_index()[[person_id]]
@@ -179,10 +265,12 @@ def get_recommendations(service, userDf, interactionsDf, articlesDf):
         all_user_predicted_ratings = np.dot(np.dot(U, sigma), Vt) 
 
         all_user_predicted_ratings_norm = (all_user_predicted_ratings - all_user_predicted_ratings.min()) / (all_user_predicted_ratings.max() - all_user_predicted_ratings.min())
-    except:
+    except ValueError:
+        print(ValueError)
         return "error, can't extract data_matrix"
 
     try:
+        #print('convert')
         #Converting the reconstructed matrix back to a Pandas dataframe
         cf_preds_df = pd.DataFrame(all_user_predicted_ratings_norm, columns = users_items_pivot_matrix_df.columns, index=users_ids).transpose()
 
@@ -203,13 +291,5 @@ def get_recommendations(service, userDf, interactionsDf, articlesDf):
                     break
     except:
         return "error, can't create recommends"
-    
-    exportFile = path + "recommends.json"
-    json_string = json.dumps(recommend_list)
-    jsonFile = open(exportFile, "w")
-    jsonFile.write(json_string)
-    jsonFile.close()
-    return "complete"
 
-    
-
+    return recommend_list

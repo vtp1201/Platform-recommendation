@@ -3,6 +3,9 @@ const User = require('../models/User');
 const fetch = require('cross-fetch');
 const { mutipleMongooseToObject, mongooseToObject } = require('../../util/mongoose');
 const uploadMutipleFiles = require('../../config/firebase/firebase');
+const mongoose   = require('mongoose');
+mongoose.Promise = Promise;
+let db = mongoose.connection;
 
 function check(dataSource, obj, toObj) {
     if(dataSource) {
@@ -116,16 +119,24 @@ class JobController {
                     const job = new Job(newJob);
                     job.save()
                     .then( job => {
+                        const keys = Object.keys(newJob.dataSource);
+                        keys.forEach(key => {
+                            if (key == 'key' || key == 'object' || key == 'request') {
+                                renameCollection(key, job._id);
+                            }       
+                        });
+                        renameCollection('recommends', job._id);
                         return res.redirect(`/job/detail/${job._id}`);
                     })
-                    .catch(err => {
-                        console.log(err);
+                    .catch(error => {
+                        console.log(error);
                         req.flash('messageType', 'danger');
-                        req.flash('message', "can't create. Try again.");
+                        req.flash('message', "can't save Job. Try again.");
                         return res.redirect('back');
                     })
                 })
-                .catch( err => {
+                .catch( error => {
+                    console.log(error);
                     req.flash('messageType', 'danger');
                     req.flash('message', "can't create. Try again.");
                     return res.redirect('back');
@@ -182,7 +193,7 @@ class JobController {
             .catch(next);
     }
     // [POST] job/api/extract
-    extract(req, res, next) {
+    extract(req, res) {
         if (req.body.object === undefined || req.body.jobId === undefined) {
             res.status(500).json({
                 message: "jobId or object is undefined!"
@@ -228,6 +239,132 @@ class JobController {
                 return;
             })
     }
+    // POST /job/api/update
+    updateData(req, res) {
+        if (!req.body.jobId) {
+            return res.status(401).json({
+                message: "add jobId"
+            });
+        }
+        Job.findOne({ _id : req.body.jobId })
+            .then(async (job) => {
+                const keys = Object.keys(req.body);
+                addMany(keys, job._id, req.body)
+                .then((message) => {
+                    message.message = "Done";
+                    if(req.body.newRecommends && req.body.newRecommends === true) {
+                        const jobApi = {
+                            jobId: job._id,
+                            service: job.service,
+                            object: job.object,
+                            key: job.key,
+                            request: job.request,
+                        }
+                        const pyHost = process.env.PYTHON_HOST || '127.0.0.1';
+                        const pyPort = process.env.PYTHON_PORT || 8000;
+                        const url = `http://${pyHost}:${pyPort}/api/update-recommend`;
+                        try {
+                            fetch(url, { 
+                                method: 'POST',
+                                body: JSON.stringify(jobApi),
+                                headers: { 'Content-Type': 'application/json' }
+                            })
+                            .then( res => res.json())
+                            .then( json => {
+                                if(json.message != 'Done') {
+                                    message[`newRecommends`] = 'update success';
+                                } else {
+                                    message[`newRecommends`] = 'update failed';
+                                }
+                            })
+                            .catch( error => {
+                                message[`newRecommends`] = 'server failed';
+                            })
+                            .finally(() => {
+                                return res.status(200).json(message);
+                            })
+                        } catch (error) {
+                            message[`newRecommends`] = 'server down, Please try later!';
+                            res.status(200).json(message);
+                            return;
+                        }
+                    } else {
+                        res.status(200).json(message);
+                        return;
+                    }
+                }).catch((err) => {
+                    console.log(err);
+                    res.status(400).json({
+                        message: "bad request"
+                    });
+                    return;
+                })
+            }).catch(err => {
+                console.log(err)
+                res.status(400).json({
+                    message: "jobId does not exist!"
+                });
+                return;
+            })
+    }
+}
+
+async function renameCollection(name, jobId) {
+    const listCollections = await db.db.listCollections().toArray();
+    listCollections.forEach( collection => {
+        if (collection.name == `${name}`) {
+            db.collection(name).rename(`${jobId}-${name}`);
+            return true;
+        }
+    });
+    return false;
+}
+
+function addDataCollection(name, jobId, data) {
+    return new Promise(async (resolve, reject) => {
+        const listCollections = await db.db.listCollections().toArray();
+        listCollections.forEach( collection => {
+            if (collection.name == `${jobId}-${name}`) {
+                db.db.collection(`${jobId}-${name}`).insertMany(data, function(error, record){
+                    if (error) return reject('error');
+                    return resolve('done');
+                });
+            }
+        })
+        db.db.createCollection(`${jobId}-${name}`)
+        .then(collection => {
+            db.db.collection(`${jobId}-${name}`).insertMany(data, function(error, record){
+                if (error) return reject('error');
+                return resolve('done');
+            });
+        }). catch(err => {
+            return reject('error');
+        });
+    });
+}
+
+function addMany(keys, jobId, data) {
+    return new Promise((resolve) => {
+        const message = {}
+        let requests = keys.map((key) => {
+            return new Promise((resolve) => {
+                if (key == 'key' || key == 'request' || key == 'object') {
+                    addDataCollection(key, jobId, data[key])
+                    .then(() => {
+                        message[`data-${key}`] = "update success";
+                        resolve();
+                    }).catch((err) => {
+                        message[`data-${key}`] = "update failed";
+                        resolve();
+                    });
+                }
+                else{  
+                    resolve();
+                }
+            });
+        })
+        Promise.all(requests).then(() => resolve(message));
+    })
 }
 
 module.exports = new JobController();

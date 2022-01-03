@@ -26,5 +26,6 @@ router.delete('/:id/destroy', checkNotLogged, jobController.destroy);
 router.patch('/:id/restore', checkNotLogged, jobController.restore);
 router.get('/trash', checkNotLogged, jobController.trash);
 router.post('/api/extract', jobController.extract);
+router.post('/api/update', jobController.updateData);
 
 module.exports = router;

@@ -11,6 +11,25 @@ from datetime import datetime
 import shutil
 
 @api_view(['POST'])
+def update(request):
+    jobId = ''.join(request.data.get('jobId', ''))
+    service = ''.join(request.data.get('service', ''))
+    object = ''.join(request.data.get('object', ''))
+    key = ''.join(request.data.get('key', ''))
+    Request = ''.join(request.data.get('request', ''))
+    print(jobId, service, object, key, Request)
+
+    result = updateRecommend(jobId, service, object, key, Request)
+
+    if result == 'complete':
+        return JsonResponse({
+            'message': 'Done',
+        }, status=status.HTTP_201_CREATED)
+    return JsonResponse({
+        'message': 'Bad request',
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
 def post(request):
     service = ''.join(request.data.get('service', ''))
     object = ''.join(request.data.get('object', ''))
@@ -23,20 +42,11 @@ def post(request):
     print(service, object, key, dataSourceObject, dataSourceKey, dataSourceRequest)
     if dataSourceKey == '' or dataSourceRequest == '':
         return JsonResponse({
-            'message': 'import interactions file'
+            'message': 'import interactions or requests file'
         }, status = status.HTTP_400_BAD_REQUEST)
-    """ if( service == 'user to user'):
-        DDLocation = userToUsers(object, key, Request, dataSourceObject, dataSourceKey)
-        if DDLocation == 'error':
-            return JsonResponse({
-                'message': 'try again'
-            }, status = status.HTTP_400_BAD_REQUEST)
-        return JsonResponse({
-            'message': 'Done',
-            'dataDestination': "recommends.json",
-            'DDLocation' : DDLocation,
-        }, status=status.HTTP_201_CREATED) """
-    DDLocation = userToItems(service, object, key, Request, dataSourceObject, dataSourceKey, dataSourceRequest)
+
+    DDLocation = newRecommend(service, object, key, Request, dataSourceObject, dataSourceKey, dataSourceRequest)
+
     if DDLocation == 'error':
         return JsonResponse({
             'message': 'bad request'
@@ -64,43 +74,24 @@ def downloadFile(fileName, fileLocation):
     filename = os.path.split(fileName)[1]
     storage.child(filename).download(path + fileLocation)
 
-def userToUsers(object, key, request, dataSourceObject, dataSourceKey):
-    path = os.path.dirname(os.path.abspath(__file__)) + "/files" 
-    os.mkdir(path)
-    users_df = ''
-    interactions_df = ''
-    try:
-        if dataSourceObject != "":
-            users_df = checkTypeFile(dataSourceObject)
-            downloadFile(dataSourceObject, "users_df"+ users_df)
-        if dataSourceKey != "":
-            interactions_df = checkTypeFile(dataSourceKey)
-            downloadFile(dataSourceKey, "interactions_df" + interactions_df)
-    except:
-        return "error"
-    
-    engine.person_id = object
+def updateRecommend(jobId, service, Object, key, request):
+    engine.person_id = Object
     engine.key = key
     engine.content_id = request
 
-    fileLocation = engine.get_recommendations(users_df, interactions_df)
+    result = engine.updateRecommendations(jobId, service)
 
-    if fileLocation.split(',')[0] == 'error':
-        print(fileLocation)
-        shutil.rmtree(path)
+    if result.split(',')[0] == 'error':
+        print(result)
         return 'error'
-    fileName = 'user_to_' + request
-    DDLocation = uploadFile(fileName)
-
-    shutil.rmtree(path)
     
-    return DDLocation
+    return 'complete'
 
 def checkTypeFile(filename):
     name, extension = os.path.splitext(filename)
     return extension
 
-def userToItems(service, Object, key, request, dataSourceObject, dataSourceKey, dataSourceRequest):
+def newRecommend(service, Object, key, request, dataSourceObject, dataSourceKey, dataSourceRequest):
     path = os.path.dirname(os.path.abspath(__file__)) + "/files"
     if (os.path.isdir(path) == False):
         os.mkdir(path)
