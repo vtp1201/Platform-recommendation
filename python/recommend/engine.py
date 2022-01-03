@@ -204,8 +204,8 @@ def updateRecommendations(jobId, service):
     user_df = mongoToDf(jobId + "-object")
     interactions_df = mongoToDf(jobId + "-key")
 
-    print(articles_df.head(5))
-    print(interactions_df.head(5))
+    #print(articles_df.head(5))
+    #print(interactions_df.head(5))
 
     recommend_list = engine(service, articles_df, interactions_df)
 
