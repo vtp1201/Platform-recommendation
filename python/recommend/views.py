@@ -18,6 +18,11 @@ def update(request):
     key = ''.join(request.data.get('key', ''))
     Request = ''.join(request.data.get('request', ''))
     print(jobId, service, object, key, Request)
+    
+    if (jobId == '' or service == '' or object == '' or key == '' or Request == ''):
+        return JsonResponse({
+        'message': 'Bad request',
+    }, status=status.HTTP_400_BAD_REQUEST)
 
     result = updateRecommend(jobId, service, object, key, Request)
 

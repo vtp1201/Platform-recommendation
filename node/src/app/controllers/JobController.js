@@ -183,7 +183,16 @@ class JobController {
     // [DELETE] job/:id/destroy
     destroy(req, res, next) {
         Job.deleteOne({ _id : req.params.id })
-            .then(() => res.redirect('back'))
+            .then(() => {
+                const request = dropCollection(`${req.params.id}-request`);
+                const object = dropCollection(`${req.params.id}-object`);
+                const key = dropCollection(`${req.params.id}-key`);
+                const recommends = dropCollection(`${req.params.id}-recommends`);
+                Promise.all([request, object, key, recommends])
+                .finally(() => {
+                    res.redirect('back');
+                });
+            })
             .catch(next);
     }
     // [PATCH] job/:id/restore
@@ -200,20 +209,33 @@ class JobController {
             });
             return;
         }
-        Job.findOne({ _id : req.body.jobId})
-            .then(job => {
-                const ddLocation = job.DDLocation;
-                fetch( ddLocation, {
-                    method: 'GET',
-                })
-                .then( res => res.json())
-                .then( json => {
-                    const key = Object.keys(json[0]);
+        Job.findOne({ _id : req.body.jobId, deleted : false})
+            .then(async job => {
+                if (job == null) {
+                    res.status(401).json({
+                        message: "jobId does not exist!"
+                    });
+                    return;
+                }
+                db.collection(`${job._id}-recommends`).find({}, { projection: { _id: 0 } }).toArray(function(err, result) {
+                    if (err) {
+                        res.status(400).json({
+                            message: "jobId does not have recommends-data!"
+                        });
+                        return;
+                    }
+                    if (result.length == 0) {
+                        res.status(400).json({
+                            message: "jobId does not have recommends-data!"
+                        });
+                        return;
+                    }
+                    const key = Object.keys(result[0]);
                     const personId = key[0];
                     function isUser(Id) {
                         return Id[`${personId}`] === req.body.object;
                     }
-                    const dt = json.find(isUser);
+                    const dt = result.find(isUser)
                     if (dt === undefined) {
                         res.status(400).json({
                             message: "userId does not exist!"
@@ -225,15 +247,10 @@ class JobController {
                         return;
                     }
                     res.status(200).json(dt.recommends.slice(0,req.body.limits));
-                })
-                .catch(err => {
-                    res.status(500).json(err);
-                    console.log(err);
-                    return;
                 });
             })
             .catch(err => {
-                res.status(400).json({
+                res.status(401).json({
                     message: "jobId does not exist!"
                 });
                 return;
@@ -246,13 +263,19 @@ class JobController {
                 message: "add jobId"
             });
         }
-        Job.findOne({ _id : req.body.jobId })
+        Job.findOne({ _id : req.body.jobId, deleted : false })
             .then(async (job) => {
+                if (job == null) {
+                    res.status(401).json({
+                        message: "jobId does not exist!"
+                    });
+                    return;
+                }
                 const keys = Object.keys(req.body);
                 addMany(keys, job._id, req.body)
                 .then((message) => {
                     message.message = "Done";
-                    if(req.body.newRecommends && req.body.newRecommends === true) {
+                    if(req.body.newRecommends || req.body.newRecommends === true) {
                         const jobApi = {
                             jobId: job._id,
                             service: job.service,
@@ -271,7 +294,7 @@ class JobController {
                             })
                             .then( res => res.json())
                             .then( json => {
-                                if(json.message != 'Done') {
+                                if(json.message == 'Done') {
                                     message[`newRecommends`] = 'update success';
                                 } else {
                                     message[`newRecommends`] = 'update failed';
@@ -301,7 +324,7 @@ class JobController {
                 })
             }).catch(err => {
                 console.log(err)
-                res.status(400).json({
+                res.status(401).json({
                     message: "jobId does not exist!"
                 });
                 return;
@@ -323,23 +346,32 @@ async function renameCollection(name, jobId) {
 function addDataCollection(name, jobId, data) {
     return new Promise(async (resolve, reject) => {
         const listCollections = await db.db.listCollections().toArray();
-        listCollections.forEach( collection => {
-            if (collection.name == `${jobId}-${name}`) {
-                db.db.collection(`${jobId}-${name}`).insertMany(data, function(error, record){
-                    if (error) return reject('error');
-                    return resolve('done');
-                });
-            }
-        })
-        db.db.createCollection(`${jobId}-${name}`)
-        .then(collection => {
+        const collections = (collection) => collection.name == `${jobId}-${name}`;
+        if (listCollections.some(collections) == true) {
             db.db.collection(`${jobId}-${name}`).insertMany(data, function(error, record){
-                if (error) return reject('error');
+                if (error) {
+                    console.log(error);
+                    return reject('error');
+                }
                 return resolve('done');
             });
-        }). catch(err => {
-            return reject('error');
-        });
+        }
+        else {
+            db.db.createCollection(`${jobId}-${name}`)
+            .then(collection => {
+                db.db.collection(`${jobId}-${name}`).insertMany(data, function(error, record){
+                    if (error) {
+                        console.log(error);
+                        return reject('error');
+                    }
+                    return resolve('done');
+                });
+            }). catch(err => {
+                console.log(error);
+                return reject('error');
+            });
+        }
+        
     });
 }
 
@@ -354,6 +386,7 @@ function addMany(keys, jobId, data) {
                         message[`data-${key}`] = "update success";
                         resolve();
                     }).catch((err) => {
+                        console.log(err);
                         message[`data-${key}`] = "update failed";
                         resolve();
                     });
@@ -364,6 +397,19 @@ function addMany(keys, jobId, data) {
             });
         })
         Promise.all(requests).then(() => resolve(message));
+    })
+}
+
+function dropCollection(name) {
+    return new Promise(async (resolve, reject) => {
+        const listCollections = await db.db.listCollections().toArray();
+        const collections = (collection) => collection.name == `${name}`;
+        if (listCollections.some(collections) == true) {
+            db.db.collection(name).drop(function (err, delOk) {
+                if (err) return reject('error');
+                return resolve();
+            })
+        } else return resolve();
     })
 }
 

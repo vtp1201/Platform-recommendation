@@ -15,23 +15,23 @@ import json
 import os
 import pymongo
 
-myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-mydb = myclient["Platform_recommendation"]
+db_host = os.getenv('DB_HOST', 'localhost')
+db_port = os.getenv('DB_PORT', '27017')
+db_collection = os.getenv('DB_NAME', 'Platform_recommendation')
+
+uri_db = 'mongodb://' + db_host + ':' + db_port + '/'
+
+myclient = pymongo.MongoClient(uri_db)
+mydb = myclient[db_collection]
 
 person_id = 'user_id'
 content_id = 'book_id'
 key = 'rating'
 class CFRecommender:
-    
-    MODEL_NAME = 'Collaborative Filtering'
-    
     def __init__(self, cf_predictions_df, items_df=None):
         self.cf_predictions_df = cf_predictions_df
         self.items_df = items_df
         
-    def get_model_name(self):
-        return self.MODEL_NAME
-
     def recommend_users(self, user_id, users_ids, topn=10, verbose=False):
         sorted_user_predictions = self.cf_predictions_df
         user_df = self.cf_predictions_df[user_id]
@@ -175,8 +175,7 @@ def get_recommendations(service, userDf, interactionsDf, articlesDf):
         print ("Waring, cant add articles_df")
     
     try:
-        key_df = interactions_df.drop(columns='eventStrength')
-        addMongo('key', key_df)
+        addMongo('key', interactions_df)
     except:
         print ("Waring, cant add interactions_df")
     
@@ -200,9 +199,13 @@ def mongoToDf(name):
     else: return "error"
 
 def updateRecommendations(jobId, service):
-    articles_df = mongoToDf(jobId + "-request")
-    user_df = mongoToDf(jobId + "-object")
-    interactions_df = mongoToDf(jobId + "-key")
+    try:
+        articles_df = mongoToDf(jobId + "-request")
+        user_df = mongoToDf(jobId + "-object")
+        interactions_df = mongoToDf(jobId + "-key")
+        interactions_df = interactions_df.drop_duplicates(subset=[person_id, content_id], keep ='last')
+    except:
+        return "error, cant read data"
 
     #print(articles_df.head(5))
     #print(interactions_df.head(5))
