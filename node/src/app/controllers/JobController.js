@@ -230,11 +230,15 @@ class JobController {
                         });
                         return;
                     }
+
+                    result = mutipleMongooseToObject(result);
+
                     const key = Object.keys(result[0]);
                     const personId = key[0];
                     function isUser(Id) {
-                        return Id[`${personId}`] === req.body.object;
+                        return Id[`${personId}`] == req.body.object;
                     }
+                    
                     const dt = result.find(isUser)
                     if (dt === undefined) {
                         res.status(400).json({
@@ -242,6 +246,10 @@ class JobController {
                         });
                         return;
                     }
+                    /* dt.recommends.forEach((data => {
+                        data = data.toString();
+                        console.log(data);       
+                    })) */
                     if (req.body.limits === undefined || Number.isInteger(req.body.limits) === false) {
                         res.status(200).json(dt.recommends)
                         return;

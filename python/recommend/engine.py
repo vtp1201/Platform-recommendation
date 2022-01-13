@@ -24,9 +24,9 @@ uri_db = 'mongodb://' + db_host + ':' + db_port + '/'
 myclient = pymongo.MongoClient(uri_db)
 mydb = myclient[db_collection]
 
-person_id = 'user_id'
-content_id = 'book_id'
-key = 'rating'
+person_id = None
+content_id = None
+key = None
 class CFRecommender:
     def __init__(self, cf_predictions_df, items_df=None):
         self.cf_predictions_df = cf_predictions_df
@@ -203,7 +203,6 @@ def updateRecommendations(jobId, service):
         articles_df = mongoToDf(jobId + "-request")
         user_df = mongoToDf(jobId + "-object")
         interactions_df = mongoToDf(jobId + "-key")
-        interactions_df = interactions_df.drop_duplicates(subset=[person_id, content_id], keep ='last')
     except:
         return "error, cant read data"
 
@@ -219,11 +218,17 @@ def updateRecommendations(jobId, service):
     return "complete"
 
 def engine(service, articles_df, interactions_df):
+
+
     try:
         #print('set values')
         arrKey = key.split(',')
         event_Strength = 'eventStrength'
         event_Type = arrKey[0]
+
+        interactions_df = interactions_df.dropna(axis='index', how='any', subset=[person_id, event_Type, content_id])
+        interactions_df = interactions_df.drop_duplicates(subset=[person_id, content_id], keep ='last')
+
         event_type_strength = {}
         if len(arrKey) == 1:
             if(interactions_df[event_Type].dtype == np.float64 or interactions_df[event_Type].dtype == np.int64):   
