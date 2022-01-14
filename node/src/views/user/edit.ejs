@@ -24,15 +24,15 @@
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-7 pt-2 pb-4 bg-white border rounded-5">
                     <% if(messageType == 'success') { %>
-                        <div class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
+                        <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
                             <strong><%= message %></strong>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     <% } %>
                     <% if(messageType == 'danger') { %>
-                        <div class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
+                        <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
                           <strong><%= message %></strong>
-                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                          <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     <% } %>
                     <div class="row g-3">
@@ -98,6 +98,11 @@
         $(document).ready(function(){
             $("#btn1").click(function(){
                 $("#main").toggleClass("mb-10");
+            });
+        });
+        $(document).ready(function() {
+            $("#btn-alert").click(function(){
+            $('#alert').hide();
             });
         });
     </script>

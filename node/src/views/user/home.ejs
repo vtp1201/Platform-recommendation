@@ -63,7 +63,7 @@
                                         role="tab"
                                         aria-controls="ex1-tabs-3"
                                         aria-selected="false"
-                                        >PHP</a
+                                        >Update Data</a
                                       >
                                     </li>
                                   </ul>
@@ -105,7 +105,18 @@
                                       </pre>
                                     </div>
                                     <div class="tab-pane fade" id="ex1-tabs-3" role="tabpanel" aria-labelledby="ex1-tab-3">
-                                      Tab 3 content
+                                      <pre>
+request = {
+  jobId: "enter jobId",
+  newRecommends: true/false
+  object: ["insert array data object"],
+  key: ["insert array data interactions"],
+  request: ["insert array data request]"
+};
+fetch('http://localhost:5000/job/api/update', {
+  method: 'POST',
+  body: JSON.stringify(request) }
+                                      </pre>
                                     </div>
                                   </div>
                             </div>

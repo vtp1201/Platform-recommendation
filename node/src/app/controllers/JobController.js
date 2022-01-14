@@ -230,9 +230,6 @@ class JobController {
                         });
                         return;
                     }
-
-                    result = mutipleMongooseToObject(result);
-
                     const key = Object.keys(result[0]);
                     const personId = key[0];
                     function isUser(Id) {
@@ -246,15 +243,17 @@ class JobController {
                         });
                         return;
                     }
-                    /* dt.recommends.forEach((data => {
-                        data = data.toString();
-                        console.log(data);       
-                    })) */
+                    const df = dt.recommends.map(data => {
+                        if (typeof data === "object") {
+                            return data.high * Math.pow(2,32) + data.low
+                        }
+                        return data;
+                    });
                     if (req.body.limits === undefined || Number.isInteger(req.body.limits) === false) {
-                        res.status(200).json(dt.recommends)
+                        res.status(200).json(df)
                         return;
                     }
-                    res.status(200).json(dt.recommends.slice(0,req.body.limits));
+                    res.status(200).json(df.slice(0,req.body.limits));
                 });
             })
             .catch(err => {
