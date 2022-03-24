@@ -1,14 +1,33 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const slug = require('mongoose-slug-generator');
 
 const Schema = mongoose.Schema;
 
 const User = new Schema(
     {
-        username: { type: String, required: true, unique: true},
-        password: { type: String, required: true},
-        slug: { type: String, slug: 'username', unique: true },
+        local            : {
+            username     : String,
+            password     : String
+        },
+        facebook         : {
+            id           : String,
+            token        : String,
+            name         : String,
+            email        : String
+        },
+        twitter          : {
+            id           : String,
+            token        : String,
+            displayName  : String,
+            username     : String
+        },
+        google           : {
+            id           : String,
+            token        : String,
+            email        : String,
+            name         : String
+        }
+    
     },
     {
         timestamps: true,
@@ -17,13 +36,10 @@ const User = new Schema(
 
 User.pre('save', function(next) {
     const user = this;
-    bcrypt.hash(user.password, 10, (err, hash) => {
+    bcrypt.hash(user.local.password, 10, (err, hash) => {
         user.password = hash;
         next();
     });
 });
-
-// plugin
-mongoose.plugin(slug);
 
 module.exports = mongoose.model('User', User);

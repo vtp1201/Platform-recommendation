@@ -3,11 +3,11 @@ const authRouter = require('./auth');
 const jobRouter = require('./job');
 const userRouter = require('./user');
 
-function route(app) {
+function route(app, passport) {
     
     app.use('/', siteRouter);
 
-    app.use('/auth', authRouter);
+    app.use('/auth', authRouter)(passport);
 
     app.use('/user', userRouter);
 

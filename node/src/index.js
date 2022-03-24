@@ -4,11 +4,13 @@ const ejs = require('ejs');
 const flash = require('connect-flash');
 const expressSession = require('express-session');
 const methodOverride = require('method-override');
+const passport = require('passport');
 
 const app = express();
 
 const db = require('./config/db/index');
 const route = require('./routes/index');
+require('./config/passport/passport')(passport);
 
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -23,6 +25,9 @@ app.use(expressSession({
 }));
 app.use(flash());
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 db.connectWithRetry();
 
 app.set('view engine', 'ejs');
@@ -36,8 +41,10 @@ app.use("*", (req, res, next) => {
     next()
 });
 
-route(app);
+route(app, passport);
 
-app.listen(5000, () => {
-    console.log('listening on port 5000');
+const host = process.env.PORT || 5000
+
+app.listen(host, () => {
+    console.log(`listening on port ${host}`);
 });

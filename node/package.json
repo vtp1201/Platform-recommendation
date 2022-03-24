@@ -22,7 +22,12 @@
     "mongoose": "^6.0.5",
     "mongoose-delete": "^0.5.4",
     "mongoose-slug-generator": "^1.0.4",
-    "multer": "^1.4.3"
+    "multer": "^1.4.3",
+    "passport": "^0.5.2",
+    "passport-facebook": "^3.0.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
+    "passport-twitter": "^1.0.4"
   },
   "devDependencies": {
     "ejs-lint": "^1.2.1",
