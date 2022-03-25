@@ -7,7 +7,7 @@ const GoogleStrategy   = require('passport-google-oauth20').Strategy;
 const User       = require('../../app/models/User');
 
 // load the auth variables
-const configAuth = require('./auth'); // use this one for testing
+const configAuth = require('./authKey'); // use this one for testing
 
 module.exports = function(passport) {
 
@@ -100,7 +100,7 @@ module.exports = function(passport) {
                         }); */
 
                         newUser
-                            .save()
+                            .saveLocal()
                             .then(() => {
                                 return done(null, newUser, req.flash('messageType', 'success'),
                                 req.flash('message', 'Sign up successfully'))
@@ -133,7 +133,7 @@ module.exports = function(passport) {
                             return done(null,user);
                         }); */
                         user
-                            .save()
+                            .saveLocal()
                             .then(() => {
                                 return done(null, newUser, req.flash('messageType', 'success'),
                                 req.flash('message', 'Sign up successfully'))

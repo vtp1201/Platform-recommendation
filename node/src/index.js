@@ -36,8 +36,31 @@ app.set('views', path.join(__dirname, 'views'));
 global.loggedIn = null;
 global.loggedName = null;
 app.use("*", (req, res, next) => {
-    loggedIn = req.session.userId;
-    loggedName = req.session.username;
+    if (req.user) {
+        if (req.user.google.name) {
+            loggedIn = req.session.passport.user;
+            loggedName = req.user.google.name;
+        }
+        if (req.user.local.username) {
+            console.log('hello');
+            console.log(req.user.local);
+            /* loggedIn = req.session.passport.user;
+            loggedName = req.user.local.name */;
+        }
+        if (req.user.facebook.name) {
+            loggedIn = req.session.passport.user;
+            loggedName = req.user.facebook.name;
+            if(!req.user.facebook.name) console.log('first')
+        }
+        if (req.user.twitter.name) {
+            console.log(req.user.twitter);
+            /* loggedIn = req.session.passport.user;
+            loggedName = req.user.twitter.name; */
+        }
+    } else {
+        loggedIn = null;
+        loggedName = null;
+    }
     next()
 });
 

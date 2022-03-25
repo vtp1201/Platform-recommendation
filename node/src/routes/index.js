@@ -7,7 +7,7 @@ function route(app, passport) {
     
     app.use('/', siteRouter);
 
-    app.use('/auth', authRouter)(passport);
+    app.use('/auth', authRouter(passport));
 
     app.use('/user', userRouter);
 

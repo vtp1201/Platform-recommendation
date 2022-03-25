@@ -34,7 +34,7 @@ const User = new Schema(
     },
 );
 
-User.pre('save', function(next) {
+User.pre('saveLocal', function(next) {
     const user = this;
     bcrypt.hash(user.local.password, 10, (err, hash) => {
         user.local.password = hash;
@@ -42,8 +42,8 @@ User.pre('save', function(next) {
     });
 });
 
-User.methods.validPassword((password) => {
+User.methods.validPassword = function(password) {
     return bcrypt.compareSync(password, this.local.password);
-})
+};
 
 module.exports = mongoose.model('User', User);
