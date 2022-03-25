@@ -37,9 +37,13 @@ const User = new Schema(
 User.pre('save', function(next) {
     const user = this;
     bcrypt.hash(user.local.password, 10, (err, hash) => {
-        user.password = hash;
+        user.local.password = hash;
         next();
     });
 });
+
+User.methods.validPassword((password) => {
+    return bcrypt.compareSync(password, this.local.password);
+})
 
 module.exports = mongoose.model('User', User);

@@ -48,10 +48,10 @@ module.exports = function(passport) {
 
                 // if no user is found, return the message
                 if (!user)
-                    return done(null, false, req.flash('loginMessage', 'No user found.'));
+                    return done(null, false, req.flash('message', 'Invalid username or password.'));
 
                 if (!user.validPassword(password))
-                    return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
+                    return done(null, false, req.flash('message', 'Invalid username or password.'));
 
                 // all is well, return user
                 else
@@ -83,21 +83,31 @@ module.exports = function(passport) {
 
                     // check to see if theres already a user with that username
                     if (user) {
-                        return done(null, false, req.flash('signupMessage', 'That username is already taken.'));
+                        return done(null, false, req.flash('messageType', 'danger'), req.flash('signupMessage', 'That username is already taken.'));
                     } else {
 
                         // create the user
                         const newUser            = new User();
 
                         newUser.local.username    = username;
-                        newUser.local.password = newUser.generateHash(password);
+                        newUser.local.password    = password;
 
-                        newUser.save(function(err) {
+                        /* newUser.save(function(err) {
                             if (err)
                                 return done(err);
 
                             return done(null, newUser);
-                        });
+                        }); */
+
+                        newUser
+                            .save()
+                            .then(() => {
+                                return done(null, newUser, req.flash('messageType', 'success'),
+                                req.flash('message', 'Sign up successfully'))
+                            }).catch((err) =>
+                                done(err)
+                            )
+
                     }
 
                 });
@@ -115,13 +125,21 @@ module.exports = function(passport) {
                     } else {
                         const user = req.user;
                         user.local.username = username;
-                        user.local.password = user.generateHash(password);
-                        user.save(function (err) {
+                        user.local.password = password;
+                        /* user.save(function (err) {
                             if (err)
                                 return done(err);
                             
                             return done(null,user);
-                        });
+                        }); */
+                        user
+                            .save()
+                            .then(() => {
+                                return done(null, newUser, req.flash('messageType', 'success'),
+                                req.flash('message', 'Sign up successfully'))
+                            }).catch((err) =>
+                                done(err)
+                            )
                     }
                 });
             } else {

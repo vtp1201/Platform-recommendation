@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const passport = require('../../config/passport/passport');
 const LocalStrategy = require('passport-local').Strategy;
 const User = require('../models/User');
 
@@ -60,18 +61,6 @@ class AuthController {
                 res.redirect('back');
             }
             );
-    }
-    // [GET] auth/sign-in/google
-    signInGoogle (req, res, next) {
-
-    }
-    // [GET] auth/sign-in/facebook
-    signInFacebook (req, res, next) {
-
-    }
-    // [GET] auth/sign-in/twitter
-    signInTwitter (req, res, next) {
-
     }
     // [GET] auth/sign-out
     logOut (req, res, next) {
