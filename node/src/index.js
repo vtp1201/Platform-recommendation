@@ -42,15 +42,12 @@ app.use("*", (req, res, next) => {
             loggedName = req.user.google.name;
         }
         if (req.user.local.username) {
-            console.log('hello');
-            console.log(req.user.local);
-            /* loggedIn = req.session.passport.user;
-            loggedName = req.user.local.name */;
+            loggedIn = req.session.passport.user;
+            loggedName = req.user.local.username;
         }
         if (req.user.facebook.name) {
             loggedIn = req.session.passport.user;
             loggedName = req.user.facebook.name;
-            if(!req.user.facebook.name) console.log('first')
         }
         if (req.user.twitter.name) {
             console.log(req.user.twitter);

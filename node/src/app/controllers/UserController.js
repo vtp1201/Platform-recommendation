@@ -6,24 +6,26 @@ const bcrypt = require('bcrypt');
 class UserController {
     // [GET] user/home
     async show(req, res, next) {
-        const user = await User.findOne({ _id: req.session.userId });
-        Job.find({userId: req.session.userId})
+        let user = await User.findOne({ _id: req.user._id });
+        user.username = loggedName;
+        Job.find({userId: req.user._id})
             .then((jobs) => {
                 jobs = mutipleMongooseToObject(jobs);
                 jobs.forEach((job) => job.createdAt = job.createdAt.toLocaleString("en-US"));
                 res.render('user/home', {
                     jobs: jobs,
-                    user: mongooseToObject(user),
+                    user: user,
                 });
             })
             .catch(err => next(err));
     }
     // [GET] user/edit-profile
     showEdit(req, res, next) {
-        User.findById(req.session.userId)
+        User.findById(req.user._id)
             .then((user) => {
+                user.username = loggedName;
                 res.render('user/edit', {
-                    user: mongooseToObject(user),
+                    user: user,
                     message: req.flash('message'),
                     messageType: req.flash('messageType'),
                 })
@@ -37,7 +39,7 @@ class UserController {
             res.redirect('back');
             return;
         }
-        User.findById(req.session.userId)
+        User.findById(req.user._id)
             .then((user) => {
                 bcrypt.compare(req.body.old_password, user.password, (err, same) => {
                     if (!same) {
@@ -50,7 +52,7 @@ class UserController {
             }).then(()=> {
                 bcrypt.hash(req.body.password, 10, (err, hash) => {
                     req.body.password = hash;
-                    User.findByIdAndUpdate(req.session.userId, req.body)
+                    User.findByIdAndUpdate(req.user._id, req.body)
                     .then(() => {
                         req.flash('messageType', 'success');
                         req.flash('message', 'update complete');

@@ -1,6 +1,4 @@
 const bcrypt = require('bcrypt');
-const passport = require('../../config/passport/passport');
-const LocalStrategy = require('passport-local').Strategy;
 const User = require('../models/User');
 
 class AuthController {

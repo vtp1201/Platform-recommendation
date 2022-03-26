@@ -2,6 +2,7 @@ const LocalStrategy    = require('passport-local').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const TwitterStrategy  = require('passport-twitter').Strategy;
 const GoogleStrategy   = require('passport-google-oauth20').Strategy;
+const bcrypt = require('bcrypt');
 
 // load up the user model
 const User       = require('../../app/models/User');
@@ -83,31 +84,22 @@ module.exports = function(passport) {
 
                     // check to see if theres already a user with that username
                     if (user) {
-                        return done(null, false, req.flash('messageType', 'danger'), req.flash('signupMessage', 'That username is already taken.'));
+                        return done(null, false, req.flash('messageType', 'danger'), 
+                        req.flash('signupMessage', 'That username is already taken.'));
                     } else {
 
                         // create the user
                         const newUser            = new User();
-
                         newUser.local.username    = username;
-                        newUser.local.password    = password;
-
-                        /* newUser.save(function(err) {
-                            if (err)
-                                return done(err);
-
-                            return done(null, newUser);
-                        }); */
-
-                        newUser
-                            .saveLocal()
-                            .then(() => {
-                                return done(null, newUser, req.flash('messageType', 'success'),
-                                req.flash('message', 'Sign up successfully'))
-                            }).catch((err) =>
-                                done(err)
-                            )
-
+                        bcrypt.hash(password, 10, (err, hash) => {
+                            newUser.local.password = hash;
+                            newUser.save(function(err) {
+                                if (err)
+                                    return done(err);
+    
+                                return done(null, newUser);
+                            });
+                        });
                     }
 
                 });
@@ -120,26 +112,21 @@ module.exports = function(passport) {
                         return done(err);
                     
                     if (user) {
-                        return done(null, false, req.flash('loginMessage', 'That username is already taken.'));
+                        return done(null, false, req.flash('messageType', 'danger'), 
+                        req.flash('message', 'Username has already been taken. Try again'));
                         // Using 'loginMessage instead of signupMessage because it's used by /connect/local'
                     } else {
                         const user = req.user;
                         user.local.username = username;
-                        user.local.password = password;
-                        /* user.save(function (err) {
-                            if (err)
-                                return done(err);
-                            
-                            return done(null,user);
-                        }); */
-                        user
-                            .saveLocal()
-                            .then(() => {
-                                return done(null, newUser, req.flash('messageType', 'success'),
-                                req.flash('message', 'Sign up successfully'))
-                            }).catch((err) =>
-                                done(err)
-                            )
+                        bcrypt.hash(password, 10, (err, hash) => {
+                            user.local.password = hash;
+                            user.save(function(err) {
+                                if (err)
+                                    return done(err);
+    
+                                return done(null, user);
+                            });
+                        });
                     }
                 });
             } else {

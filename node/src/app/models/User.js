@@ -34,14 +34,6 @@ const User = new Schema(
     },
 );
 
-User.pre('saveLocal', function(next) {
-    const user = this;
-    bcrypt.hash(user.local.password, 10, (err, hash) => {
-        user.local.password = hash;
-        next();
-    });
-});
-
 User.methods.validPassword = function(password) {
     return bcrypt.compareSync(password, this.local.password);
 };

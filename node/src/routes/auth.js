@@ -7,8 +7,17 @@ module.exports = function(passport){
 
     router.get('/sign-in', checkLogged, authController.signIn);
     router.get('/sign-up', checkLogged, authController.signUp);
-    router.post('/sign-in', checkLogged, authController.signInUser);
-    router.post('/sign-up', checkLogged, authController.signUpUser);
+
+    router.post('/sign-in', checkLogged, passport.authenticate('local-login', {
+        successRedirect : '/', // redirect to the secure profile section
+        failureRedirect : '/auth/sign-in', // redirect back to the signup page if there is an error
+        failureFlash : true // allow flash messages
+    }));
+    router.post('/sign-up', checkLogged, passport.authenticate('local-signup', {
+        successRedirect : '/',
+        failureRedirect : '/auth/sign-up',
+        failureFlash : true,
+    }));
     router.get('/sign-out', authController.logOut);
 
     router.get('/facebook', 

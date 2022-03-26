@@ -19,11 +19,11 @@ class JobController {
     showManager(req, res, next) {
         const perPage = 4;
         const page = parseInt(req.query.page) || 1;
-        Job.find({userId: req.session.userId , deleted: false})
+        Job.find({userId: req.user._id , deleted: false})
             .skip((perPage * page) - perPage)
             .limit(perPage)
             .exec((err, jobs) => 
-                Job.where({userId: req.session.userId, deleted : false}).countDocuments ((err, count) => {
+                Job.where({userId: req.user._id, deleted : false}).countDocuments ((err, count) => {
                 if (err) return next(err);
                 jobs = mutipleMongooseToObject(jobs);
                 jobs.forEach((job) => job.createdAt = job.createdAt.toLocaleString("en-US"));
@@ -40,7 +40,7 @@ class JobController {
             .then( job => {
                 job = mongooseToObject(Job(job));
                 job.createdAt = job.createdAt.toLocaleString("en-US");
-                if (job.userId != req.session.userId) {
+                if (job.userId != req.user._id) {
                     return res.render('notfound');
                 }
                 res.render('job/detail', {
@@ -94,7 +94,7 @@ class JobController {
                         return res.redirect('back');
                     }
                     const newJob = {
-                        userId: req.session.userId,
+                        userId: req.user._id,
                         title: req.body.title,
                         description: req.body.description,
                         service: req.body.service,
@@ -156,11 +156,11 @@ class JobController {
     trash(req, res, next) {
         const perPage = 4;
         const page = parseInt(req.query.page) || 1;
-        Job.findDeleted({userId: req.session.userId})
+        Job.findDeleted({userId: req.user._id})
             .skip((perPage * page) - perPage)
             .limit(perPage)
             .exec((err, jobs) => 
-                Job.countDocumentsDeleted (({userId: req.session.userId}), (err, count) => {
+                Job.countDocumentsDeleted (({userId: req.user._id}), (err, count) => {
                 if (err) return next(err);
                 jobs = mutipleMongooseToObject(jobs);
                 jobs.forEach((job) => {
