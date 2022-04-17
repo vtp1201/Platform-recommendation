@@ -11,8 +11,8 @@ class AuthController {
     // [GET] auth/sign-up
     signUp (req, res, next) {
         res.render('user/signup', { 
-            messageType: req.flash('messageType'),
-            message: req.flash('message') 
+            messageType: (req.flash('messageType')).toString(),
+            message: (req.flash('message')).toString()
         });
     }
     // [POST] auth/sign-in
