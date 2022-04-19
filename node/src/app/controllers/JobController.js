@@ -56,6 +56,38 @@ class JobController {
             message: req.flash('message'),
         });
     }
+    // [GET] job/preview-data/:id
+    async newData(req, res, next) {
+        try {
+            const job = await Job.findById(req.params.id).populate('DataSource');
+            console.log(job);
+            res.render('job/preview', {
+                messageType: req.flash('messageType'),
+                message: req.flash('message'),
+                job: job,
+            })
+        } catch (error) {
+            console.log(error);
+            res.redirect('back');
+        }
+        
+    }
+    // [POST] job/preview-data/:id
+    async createNewData(req, res) {
+        try {
+            const job = await Job.findById(req.params.id).populate('DataSource');
+            console.log(job);
+            res.render('job/preview', {
+                messageType: req.flash('messageType'),
+                message: req.flash('message'),
+                job: job,
+            })
+        } catch (error) {
+            console.log(error);
+            res.redirect('back');
+        }
+        
+    }
     // [POST] job/new-job
     create (req, res, next) {
         uploadMutipleFiles(req, res, next)

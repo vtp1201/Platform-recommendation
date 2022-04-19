@@ -5,25 +5,25 @@ const Schema = mongoose.Schema;
 
 const Job = new Schema(
     {
-        userId: { type: String, required: true,},
-        title: { type: String, required: true,},
-        description: { type: String,},
-        service: String,
-        object: String,
-        key: String,
-        request: String,
+        userId: { 
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        },
+        title: { 
+            type: Schema.Types.String,
+            required: true,
+        },
+        description: Schema.Types.String,
+        service: Schema.Types.String,
+        object: Schema.Types.String,
+        key: Schema.Types.String,
+        request: Schema.Types.String,
         dataSource: {
-            object: String,
-            key: String,
-            request: String,
+            type : Schema.Types.ObjectId,
+            ref: "DataSource",
         },
-        DSLocation: { 
-            object: String,
-            key: String,
-            request: String,
-        },
-        dataDestination: String,
-        DDLocation: String,
+        dataDestination: Schema.Types.String
     },
     {
         timestamps: true,
