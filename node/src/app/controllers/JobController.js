@@ -1,6 +1,8 @@
 const Job = require('../models/Job');
-const User = require('../models/User');
+const DataSource = require('../models/DataSource');
 const fetch = require('cross-fetch');
+const {connnect, disconnect, query} = require('../../config/db/mssql');
+
 const { mutipleMongooseToObject, mongooseToObject } = require('../../util/mongoose');
 const uploadMutipleFiles = require('../../config/firebase/firebase');
 const mongoose   = require('mongoose');
@@ -73,18 +75,60 @@ class JobController {
         
     }
     // [POST] job/preview-data/:id
-    async createNewData(req, res) {
+    async createNewQuery(req, res) {
         try {
             const job = await Job.findById(req.params.id).populate('DataSource');
             console.log(job);
-            res.render('job/preview', {
+            res.redirect(`preview-data/${job._id}`, {
                 messageType: req.flash('messageType'),
                 message: req.flash('message'),
                 job: job,
             })
         } catch (error) {
             console.log(error);
-            res.redirect('back');
+            req.flash('messageType', 'danger');
+            req.flash('message', "Something went wrong. try again.");
+            return res.redirect('back');
+        }
+        
+    }
+    // [POST] job/new-job
+    async createNewJob(req, res) {
+        try {
+            if (req.body.dataSourceType == 'SQL') {
+                const config = {
+                    database: req.body.database,
+                    server: req.body.server,
+                    user: req.body.user,
+                    password: req.body.password,
+                }
+                const check = await connnect(config);
+                if (check == false) {
+                    req.flash('messageType', 'danger');
+                    req.flash('message', "Please check dataSource and try again.");
+                    return res.redirect('back');
+                }
+            }
+            const newJob = new Job({
+                ...req.body,
+                userId : req.user._id,
+            });
+            const job = await newJob.save();
+            const newDataSource = new DataSource({
+                jobId: job._id,
+                type: req.body.dataSourceType,
+                ...req.body,
+            })
+            const dataSource = await newDataSource.save();
+            await Job.updateOne({ _id: job._id}, {
+                dataSource: dataSource._id,
+            });
+            return req.redirect(`/job/preview-data/${job._id}`);
+        } catch (error) {
+            console.log(error);
+            req.flash('messageType', 'danger');
+            req.flash('message', "Something went wrong. try again.");
+            return res.redirect('back');
         }
         
     }
