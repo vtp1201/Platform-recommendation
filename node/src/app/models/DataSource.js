@@ -33,11 +33,21 @@ const DataSource = new Schema(
         request : {
             type : Schema.Types.String,
         },
-        query: {
-            object: Schema.Types.String,
-            key : Schema.Types.String,
-            request : Schema.Types.String,
-        }
+        queryobject: {
+            select: Schema.Types.String,
+            from: Schema.Types.String,
+            where: Schema.Types.String,
+        },
+        queryrequest: {
+            select: Schema.Types.String,
+            from: Schema.Types.String,
+            where: Schema.Types.String,
+        },
+        querykey: {
+            select: Schema.Types.String,
+            from: Schema.Types.String,
+            where: Schema.Types.String,
+        },
     },
     {
         timestamps: true,

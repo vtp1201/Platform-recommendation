@@ -27,7 +27,10 @@ module.exports = async function query(query) {
     try {
         let sqlRequest = new sql.Request();
         const sqlQuery = `SELECT ${query.select} 
-        FROM ${query.from} WHERE ${query.where}`
+        FROM ${query.from} `;
+        if (query.where) {
+            query += `WHERE ${query.where}`;
+        }
         const data = await sqlRequest.query(sqlQuery);
         console.log(data);
         return data;

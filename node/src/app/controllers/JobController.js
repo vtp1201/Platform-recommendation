@@ -1,7 +1,7 @@
 const Job = require('../models/Job');
 const DataSource = require('../models/DataSource');
 const fetch = require('cross-fetch');
-const {connnect, disconnect, query} = require('../../config/db/mssql');
+const {connect, disconnect, query} = require('../../config/db/mssql');
 
 const { mutipleMongooseToObject, mongooseToObject } = require('../../util/mongoose');
 const uploadMutipleFiles = require('../../config/firebase/firebase');
@@ -67,6 +67,7 @@ class JobController {
                 messageType: req.flash('messageType'),
                 message: req.flash('message'),
                 job: job,
+                dataSource: job.dataSource,
             })
         } catch (error) {
             console.log(error);
@@ -77,13 +78,33 @@ class JobController {
     // [POST] job/preview-data/:id
     async createNewQuery(req, res) {
         try {
-            const job = await Job.findById(req.params.id).populate('DataSource');
-            console.log(job);
-            res.redirect(`preview-data/${job._id}`, {
-                messageType: req.flash('messageType'),
-                message: req.flash('message'),
-                job: job,
-            })
+            const job = await Job.findById(req.params.id).populate('dataSource');
+            const config = {
+                database: req.body.database,
+                server: req.body.server,
+                user: req.body.user,
+                password: req.body.password,
+            }
+            for (key in req.body) {
+                if (key == 'object' || key == 'key' || key == 'request') {
+                    let query = {
+                        ...req.body[key],
+                    }
+                    query += ` LIMIT 5`;
+                    const sql = await connect(config);
+                    const result = await query(query);
+                    console.log(result);
+                    let updateData = `query${key}`;
+                    const update = await DataSource.updateOne(
+                        { 
+                            _id: job.dataSource._id,
+                        }, {
+                            [updateData] : query,
+                        }
+                    )
+                }
+            }
+            res.redirect(`preview-data/${job._id}`)
         } catch (error) {
             console.log(error);
             req.flash('messageType', 'danger');
@@ -95,19 +116,20 @@ class JobController {
     // [POST] job/new-job
     async createNewJob(req, res) {
         try {
-            if (req.body.dataSourceType == 'SQL') {
+            if (req.body.dataSourceType == 'sql') {
                 const config = {
                     database: req.body.database,
                     server: req.body.server,
                     user: req.body.user,
                     password: req.body.password,
                 }
-                const check = await connnect(config);
+                const check = await connect(config);
                 if (check == false) {
                     req.flash('messageType', 'danger');
                     req.flash('message', "Please check dataSource and try again.");
                     return res.redirect('back');
                 }
+                await disconnect();
             }
             const newJob = new Job({
                 ...req.body,
