@@ -89,8 +89,7 @@ class JobController {
                 if (key == 'object' || key == 'key' || key == 'request') {
                     let query = {
                         ...req.body[key],
-                    }
-                    query += ` LIMIT 5`;
+                    };
                     const sql = await connect(config);
                     const result = await query(query);
                     console.log(result);

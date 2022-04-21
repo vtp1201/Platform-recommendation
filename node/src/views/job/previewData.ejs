@@ -37,111 +37,50 @@
         <div class="container-fluid">
             <div class="p-3 my-4">
                 <div class="row d-flex justify-content-lg-between">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="row">
-                            <div class="col-md-12">
-                                <div class="text-center">
-                                    <img style="width: 50px; height: 50px" src="/img/user.jpg" 
-                                    class = "shadow rounded-circle img-thumbnail" style="width:10rem;height: 10rem;"/>
-                                    <h2 class ="text-center pt-2"><%= user.username %></h2>
-                                    <h5 class ="pt-2">User ID: <%=user._id%></h5>
-                                </div>
-                                <div class="p-4 bg-white border rounded-5">
-                                    <ul class="nav nav-tabs mb-3" id="ex1" role="tablist">
-                                        <li class="nav-item" role="presentation">
-                                          <a
-                                            class="nav-link active"
-                                            id="ex1-tab-1"
-                                            data-mdb-toggle="tab"
-                                            href="#ex1-tabs-1"
-                                            role="tab"
-                                            aria-controls="ex1-tabs-1"
-                                            aria-selected="true"
-                                            >Node.js</a
-                                          >
-                                        </li>
-                                        <li class="nav-item" role="presentation">
-                                          <a
-                                            class="nav-link"
-                                            id="ex1-tab-2"
-                                            data-mdb-toggle="tab"
-                                            href="#ex1-tabs-2"
-                                            role="tab"
-                                            aria-controls="ex1-tabs-2"
-                                            aria-selected="false"
-                                            >Python</a
-                                          >
-                                        </li>
-                                        <li class="nav-item" role="presentation">
-                                          <a
-                                            class="nav-link"
-                                            id="ex1-tab-3"
-                                            data-mdb-toggle="tab"
-                                            href="#ex1-tabs-3"
-                                            role="tab"
-                                            aria-controls="ex1-tabs-3"
-                                            aria-selected="false"
-                                            >Update Data</a
-                                          >
-                                        </li>
-                                      </ul>
-                                      <!-- Tabs navs -->
-                                      
-                                      <!-- Tabs content -->
-                                      <div class="tab-content" id="ex1-content">
-                                        <div
-                                          class="tab-pane fade show active"
-                                          id="ex1-tabs-1"
-                                          role="tabpanel"
-                                          aria-labelledby="ex1-tab-1"
-                                        >
-                                        <pre>
-      request = {
-        object: "your id you want to extract",
-        limits: "limits recommends",
-        jobId: "enter jobId",
-      };
-      fetch('http://localhost:5000/job/api/extract', {
-        method: 'POST',
-        body: JSON.stringify(request),
-        headers: { 'Content-Type': 'application/json' }
-      }).then(res => res.json())
-                                      </pre>
-                                        </div>
-                                        <div class="tab-pane fade" id="ex1-tabs-2" role="tabpanel" aria-labelledby="ex1-tab-2">
-                                          <pre>
-      import requests
-    
-      url = 'http://localhost:5000/job/api/extract'
-      request = {
-        object: "your id you want to extract",
-        limits: "limits recommends",
-        jobId: "enter jobId",
-      };
-    
-      response = requests.post(url, request)
-                                          </pre>
-                                        </div>
-                                        <div class="tab-pane fade" id="ex1-tabs-3" role="tabpanel" aria-labelledby="ex1-tab-3">
-                                          <pre>
-    request = {
-      jobId: "enter jobId",
-      newRecommends: true/false
-      object: ["insert array data object"],
-      key: ["insert array data interactions"],
-      request: ["insert array data request]"
-    };
-    fetch('http://localhost:5000/job/api/update', {
-      method: 'POST',
-      body: JSON.stringify(request) }
-                                          </pre>
-                                        </div>
-                                      </div>
-                                </div>
-                            </div>
+                            <% if (dataSource.type == 'file') { %>
+                              <div class="mb-3">
+                                <label for="dataSourceObject" class="form-label">Data source user</label>
+                                <input type="file" name="dataSourceObject" id="dataSourceObject" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
+                                <div class="invalid-feedback">Example invalid form file feedback</div>
+                              </div>
+                              <div class="mb-3">
+                                  <label for="dataSourceKey" class="form-label">Data source interactions</label>
+                                  <input type="file" name="dataSourceKey" id="dataSourceKey" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
+                                  <div class="invalid-feedback">Example invalid form file feedback</div>
+                              </div>
+                              <div id="dt_request" class="mb-3">
+                                  <label for="dataSourceRequest" class="form-label">Data source items/contents</label>
+                                  <input type="file" name="dataSourceRequest" id="dataSourceRequest" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
+                                  <div class="invalid-feedback">Example invalid form file feedback</div>
+                              </div>
+                            <% } else {%>
+                              <div class="mb-3">
+                                <label for="dataSourceObject" class="form-label">Data source user</label>
+                                <input type="file" name="dataSourceObject" id="dataSourceObject" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
+                                <div class="invalid-feedback">Example invalid form file feedback</div>
+                              </div>
+                              <div class="mb-3">
+                                  <h3>Data source interactions</h3>
+                                  <input type="text" name="" id="" class="form-control" aria-label="file example" value="<%= dataSource %>">
+                                  <div class="invalid-feedback">Example invalid form file feedback</div>
+                                  <label for="" class="form-label">Data source interactions</label>
+                                  <input type="text" name="" id="" class="form-control" aria-label="file example">
+                                  <div class="invalid-feedback">Example invalid form file feedback</div>
+                                  <label for="" class="form-label">Data source interactions</label>
+                                  <input type="text" name="" id="" class="form-control" aria-label="file example">
+                                  <div class="invalid-feedback">Example invalid form file feedback</div>
+                              </div>
+                              <div id="dt_request" class="mb-3">
+                                  <label for="dataSourceRequest" class="form-label">Data source items/contents</label>
+                                  <input type="file" name="dataSourceRequest" id="dataSourceRequest" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
+                                  <div class="invalid-feedback">Example invalid form file feedback</div>
+                              </div>
+                            <% } %>
                         </div>	
                     </div>
-                    <div class="col-md-6  pt-3">
+                    <div class="col-md-8  pt-3">
                         <div class="text-left">
                             <h1>JOB : <%=jobs.length%></h1>
                             <div class="card border rounded-5 p-2" style="width: 95%; height: 447px; background-color: #F7F7F7; overflow: auto;">
