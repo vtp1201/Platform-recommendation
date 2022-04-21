@@ -2,6 +2,7 @@ const Job = require('../models/Job');
 const DataSource = require('../models/DataSource');
 const fetch = require('cross-fetch');
 const {connect, disconnect, query} = require('../../config/db/mssql');
+const {testConnection, queryData} = require('../../config/db/mysql');
 
 const { mutipleMongooseToObject, mongooseToObject } = require('../../util/mongoose');
 const uploadMutipleFiles = require('../../config/firebase/firebase');
@@ -59,15 +60,24 @@ class JobController {
         });
     }
     // [GET] job/preview-data/:id
-    async newData(req, res, next) {
+    async preview(req, res, next) {
         try {
-            const job = await Job.findById(req.params.id).populate('DataSource');
-            console.log(job);
-            res.render('job/preview', {
+            const job = await Job.findById(req.params.id).populate('dataSource');
+            const dataObject = [];
+            const dataKey = [];
+            const dataRequest = [];
+            job.createdAt = job.createdAt.toLocaleString("vi-VN");
+            if (job.userId != req.user._id) {
+                res.redirect('back');
+            }
+            res.render('job/previewData', {
                 messageType: req.flash('messageType'),
                 message: req.flash('message'),
                 job: job,
                 dataSource: job.dataSource,
+                dataObject: dataObject,
+                dataKey: dataKey,
+                dataRequest: dataRequest,
             })
         } catch (error) {
             console.log(error);
@@ -79,6 +89,7 @@ class JobController {
     async createNewQuery(req, res) {
         try {
             const job = await Job.findById(req.params.id).populate('dataSource');
+            const dataSource = job.dataSource;
             const config = {
                 database: req.body.database,
                 server: req.body.server,
@@ -90,9 +101,13 @@ class JobController {
                     let query = {
                         ...req.body[key],
                     };
-                    const sql = await connect(config);
-                    const result = await query(query);
-                    console.log(result);
+                    let data = [];
+                    if (dataSource.type == 'sqlS') {
+                        data = await query(query);
+                    } else if (dataSource.type == 'mysql') {
+                        data = await queryData(config, query);
+                    }
+                    console.log(data);
                     let updateData = `query${key}`;
                     const update = await DataSource.updateOne(
                         { 
@@ -115,20 +130,25 @@ class JobController {
     // [POST] job/new-job
     async createNewJob(req, res) {
         try {
-            if (req.body.dataSourceType == 'sql') {
+            if (req.body.dataSourceType != 'file') {
                 const config = {
                     database: req.body.database,
                     server: req.body.server,
                     user: req.body.user,
                     password: req.body.password,
                 }
-                const check = await connect(config);
+                let check = '';
+                if (req.body.dataSourceType == 'sqlS') {
+                    check = await connect(config);
+                    await disconnect();
+                } else if (req.body.dataSourceType == 'mysql') {
+                    check = await testConnection(config);
+                }
                 if (check == false) {
                     req.flash('messageType', 'danger');
                     req.flash('message', "Please check dataSource and try again.");
                     return res.redirect('back');
                 }
-                await disconnect();
             }
             const newJob = new Job({
                 ...req.body,
@@ -144,7 +164,7 @@ class JobController {
             await Job.updateOne({ _id: job._id}, {
                 dataSource: dataSource._id,
             });
-            return req.redirect(`/job/preview-data/${job._id}`);
+            return res.redirect(`/job/preview-data/${job._id}`);
         } catch (error) {
             console.log(error);
             req.flash('messageType', 'danger');

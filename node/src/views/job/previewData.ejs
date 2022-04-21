@@ -34,12 +34,25 @@
     </style>
     <%- include('../layouts/navbar') -%>
     <body>
+        <header class="masthead img-fluid" style="background-image: url('/img/main.svg')">
+            <div class="container position-relative px-4 px-lg-5 py-3">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="site-heading">
+                            <h1>Job id: <%=job._id%></h1>
+                            <span class="subheading"><%=job.createdAt%></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
         <div class="container-fluid">
-            <div class="p-3 my-4">
+            <div class="px-3 my-1">
                 <div class="row d-flex justify-content-lg-between">
                     <div class="col-md-4">
                         <div class="row">
                             <% if (dataSource.type == 'file') { %>
+                            <form method="POST" action="" class="form-horizontal">
                               <div class="mb-3">
                                 <label for="dataSourceObject" class="form-label">Data source user</label>
                                 <input type="file" name="dataSourceObject" id="dataSourceObject" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
@@ -55,57 +68,83 @@
                                   <input type="file" name="dataSourceRequest" id="dataSourceRequest" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
                                   <div class="invalid-feedback">Example invalid form file feedback</div>
                               </div>
+                              <button class="w-30 btn btn-primary btn-lg" type="submit">Submit Data</button>
+                            </form>
                             <% } else {%>
                               <div class="mb-3">
-                                <label for="dataSourceObject" class="form-label">Data source user</label>
-                                <input type="file" name="dataSourceObject" id="dataSourceObject" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
-                                <div class="invalid-feedback">Example invalid form file feedback</div>
-                              </div>
+                                <h3>Data source user</h3>
+                                  <div class="input-group mb-3">
+                                    <span class="input-group-text" id="basic-addon1">SELECT</span>
+                                    <input type="text" class="form-control" placeholder="*" aria-label="Username" aria-describedby="basic-addon1">
+                                  </div>
+                                  <div class="input-group mb-3">
+                                    <span class="input-group-text" id="basic-addon1">FROM</span>
+                                    <input type="text" class="form-control" placeholder="USER" aria-label="Username" aria-describedby="basic-addon1">
+                                  </div>
+                                  <div class="input-group mb-3">
+                                    <span class="input-group-text" id="basic-addon1">WHERE</span>
+                                    <input type="text" class="form-control" placeholder="" aria-label="Username" aria-describedby="basic-addon1">
+                                  </div>
                               <div class="mb-3">
                                   <h3>Data source interactions</h3>
-                                  <input type="text" name="" id="" class="form-control" aria-label="file example" value="<%= dataSource %>">
-                                  <div class="invalid-feedback">Example invalid form file feedback</div>
-                                  <label for="" class="form-label">Data source interactions</label>
-                                  <input type="text" name="" id="" class="form-control" aria-label="file example">
-                                  <div class="invalid-feedback">Example invalid form file feedback</div>
-                                  <label for="" class="form-label">Data source interactions</label>
-                                  <input type="text" name="" id="" class="form-control" aria-label="file example">
-                                  <div class="invalid-feedback">Example invalid form file feedback</div>
+                                  <div class="input-group mb-3">
+                                    <span class="input-group-text" id="basic-addon1">SELECT</span>
+                                    <input type="text" class="form-control" placeholder="*" aria-label="Username" aria-describedby="basic-addon1">
+                                  </div>
+                                  <div class="input-group mb-3">
+                                    <span class="input-group-text" id="basic-addon1">FROM</span>
+                                    <input type="text" class="form-control" placeholder="USER, CONTENT" aria-label="Username" aria-describedby="basic-addon1">
+                                  </div>
+                                  <div class="input-group mb-3">
+                                    <span class="input-group-text" id="basic-addon1">WHERE</span>
+                                    <input type="text" class="form-control" placeholder="USER.id = CONTENT.userId" aria-label="Username" aria-describedby="basic-addon1">
+                                  </div>
                               </div>
                               <div id="dt_request" class="mb-3">
-                                  <label for="dataSourceRequest" class="form-label">Data source items/contents</label>
-                                  <input type="file" name="dataSourceRequest" id="dataSourceRequest" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
-                                  <div class="invalid-feedback">Example invalid form file feedback</div>
+                                <h3>Data source items/contents</h3>
+                                <div class="input-group mb-3">
+                                  <span class="input-group-text" id="basic-addon1">SELECT</span>
+                                  <input type="text" class="form-control" placeholder="*" aria-label="Username" aria-describedby="basic-addon1">
+                                </div>
+                                <div class="input-group mb-3">
+                                  <span class="input-group-text" id="basic-addon1">FROM</span>
+                                  <input type="text" class="form-control" placeholder="CONTENT" aria-label="Username" aria-describedby="basic-addon1">
+                                </div>
+                                <div class="input-group mb-3">
+                                  <span class="input-group-text" id="basic-addon1">WHERE</span>
+                                  <input type="text" class="form-control" placeholder="" aria-label="Username" aria-describedby="basic-addon1">
+                                </div>
                               </div>
                             <% } %>
                         </div>	
                     </div>
                     <div class="col-md-8  pt-3">
                         <div class="text-left">
-                            <h1>JOB : <%=jobs.length%></h1>
-                            <div class="card border rounded-5 p-2" style="width: 95%; height: 447px; background-color: #F7F7F7; overflow: auto;">
-                                <% if(jobs.length > 0){ %>
-                                    <% jobs.forEach(function(job, index) { %>
-                                    <div class="card-body border border-2 rounded-3 mb-1" 
-                                    style="box-sizing: border-box; background-color: #FFFFFF">
-                                        <h5 class="card-title text-dark">jobId = <%= job._id %></h3>
-                                        <a href="/job/detail/<%= job._id %>"><h6 class="card-title text-dark"><%= job.title%></h5></a>
-                                        <h6 class="card-subtitle mb-2 text-muted"><%= job.description %></h6>
-                                        <h6 class="card-subtitle mb-2 text-muted"><%= job.createdAt %></h6>
-                                        <div class = "d-flex mx-3 justify-content-between">
-                                            <a href="/job/detail/<%= job._id %>"><button class = "btn btn-dark btn-sm text-capitalize">Detail</button></a>
-                                        </div>
-                                    </div>
-                                    <% }); %> 
-                                <% } %>
-                                <% if(jobs.length == 0){ %>
+                            <div class="card border rounded-5 p-1" style="width: 100%; height: 800px; background-color: #F7F7F7; overflow: auto;">
+                                <div class="card border rounded-5 p-1 m-1" style="width: 99%; height: 300px; overflow: auto;">
                                   <tr>
-                                  <td colspan="5" class="text-center">
-                                      You don't have a job yet.
-                                      <a href="/job/new-job">Create a new job</a>
-                                  </td>
+                                    <td colspan="5" class="text-center" >
+                                        You don't have a job yet.
+                                        <a href="/job/new-job">Create a new job</a>
+                                    </td>
                                   </tr>
-                                <% } %>
+                                </div>
+                                <div class="card border rounded-5 p-1 m-1" style="width: 99%; height: 300px; overflow: auto;">
+                                    <tr>
+                                      <td colspan="5" class="text-center">
+                                          You don't have a job yet.
+                                          <a href="/job/new-job">Create a new job</a>
+                                      </td>
+                                    </tr>
+                                </div>
+                                <div class="card border rounded-5 p-1 m-1" style="width: 99%; height: 300px; overflow: auto;">
+                                    <tr>
+                                      <td colspan="5" class="text-center">
+                                          You don't have a job yet.
+                                          <a href="/job/new-job">Create a new job</a>
+                                      </td>
+                                    </tr>
+                                </div>
                             </div>
                         </div>
                     </div>

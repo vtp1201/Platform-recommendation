@@ -50,7 +50,7 @@
         <div class="row gx-4 gx-lg-5 justify-content-center">
             <div class="col-md-10 col-lg-8 col-xl-7">
                 <div class="">
-                    <form method= "POST" action="/job/new-job" class="needs-validation" novalidate="" enctype="multipart/form-data">    
+                    <form method= "POST" action="/job/new-job" class="needs-validation" novalidate="" enctype="">    
                     <% if(messageType == 'success') { %>
                         <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
                             <strong><%= message %></strong>
@@ -66,7 +66,7 @@
                     <div class="row g-3">
                         <div class="col-sm-6">
                             <label for="title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" placeholder="Title" value="" required>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Title" required>
                             <div class="invalid-feedback">
                                 Valid title is required.
                             </div>
