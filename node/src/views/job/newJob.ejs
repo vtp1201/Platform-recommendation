@@ -81,14 +81,15 @@
                             </div>
                         </div>
                         <div class="col-md-9">
-                            <label for="type" class="form-label">Type Data</label>
-                            <select class="form-select" id="type" name="type" required>
+                            <label for="dataSourceType" class="form-label">Type Data</label>
+                            <select class="form-select" id="dataSourceType" name="dataSourceType" required>
                                 <option value="">Choose...</option>
                                 <option value="file">File upload csv, xlsx, json</option>
-                                <option value="sql">SQL Database</option>
+                                <option value="sqlS">SQL Server</option>
+                                <option value="mysql">MySQL</option>
                             </select>
                             <div class="invalid-feedback">
-                                Please select a type.
+                                Please select a dataSourceType.
                             </div>
                         </div>
                         <div class="accordion" id="accordionExample">
@@ -113,30 +114,37 @@
                                 data-mdb-parent="#accordionExample"
                               >
                                 <div class="accordion-body">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6">
                                         <label for="server" class="form-label">Server</label>
-                                        <input type="text" class="form-control" id="server" name="server" placeholder="EX: user_id" required>
+                                        <input type="text" class="form-control" id="server" name="server" placeholder="EX: server name" required>
                                         <div class="invalid-feedback">
                                           Please provide a valid city.
                                         </div>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6">
                                         <label for="user" class="form-label">User</label>
-                                        <input type="text" class="form-control" id="user" name="user" placeholder="EX: buy" required>
+                                        <input type="text" class="form-control" id="user" name="user" placeholder="EX: username" required>
                                         <div class="invalid-feedback">
                                           Please provide a valid zip.
                                         </div>
                                     </div>
-                                    <div id="text_request" class="col-sm-3">
+                                    <div id="text_request" class="col-sm-6">
                                         <label for="password" class="form-label">password</label>
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="EX: product_id" required>
+                                        <input type="password" class="form-control" id="password" name="password" placeholder="EX: password" required>
                                         <div class="invalid-feedback">
                                           Please provide a valid zip.
                                         </div>
                                     </div>
-                                    <div id="text_request" class="col-sm-3">
+                                    <div id="text_request" class="col-sm-6">
                                         <label for="database" class="form-label">database</label>
-                                        <input type="text" class="form-control" id="database" name="database" placeholder="EX: product_id" required>
+                                        <input type="text" class="form-control" id="database" name="database" placeholder="EX: DB name" required>
+                                        <div class="invalid-feedback">
+                                          Please provide a valid zip.
+                                        </div>
+                                    </div>
+                                    <div id="text_request" class="col-sm-6">
+                                        <label for="port" class="form-label">port</label>
+                                        <input type="number" class="form-control" id="port" name="port" placeholder="EX: Server port" required>
                                         <div class="invalid-feedback">
                                           Please provide a valid zip.
                                         </div>
@@ -179,11 +187,11 @@
         $(document).ready(function(){
             $('.accordion-collapse').attr('id','');
             $("#btn1").click(function(){
-                if(!$('#type').val()) {
-                    alert("please choose service first!");
+                if(!$('#dataSourceType').val()) {
+                    alert("please choose dataSourceType first!");
                     return;
                 }
-                else if ($('#type').val() == 'file') {
+                else if ($('#dataSourceType').val() == 'file') {
                     alert("Can`t access");
                     return;
                 }
@@ -199,7 +207,7 @@
                     } */
                 }
             });
-            $('#service').on('change', () => {
+            $('#dataSourceType').on('change', () => {
                 $('.accordion-collapse').attr('id','');
                 $('#btn1').addClass('collapsed');
                 $('.accordion-collapse').removeClass('show');

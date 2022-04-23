@@ -62,23 +62,30 @@ class JobController {
     // [GET] job/preview-data/:id
     async preview(req, res, next) {
         try {
-            const job = await Job.findById(req.params.id).populate('dataSource');
-            const dataObject = [];
-            const dataKey = [];
-            const dataRequest = [];
-            job.createdAt = job.createdAt.toLocaleString("vi-VN");
-            if (job.userId != req.user._id) {
+            const job = await Job.findOne({
+                _id: req.params.id,
+                userId: req.user._id,
+            }).populate('dataSource');
+            
+            if (job === null) {
                 res.redirect('back');
+                return;
             }
+            const dataSource = job.dataSource;
+            let dataObject = [];
+            let dataKey = [];
+            let dataRequest = [];
+
+            job.createdAt = job.createdAt.toLocaleString("en-US");
             res.render('job/previewData', {
                 messageType: req.flash('messageType'),
                 message: req.flash('message'),
                 job: job,
-                dataSource: job.dataSource,
+                dataSource: dataSource,
                 dataObject: dataObject,
                 dataKey: dataKey,
                 dataRequest: dataRequest,
-            })
+            });
         } catch (error) {
             console.log(error);
             res.redirect('back');
@@ -87,20 +94,31 @@ class JobController {
     }
     // [POST] job/preview-data/:id
     async createNewQuery(req, res) {
+        console.log(req.body);
         try {
-            const job = await Job.findById(req.params.id).populate('dataSource');
+            const job = await Job.findOne({
+                _id : req.params.id,
+                userId: req.user._id
+            }).populate('dataSource');
             const dataSource = job.dataSource;
+            let server = 'server';
+            if (dataSource.type == 'mysql') {
+                server = 'host';
+            } 
             const config = {
-                database: req.body.database,
-                server: req.body.server,
-                user: req.body.user,
-                password: req.body.password,
+                database: dataSource.database,
+                [server]: dataSource.server,
+                user: dataSource.user,
+                password: dataSource.password,
             }
             for (key in req.body) {
-                if (key == 'object' || key == 'key' || key == 'request') {
+                if (key == 'queryobject' || key == 'querykey' || key == 'queryrequest') {
                     let query = {
                         ...req.body[key],
                     };
+                    if (!query.select || !query.from) {
+                        break;
+                    }
                     let data = [];
                     if (dataSource.type == 'sqlS') {
                         data = await query(query);
@@ -133,18 +151,21 @@ class JobController {
             if (req.body.dataSourceType != 'file') {
                 const config = {
                     database: req.body.database,
-                    server: req.body.server,
+                    host: req.body.server,
                     user: req.body.user,
                     password: req.body.password,
+                    port: req.body.port == null ? undefined: Number(req.body.port)
                 }
                 let check = '';
                 if (req.body.dataSourceType == 'sqlS') {
                     check = await connect(config);
                     await disconnect();
                 } else if (req.body.dataSourceType == 'mysql') {
+                    console.log("object");
                     check = await testConnection(config);
+                    console.log(check)
                 }
-                if (check == false) {
+                if (check === false) {
                     req.flash('messageType', 'danger');
                     req.flash('message', "Please check dataSource and try again.");
                     return res.redirect('back');

@@ -24,6 +24,9 @@ const DataSource = new Schema(
         password: {
             type : Schema.Types.String,
         },
+        port: {
+            type : Schema.Types.Number,
+        },
         object: {
             type : Schema.Types.String,
         },
