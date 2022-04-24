@@ -72,9 +72,22 @@ class JobController {
                 return;
             }
             const dataSource = job.dataSource;
-            let dataObject = [];
-            let dataKey = [];
-            let dataRequest = [];
+            let dataObject = {};
+            let dataKey = {};
+            let dataRequest = {};
+
+            if(dataSource.object) {
+                dataObject = await preViewData(dataSource.object);
+            }
+
+            if(dataSource.key) {
+                dataKey = await preViewData(dataSource.object);
+            }
+
+            if(dataSource.request) {
+                dataRequest = await preViewData(dataSource.request);
+            }
+            //console.log(dataObject);
 
             job.createdAt = job.createdAt.toLocaleString("en-US");
             res.render('job/previewData', {
@@ -94,29 +107,38 @@ class JobController {
     }
     // [POST] job/preview-data/:id
     async createNewQuery(req, res) {
-        console.log(req.body);
+        //console.log(req.body);
         try {
             const job = await Job.findOne({
                 _id : req.params.id,
                 userId: req.user._id
             }).populate('dataSource');
+
             const dataSource = job.dataSource;
+
             let server = 'server';
             if (dataSource.type == 'mysql') {
                 server = 'host';
             } 
+
             const config = {
                 database: dataSource.database,
                 [server]: dataSource.server,
                 user: dataSource.user,
                 password: dataSource.password,
             }
-            for (key in req.body) {
+
+            if (dataSource.port) {
+                config.port = dataSource.port;
+            }
+
+            for (let key in req.body) {
                 if (key == 'queryobject' || key == 'querykey' || key == 'queryrequest') {
                     let query = {
                         ...req.body[key],
                     };
-                    if (!query.select || !query.from) {
+                    let name = key.split('query')[1];
+                    if (!query.select || !query.from || dataSource[name]) {
                         break;
                     }
                     let data = [];
@@ -125,25 +147,29 @@ class JobController {
                     } else if (dataSource.type == 'mysql') {
                         data = await queryData(config, query);
                     }
-                    console.log(data);
-                    let updateData = `query${key}`;
-                    const update = await DataSource.updateOne(
-                        { 
-                            _id: job.dataSource._id,
-                        }, {
-                            [updateData] : query,
-                        }
-                    )
+                    if ( data == false ) {
+                        break;
+                    }
+                    const [addData, update] = await Promise.all([
+                        addDataCollection(`data-${name}`, dataSource._id, data),
+                        DataSource.updateOne(
+                            { 
+                                _id: dataSource._id,
+                            }, {
+                                [key] : query,
+                                [name] : `${dataSource._id}-data-${name}`,
+                            }
+                        )
+                    ]);
                 }
             }
-            res.redirect(`preview-data/${job._id}`)
+            res.redirect(`preview-data/${job._id}`);
         } catch (error) {
             console.log(error);
             req.flash('messageType', 'danger');
             req.flash('message', "Something went wrong. try again.");
             return res.redirect('back');
         }
-        
     }
     // [POST] job/new-job
     async createNewJob(req, res) {
@@ -518,6 +544,38 @@ function addDataCollection(name, jobId, data) {
         }
         
     });
+}
+
+async function preViewData(collection) {
+    try {
+        let [count, data] = await Promise.all([
+            db.db.collection(collection).countDocuments(),
+            db.db.collection(collection).find({},{
+                _id: false,
+            }).limit(20).toArray()
+        ]);
+
+        let current = 20 ;
+        if (count <= 20 ) {
+            current = count;
+        }
+
+        data = data.map(data => {
+            if (data._id) {
+                delete data._id
+            }
+            return data;
+        })
+
+        return { 
+            count, 
+            current, 
+            data
+        }
+    } catch (error) {
+        console.log(error);
+        return {};
+    }
 }
 
 function addMany(keys, jobId, data) {

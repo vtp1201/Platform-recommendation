@@ -4,6 +4,7 @@ module.exports = {
     testConnection: async function (config) {
         try {
             const result = await mysql.createConnection(config);
+            result.close();
             return true;
         } catch (error) {
             console.log(error);
@@ -17,9 +18,9 @@ module.exports = {
             if (query.where) {
                 queryString += ` WHERE ${query.where}`;
             }
-            const data = await connection.execute(queryString);
-            console.log(data);
-            return data;
+            const [rows, fields] = await connection.execute(queryString);
+            connection.close();
+            return rows;
         } catch (error) {
             console.log(error);
             return false;

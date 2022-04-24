@@ -40,7 +40,7 @@
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
                         <div class="site-heading">
-                            <h1>Job id: <%=job._id%></h1>
+                            <h1 id="my-h1">Job id: <%=job._id%></h1>
                             <span class="subheading"><%=job.createdAt%></span>
                         </div>
                     </div>
@@ -90,45 +90,81 @@
                                 <h5>Data source user</h5>
                                   <div class="input-group mb-3">
                                     <span class="input-group-text" id="basic-addon1">SELECT</span>
-                                    <input type="text" class="form-control" placeholder="EX: *" name="object.select" aria-describedby="basic-addon1">
+                                    <% if(dataSource.queryobject && dataSource.queryobject.select) { %>
+                                      <input type="text" class="form-control" placeholder="EX: *" name="object.select" value="<%= dataSource.queryobject.select %>" aria-describedby="basic-addon1">
+                                    <% } else { %>
+                                      <input type="text" class="form-control" placeholder="EX: *" name="object.select" aria-describedby="basic-addon1">
+                                    <% } %>
                                   </div>
                                   <div class="input-group mb-3">
                                     <span class="input-group-text" id="basic-addon1">FROM</span>
-                                    <input type="text" class="form-control" placeholder="EX: USER" name="object.from" aria-describedby="basic-addon1">
+                                    <% if(dataSource.queryobject && dataSource.queryobject.from) { %>
+                                      <input type="text" class="form-control" placeholder="EX: USER" name="object.from" value="<%= dataSource.queryobject.from %>" aria-describedby="basic-addon1">
+                                    <% } else { %>
+                                      <input type="text" class="form-control" placeholder="EX: USER" name="object.from" aria-describedby="basic-addon1">
+                                    <% } %>
                                   </div>
                                   <div class="input-group mb-3">
                                     <span class="input-group-text" id="basic-addon1">WHERE</span>
-                                    <input type="text" class="form-control" placeholder="EX: " name="object.where" aria-describedby="basic-addon1">
+                                    <% if(dataSource.queryobject && dataSource.queryobject.where) { %>
+                                      <input type="text" class="form-control" placeholder="EX: " name="object.where" value="<%= dataSource.queryobject.where %>" aria-describedby="basic-addon1">
+                                    <% } else { %>
+                                      <input type="text" class="form-control" placeholder="EX: " name="object.where" aria-describedby="basic-addon1">
+                                    <% } %>
                                   </div>
                               </div>
                               <div class="mb-3">
                                 <h5>Data source interactions</h5>
                                   <div class="input-group mb-3">
                                     <span class="input-group-text" id="basic-addon1">SELECT</span>
+                                    <% if(dataSource.querykey && dataSource.querykey.select) { %>
+                                    <input type="text" class="form-control" placeholder="EX: *" name="key.select" value="<%= dataSource.querykey.select %>" aria-describedby="basic-addon1">
+                                    <% } else { %>
                                     <input type="text" class="form-control" placeholder="EX: *" name="key.select" aria-describedby="basic-addon1">
+                                    <% } %>
                                   </div>
                                   <div class="input-group mb-3">
                                     <span class="input-group-text" id="basic-addon1">FROM</span>
-                                    <input type="text" class="form-control" placeholder="EX: USER, CONTENT" name="key.from" aria-describedby="basic-addon1">
+                                    <% if(dataSource.querykey && dataSource.querykey.from) { %>
+                                      <input type="text" class="form-control" placeholder="EX: USER, CONTENT" name="key.from" value="<%= dataSource.querykey.from %>" aria-describedby="basic-addon1">
+                                    <% } else { %>
+                                      <input type="text" class="form-control" placeholder="EX: USER, CONTENT" name="key.from" aria-describedby="basic-addon1">
+                                    <% } %>
                                   </div>
                                   <div class="input-group mb-3">
                                     <span class="input-group-text" id="basic-addon1">WHERE</span>
-                                    <input type="text" class="form-control" placeholder="EX: USER.id = CONTENT.userId" name="key.where" aria-describedby="basic-addon1">
+                                    <% if(dataSource.querykey && dataSource.querykey.where) { %>
+                                      <input type="text" class="form-control" placeholder="EX: USER.id = CONTENT.userId" name="key.where" value="<%= dataSource.querykey.where %>" aria-describedby="basic-addon1">
+                                    <% } else { %>
+                                      <input type="text" class="form-control" placeholder="EX: USER.id = CONTENT.userId" name="key.where" aria-describedby="basic-addon1">
+                                    <% } %>
                                   </div>
                               </div>
                               <div id="dt_request" class="mb-3">
                                 <h5>Data source items/contents</h5>
                                 <div class="input-group mb-3">
                                   <span class="input-group-text" id="basic-addon1">SELECT</span>
-                                  <input type="text" class="form-control" placeholder="EX: *" name="request.select" aria-describedby="basic-addon1">
+                                  <% if(dataSource.queryrequest && dataSource.queryrequest.select) { %>
+                                    <input type="text" class="form-control" placeholder="EX: *" name="request.select" value="<%= dataSource.queryrequest.select %>" aria-describedby="basic-addon1">
+                                  <% } else { %>
+                                    <input type="text" class="form-control" placeholder="EX: *" name="request.select" aria-describedby="basic-addon1">
+                                  <% } %>
                                 </div>
                                 <div class="input-group mb-3">
                                   <span class="input-group-text" id="basic-addon1">FROM</span>
-                                  <input type="text" class="form-control" placeholder="EX: CONTENT" name="request.from" aria-describedby="basic-addon1">
+                                  <% if(dataSource.queryrequest && dataSource.queryrequest.from) { %>
+                                    <input type="text" class="form-control" placeholder="EX: CONTENT" name="request.from" value="<%= dataSource.queryrequest.from %>" aria-describedby="basic-addon1">
+                                  <% } else { %>
+                                    <input type="text" class="form-control" placeholder="EX: CONTENT" name="request.from" aria-describedby="basic-addon1">
+                                  <% } %>
                                 </div>
                                 <div class="input-group mb-3">
                                   <span class="input-group-text" id="basic-addon1">WHERE</span>
-                                  <input type="text" class="form-control" placeholder="EX: " name="request.where" aria-describedby="basic-addon1">
+                                  <% if(dataSource.queryrequest && dataSource.queryrequest.where) { %>
+                                    <input type="text" class="form-control" placeholder="EX: " name="request.where" value="<%= dataSource.queryrequest.where %>" aria-describedby="basic-addon1">
+                                  <% } else { %>
+                                    <input type="text" class="form-control" placeholder="EX: " name="request.where" aria-describedby="basic-addon1">
+                                  <% } %>
                                 </div>
                               </div>
                             </form>
@@ -142,29 +178,120 @@
                             <div class="card border rounded-5 p-1" style="width: 100%; height: 1100px; background-color: #F7F7F7; overflow: auto;">
                               <h5 class="mt-2">Data source user</h5>  
                               <div class="card border rounded-5 p-1 m-1" style="width: 99%; height: 300px; overflow: auto;">
-                                <tr>
-                                  <td colspan="5" class="text-center" >
-                                      You don't have data yet.
-                                  </td>
-                                </tr>
+                                <table id="table" class="table table-hover table-borderless align-middle caption-top p-2">
+                                  <caption>
+                                    <% if (dataObject.data) { %>
+                                      Data source user <%= dataObject.current %> / <%= dataObject.count %>
+                                    <% } else { %>
+                                      Data source user
+                                    <% } %>
+                                  </caption>
+                                  <thead class="table-dark">
+                                    <tr>
+                                      <% if (dataObject.data) { %>
+                                        <th scope="col">#</th>
+                                        <% Object.keys(dataObject.data[0]).forEach(function(key, index) { %>
+                                          <th scope="col"><%= key %></th>
+                                        <% }) %>
+                                      <% } else { %>
+                                      <td colspan="5" class="text-center">
+                                          You don't have data yet.
+                                      </td>
+                                      <% } %>
+                                    </tr>
+                                  </thead>
+                                  <% if (dataObject.data) { %>
+                                    <tbody>
+                                      <% dataObject.data.forEach(function(data, index) { %>
+                                        <tr>
+                                          <th scope="row"><%= index +1 %></th>
+                                          <% Object.keys(dataObject.data[0]).forEach(function(key, index) { %>
+                                            <td><%= data[key] %></td>
+                                          <% }) %>
+                                        </tr>
+                                      <% }) %>
+                                    </tbody>
+                                  <% } %>
+                                </table>
                               </div>
                               <h5 class="mt-2">Data source interactions</h5> 
                               <div class="card border rounded-5 p-1 m-1" style="width: 99%; height: 300px; overflow: auto;">
-                                <tr>
-                                  <td colspan="5" class="text-center">
-                                      You don't have data yet.
-                                  </td>
-                                </tr>
+                                <table id="table" class="table table-hover table-borderless align-middle caption-top p-2">
+                                  <caption>
+                                    <% if (dataKey.data) { %>
+                                      Data source interactions <%= dataKey.current %> / <%= dataKey.count %>
+                                    <% } else { %>
+                                      Data source interactions
+                                    <% } %>
+                                  </caption>
+                                  <thead class="table-dark">
+                                    <tr>
+                                      <% if (dataKey.data) { %>
+                                        <th scope="col">#</th>
+                                        <% Object.keys(dataKey.data[0]).forEach(function(key, index) { %>
+                                          <th scope="col"><%= key %></th>
+                                        <% }) %>
+                                      <% } else { %>
+                                      <td colspan="5" class="text-center">
+                                          You don't have data yet.
+                                      </td>
+                                      <% } %>
+                                    </tr>
+                                  </thead>
+                                <% if (dataKey.data) { %>
+                                  <tbody>
+                                    <% dataKey.data.forEach(function(data, index) { %>
+                                      <tr>
+                                        <th scope="row"><%= index + 1 %></th>
+                                        <% Object.keys(dataKey.data[0]).forEach(function(key, index) { %>
+                                          <td><%= data[key] %></td>
+                                        <% }) %>
+                                      </tr>
+                                    <% }) %>
+                                  </tbody>
+                                <% } %>
+                                </table>
                               </div>
                               <h5 class="mt-2">Data source items/contents</h5>
                               <div class="card border rounded-5 p-1 m-1" style="width: 99%; height: 300px; overflow: auto;">
-                                <tr>
-                                  <td colspan="5" class="text-center">
-                                    You don't have data yet.
-                                  </td>
-                                </tr>
+                                <table id="table" class="table table-hover table-borderless align-middle caption-top p-2">
+                                  <caption>
+                                    <% if (dataRequest.data) { %>
+                                      Data source user <%= dataRequest.current %> / <%= dataRequest.count %>
+                                    <% } else { %>
+                                      Data source user
+                                    <% } %>
+                                  </caption>
+                                  <thead class="table-dark">
+                                    <tr>
+                                      <% if (dataRequest.data) { %>
+                                        <th scope="col">#</th>
+                                        <% Object.keys(dataRequest.data[0]).forEach(function(key, index) { %>
+                                          <th scope="col"><%= key %></th>
+                                        <% }) %>
+                                      <% } else { %>
+                                      <td colspan="5" class="text-center">
+                                          You don't have data yet.
+                                      </td>
+                                      <% } %>
+                                    </tr>
+                                  </thead>
+                                  <% if (dataRequest.data) { %>
+                                    <tbody>
+                                      <% dataRequest.data.forEach(function(data, index) { %>
+                                        <tr>
+                                          <th scope="row"><%= index + 1 %></th>
+                                          <% Object.keys(dataRequest.data[0]).forEach(function(key, index) { %>
+                                            <td><%= data[key] %></td>
+                                          <% }) %>
+                                        </tr>
+                                      <% }) %>
+                                    </tbody>
+                                  <% } %>
+                                </table>
                               </div>
-                              <% if (dataKey.length > 0 && dataRequest.length > 0) { %>>
+                              <% if (dataKey.data && dataRequest.data) { %>
+                                <button class="mt-2 mx-5 btn btn-primary btn-sm" type="submit">Submit Data</button>
                               <% } else { %>
                                 <button class="mt-2 mx-5 btn btn-primary btn-sm disabled" type="submit">Submit Data</button>
                               <% } %>
@@ -205,15 +332,17 @@
               checkNull('input[name="request.select"]', 'queryrequest', 'select'),
               checkNull('input[name="request.from"]', 'queryrequest', 'from'),
               checkNull('input[name="request.where"]', 'queryrequest', 'where'),
-            ]).then(()=> console.log(formData))
-              /* $.ajax({
-                type: "POST",
-                url: "/job/add-query/<%= job._id %>",
-                data: formData,
-                success: function(){},
-                dataType: "json",
-                contentType : "application/json"
-              }); */
+            ]).then(async ()=> {
+              var jobId = document.getElementById('my-h1').innerHTML.split('Job id: ')[1];           
+              let response = await fetch(`http://localhost:5000/job/add-query/${jobId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+              })
+              location.reload();
+            })
           }
         </script>
     </body>
