@@ -19,11 +19,12 @@ const jobController = require('../app/controllers/JobController');
 
 router.get('/managers', checkNotLogged, jobController.showManager);
 router.get('/detail/:id', checkNotLogged, jobController.showJob);
+router.get('/scenario/:id', checkNotLogged, jobController.showScenario);
 router.get('/new-job', checkNotLogged, jobController.newJob);
 router.post('/new-job', checkNotLogged, jobController.createNewJob);
 router.get('/preview-data/:id', checkNotLogged, jobController.preview);
 router.post('/add-query/:id', checkNotLogged, jobController.createNewQuery);
-//router.post('/new-job', checkNotLogged, uploadMutiple, jobController.create);
+router.post('/add-file/:id', checkNotLogged, uploadMutiple, jobController.addFile);
 router.delete('/:id', checkNotLogged, jobController.delete);
 router.delete('/:id/destroy', checkNotLogged, jobController.destroy);
 router.patch('/:id/restore', checkNotLogged, jobController.restore);

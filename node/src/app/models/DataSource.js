@@ -36,6 +36,16 @@ const DataSource = new Schema(
         request : {
             type : Schema.Types.String,
         },
+        location: {
+            object: Schema.Types.String,
+            key: Schema.Types.String,
+            request: Schema.Types.String,
+        },
+        name: {
+            object: Schema.Types.String,
+            key: Schema.Types.String,
+            request: Schema.Types.String,
+        },
         queryobject: {
             select: Schema.Types.String,
             from: Schema.Types.String,

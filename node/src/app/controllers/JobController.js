@@ -59,6 +59,51 @@ class JobController {
             message: req.flash('message'),
         });
     }
+    // [GET] job/scenario/:id
+    async showScenario(req, res) {
+        try {
+            const job = await Job.findOne({
+                _id: req.params.id,
+                userId: req.user._id,
+            }).populate('dataSource');
+            
+            if (job === null) {
+                res.redirect('back');
+                return;
+            }
+            const dataSource = job.dataSource;
+            let dataObject = {};
+            let dataKey = {};
+            let dataRequest = {};
+
+            if(dataSource.object) {
+                dataObject = await preViewData(dataSource.object);
+            }
+
+            if(dataSource.key) {
+                dataKey = await preViewData(dataSource.object);
+            }
+
+            if(dataSource.request) {
+                dataRequest = await preViewData(dataSource.request);
+            }
+            //console.log(dataObject);
+
+            job.createdAt = job.createdAt.toLocaleString("en-US");
+            res.render('job/scenario', {
+                messageType: req.flash('messageType'),
+                message: req.flash('message'),
+                job: job,
+                dataSource: dataSource,
+                dataObject: dataObject,
+                dataKey: dataKey,
+                dataRequest: dataRequest,
+            });
+        } catch (error) {
+            console.log(error);
+            res.redirect('back');
+        } 
+    }
     // [GET] job/preview-data/:id
     async preview(req, res, next) {
         try {
@@ -102,8 +147,7 @@ class JobController {
         } catch (error) {
             console.log(error);
             res.redirect('back');
-        }
-        
+        }    
     }
     // [POST] job/preview-data/:id
     async createNewQuery(req, res) {
@@ -163,7 +207,7 @@ class JobController {
                     ]);
                 }
             }
-            res.redirect(`preview-data/${job._id}`);
+            res.redirect(`job/preview-data/${job._id}`);
         } catch (error) {
             console.log(error);
             req.flash('messageType', 'danger');
@@ -219,6 +263,64 @@ class JobController {
             return res.redirect('back');
         }
         
+    }
+    // [POST] job/add-file/:id
+    async addFile(req, res) {
+        try {
+            const job = await Job.findById(req.params.id);
+            await uploadMutipleFiles(req, res, next);
+            const jobApi = {}
+            check(req.files.dataSourceObject, jobApi, 'dataSourceObject');
+            check(req.files.dataSourceKey, jobApi, 'dataSourceKey');
+            check(req.files.dataSourceRequest, jobApi, 'dataSourceRequest');
+            const pyHost = process.env.PYTHON_HOST || '127.0.0.1';
+            const pyPort = process.env.PYTHON_PORT || 8000;
+            const url = `http://${pyHost}:${pyPort}/api/addfile`;
+            fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(jobApi),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then( res => res.json())
+            .then( async json => {
+                if(json.message != 'Done') {
+                    req.flash('messageType', 'danger');
+                    req.flash('message', json.message + ", Try again.");
+                    return res.redirect('back');
+                }
+                const update = {};
+                if (check(req.files.dataSourceObject, update.location, 'object') == true) {
+                    update.name.object = req.files.dataSourceObject[0].originalname;
+                }
+                if (check(req.files.dataSourceObject, update.location, 'key') == true) {
+                    update.name.key = req.files.dataSourceObject[0].originalname;
+                }
+                if (check(req.files.dataSourceRequest, update.location, 'request') == true) {
+                    update.name.request = req.files.dataSourceRequest[0].originalname;
+                }
+                const result = await DataSource.updateOne({_id : job.dataSource}, update);
+                console.log(result);
+                const dataSource = await DataSource.findOne({_id : job.dataSource});
+                const keys = Object.keys(dataSource);
+                keys.forEach(key => {
+                    if (key == 'key' || key == 'object' || key == 'request') {
+                        renameCollection(key, dataSource._id);
+                    }       
+                });
+                //renameCollection('recommends', job._id);
+                return res.redirect(`/job/preview-data/${job._id}`);
+            })
+            .catch( error => {
+                console.log(error);
+                req.flash('messageType', 'danger');
+                req.flash('message', "can't create. Try again.");
+                return res.redirect('back');
+            })
+        } catch (error) {
+            req.flash('messageType', 'danger');
+            req.flash('message', "can't add file. Try again.");
+            return res.redirect('back');
+        }
     }
     // [POST] job/new-job
     create (req, res, next) {
@@ -519,7 +621,7 @@ function addDataCollection(name, jobId, data) {
         const listCollections = await db.db.listCollections().toArray();
         const collections = (collection) => collection.name == `${jobId}-${name}`;
         if (listCollections.some(collections) == true) {
-            db.db.collection(`${jobId}-${name}`).insertMany(data, function(error, record){
+            db.db.collection(`${jobId}-data-${name}`).insertMany(data, function(error, record){
                 if (error) {
                     console.log(error);
                     return reject('error');
