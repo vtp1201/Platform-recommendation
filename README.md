@@ -3,7 +3,6 @@
 ## Tên đề tài: Xây đựng trang web gợi ý
 ## GVHD: TS. Huỳnh Xuân Phụng
 ## Nhóm SVTH:
-### - Phạm Ngọc Hùng - 18133017
 ### - Phạm Việt Thắng - 18133052
 ### - Đinh Quang Ngọc - 18133034
 ## Công cụ sử dụng:
