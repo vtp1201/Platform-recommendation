@@ -66,23 +66,44 @@
                                 </div>
                             <% } %>
                             <% if (dataSource.type == 'file') { %>
-                            <form method="POST" action="" class="form-horizontal">
-                              <div class="my-3">
-                                <label for="dataSourceObject" class="form-label">Data source user</label>
-                                <input type="file" name="dataSourceObject" id="dataSourceObject" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
-                                <div class="invalid-feedback">Example invalid form file feedback</div>
-                              </div>
-                              <div class="mb-3">
+                            <form method="POST" action="/job/add-file/<%= job._id %>" class="form-horizontal">
+                              <% if (dataSource.object) { %>
+                                <div class="my-3">
+                                  <label for="dataSourceObject" class="form-label">Data source user</label>
+                                  <a href="<%= dataSource.location.object %>" download="<%= dataSource.name.object %>"><%= dataSource.name.object %></a>
+                                </div>
+                              <% } else { %>
+                                <div class="my-3">
+                                  <label for="dataSourceObject" class="form-label">Data source user</label>
+                                  <input type="file" name="dataSourceObject" id="dataSourceObject" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
+                                  <div class="invalid-feedback">Example invalid form file feedback</div>
+                                </div>
+                              <% } %>
+                              <% if (dataSource.key) { %>
+                                <div class="mb-3">
+                                  <label for="dataSource" class="form-label">Data source key</label>
+                                  <a href="<%= dataSource.location.key %>" download="<%= dataSource.name.key %>"><%= dataSource.name.key %></a>
+                                </div>
+                              <% } else { %>
+                                <div class="mb-3">
                                   <label for="dataSourceKey" class="form-label">Data source interactions</label>
                                   <input type="file" name="dataSourceKey" id="dataSourceKey" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
                                   <div class="invalid-feedback">Example invalid form file feedback</div>
-                              </div>
-                              <div id="dt_request" class="mb-3">
+                                </div>
+                              <% } %>
+                              <% if (dataSource.request) { %>
+                                <div id="dt_request" class="mb-3">
+                                  <label for="dataSourceRequest" class="form-label">Data source items/contents</label>
+                                  <a href="<%= dataSource.location.request %>" download="<%= dataSource.name.request %>"><%= dataSource.name.request %></a>
+                                </div>
+                              <% } else { %>
+                                <div id="dt_request" class="mb-3">
                                   <label for="dataSourceRequest" class="form-label">Data source items/contents</label>
                                   <input type="file" name="dataSourceRequest" id="dataSourceRequest" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
                                   <div class="invalid-feedback">Example invalid form file feedback</div>
-                              </div>
-                              <button class="mx-5 btn btn-primary btn-sm" type="submit">Submit Query</button>
+                                </div>
+                              <% } %>
+                              <button class="mx-5 btn btn-primary btn-sm" type="submit">Submit file</button>
                             </form>
                             <% } else {%>
                             <form id="add-query" class="needs-validation" novalidate="" enctype="">
