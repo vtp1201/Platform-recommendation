@@ -3,6 +3,7 @@ const DataSource = require('../models/DataSource');
 const fetch = require('cross-fetch');
 const {connect, disconnect, query} = require('../../config/db/mssql');
 const {testConnection, queryData} = require('../../config/db/mysql');
+const {testConnectionPG, queryDataPG} = require('../../config/db/postgressql');
 
 const { mutipleMongooseToObject, mongooseToObject } = require('../../util/mongoose');
 const uploadMutipleFiles = require('../../config/firebase/firebase');
@@ -190,6 +191,8 @@ class JobController {
                         data = await query(query);
                     } else if (dataSource.type == 'mysql') {
                         data = await queryData(config, query);
+                    } else if (dataSource.type == 'postgressql') {
+                        data = await queryDataPG(config, query);
                     }
                     if ( data == false ) {
                         break;
@@ -231,9 +234,11 @@ class JobController {
                     check = await connect(config);
                     await disconnect();
                 } else if (req.body.dataSourceType == 'mysql') {
-                    console.log("object");
                     check = await testConnection(config);
-                    console.log(check)
+                    // console.log(check)
+                } else if (req.body.dataSourceType == 'postgressql') {
+                    check = await testConnectionPG(config);
+                    // console.log(check)
                 }
                 if (check === false) {
                     req.flash('messageType', 'danger');
