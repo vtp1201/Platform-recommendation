@@ -11,6 +11,9 @@ const mongoose   = require('mongoose');
 mongoose.Promise = Promise;
 let db = mongoose.connection;
 
+const pyHost = process.env.PYTHON_HOST || '127.0.0.1';
+const pyPort = process.env.PYTHON_PORT || 8000;
+
 function check(dataSource, obj, toObj) {
     if(dataSource) {
         obj[toObj] = dataSource[0].firebaseUrl;
@@ -278,8 +281,6 @@ class JobController {
             check(req.files.dataSourceObject, jobApi, 'dataSourceObject');
             check(req.files.dataSourceKey, jobApi, 'dataSourceKey');
             check(req.files.dataSourceRequest, jobApi, 'dataSourceRequest');
-            const pyHost = process.env.PYTHON_HOST || '127.0.0.1';
-            const pyPort = process.env.PYTHON_PORT || 8000;
             const url = `http://${pyHost}:${pyPort}/api/addfile`;
             fetch(url, {
                 method: 'POST',
@@ -327,101 +328,53 @@ class JobController {
             return res.redirect('back');
         }
     }
-    // [POST] job/new-job
-    create (req, res, next) {
-        uploadMutipleFiles(req, res, next)
-        .then((a) => {
+    // [POST] job/scenario/:id
+    async createRecommendation (req, res, next) {
+        try {
+            const job = await Job.findOne({_id : req.params.id}).populate('dataSource');
+            const dataSource = job.dataSource;
+            if (!job) {
+                return res.redirect('back');
+            }
             const jobApi = {
                 service: req.body.service,
                 object: req.body.object,
                 key: req.body.key,
                 request: req.body.request,
+                dataSourceObject: dataSource.object || null,
+                dataSourceKey: dataSource.key,
+                dataSourceRequest: dataSource.request,
             };
-            if (!req.files.dataSourceKey) {
-                req.flash('messageType', 'danger');
-                req.flash('message', "please enter interactions files. Try again.");
-                return res.redirect('back');
-            }
-            else {
-                jobApi.dataSourceKey = req.files.dataSourceKey[0].firebaseUrl;
-            }
-            check(req.files.dataSourceObject, jobApi, 'dataSourceObject');
-            check(req.files.dataSourceRequest, jobApi, 'dataSourceRequest');
-            try {
-                const pyHost = process.env.PYTHON_HOST || '127.0.0.1';
-                const pyPort = process.env.PYTHON_PORT || 8000;
-                const url = `http://${pyHost}:${pyPort}/api/recommend`;
-                console.log(url);
-                fetch(url, {
-                    method: 'POST',
-                    body: JSON.stringify(jobApi),
-                    headers: { 'Content-Type': 'application/json' }
-                })
-                .then( res => res.json())
-                .then( json => {
-                    if(json.message != 'Done') {
-                        req.flash('messageType', 'danger');
-                        req.flash('message', json.message + ", Try again.");
-                        return res.redirect('back');
-                    }
-                    const newJob = {
-                        userId: req.user._id,
-                        title: req.body.title,
-                        description: req.body.description,
-                        service: req.body.service,
-                        object: req.body.object,
-                        key: req.body.key,
-                        request: req.body.request,
-                        dataSource: { 
-                            key: req.files.dataSourceKey[0].originalname,
-                        },
-                        DSLocation: { 
-                            key: req.files.dataSourceKey[0].firebaseUrl,
-                        },
-                        dataDestination: json.dataDestination,
-                        DDLocation: json.DDLocation
-                    }
-                    if (check(req.files.dataSourceObject, newJob.DSLocation, 'object') == true) {
-                        newJob.dataSource.object = req.files.dataSourceObject[0].originalname;
-                    }
-                    if (check(req.files.dataSourceRequest, newJob.DSLocation, 'request') == true) {
-                        newJob.dataSource.request = req.files.dataSourceRequest[0].originalname;
-                    }
-                    const job = new Job(newJob);
-                    job.save()
-                    .then( job => {
-                        const keys = Object.keys(newJob.dataSource);
-                        keys.forEach(key => {
-                            if (key == 'key' || key == 'object' || key == 'request') {
-                                renameCollection(key, job._id);
-                            }       
-                        });
-                        renameCollection('recommends', job._id);
-                        return res.redirect(`/job/detail/${job._id}`);
-                    })
-                    .catch(error => {
-                        console.log(error);
-                        req.flash('messageType', 'danger');
-                        req.flash('message', "can't save Job. Try again.");
-                        return res.redirect('back');
-                    })
-                })
-                .catch( error => {
-                    console.log(error);
+            const url = `http://${pyHost}:${pyPort}/api/recommend`;
+            fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(jobApi),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then( res => res.json())
+            .then( json => {
+                if(json.message != 'Done') {
                     req.flash('messageType', 'danger');
-                    req.flash('message', "can't create. Try again.");
+                    req.flash('message', json.message + ", Try again.");
                     return res.redirect('back');
-                })
-            } catch (error) {
-                req.flash('messageType', 'danger');
-                req.flash('message', "server down. Try again later!");
-                return res.redirect('back');
-            }
-        }).catch(error => {
+                }
+                renameCollection('recommends', job._id);
+                const updateJob = {
+                    service: req.body.service,
+                    object: req.body.object,
+                    key: req.body.key,
+                    request: req.body.request,
+                    dataDestination: `${job._id}-data-recommends`
+                }
+                await Job.updateOne({ _id: job._id}, updateJob);
+                return res.redirect(`/job/detail/${job._id}`);
+            })
+        } catch (error) {
+            console.log(error);
             req.flash('messageType', 'danger');
-            req.flash('message', "can't create(bad request). Try again.");
+            req.flash('message', json.message + ", Try again.");
             return res.redirect('back');
-        })
+        }
     }
     // [GET] job/trash
     trash(req, res, next) {
@@ -561,8 +514,6 @@ class JobController {
                             key: job.key,
                             request: job.request,
                         }
-                        const pyHost = process.env.PYTHON_HOST || '127.0.0.1';
-                        const pyPort = process.env.PYTHON_PORT || 8000;
                         const url = `http://${pyHost}:${pyPort}/api/update-recommend`;
                         try {
                             fetch(url, { 
@@ -614,7 +565,7 @@ async function renameCollection(name, jobId) {
     const listCollections = await db.db.listCollections().toArray();
     listCollections.forEach( collection => {
         if (collection.name == `${name}`) {
-            db.collection(name).rename(`${jobId}-${name}`);
+            db.collection(name).rename(`${jobId}-data-${name}`);
             return true;
         }
     });
