@@ -184,9 +184,9 @@ def mongoToDf(name):
 
 def updateRecommendations(jobId, service):
     try:
-        articles_df = mongoToDf(jobId + "-data-request")
-        user_df = mongoToDf(jobId + "-data-object")
-        interactions_df = mongoToDf(jobId + "-data-key")
+        articles_df = mongoToDf(jobId + "-request")
+        user_df = mongoToDf(jobId + "-object")
+        interactions_df = mongoToDf(jobId + "-key")
     except:
         return "error, cant read data"
 
@@ -198,7 +198,7 @@ def updateRecommendations(jobId, service):
     if isinstance(recommend_list, str):
         return recommend_list
 
-    addMongo(name = jobId + "-data-recommends", data = recommend_list)
+    addMongo(name = jobId + "-recommends", data = recommend_list)
     return "complete"
 
 def engine(service, articles_df, interactions_df):

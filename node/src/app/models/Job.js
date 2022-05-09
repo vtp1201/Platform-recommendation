@@ -14,16 +14,29 @@ const Job = new Schema(
             type: Schema.Types.String,
             required: true,
         },
-        description: Schema.Types.String,
-        service: Schema.Types.String,
-        object: Schema.Types.String,
-        key: Schema.Types.String,
-        request: Schema.Types.String,
+        description: { 
+            type: Schema.Types.String,
+            required: true,
+        },
+        service: { 
+            type: Schema.Types.String,
+        },
+        object: { 
+            type: Schema.Types.String,
+        },
+        key: { 
+            type: Schema.Types.String,
+        },
+        request: { 
+            type: Schema.Types.String,
+        },
         dataSource: {
             type : Schema.Types.ObjectId,
             ref: "DataSource",
         },
-        dataDestination: Schema.Types.String
+        dataDestination: { 
+            type: Schema.Types.String,
+        },
     },
     {
         timestamps: true,

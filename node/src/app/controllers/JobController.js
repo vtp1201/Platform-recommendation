@@ -18,7 +18,6 @@ function check(dataSource, obj, toObj) {
     if(dataSource) {
         if (!obj) {
             obj = {[toObj]: null};
-            console.log(obj)
         }
         obj[toObj] = dataSource[0].firebaseUrl;
         return true;
@@ -215,7 +214,7 @@ class JobController {
                                 _id: dataSource._id,
                             }, {
                                 [key] : query,
-                                [name] : `${dataSource._id}-data-${name}`,
+                                [name] : `${dataSource._id}-${name}`,
                             }
                         )
                     ]);
@@ -305,14 +304,14 @@ class JobController {
                     return res.redirect('back');
                 }
                 const update = {};
-                if (check(req.files.dataSourceObject, update.location, 'object') == true) {
+                if (check(req.files.dataSourceObject, update.location, 'object')) {
                     if (!update.name) {
                         update.name = {object: null};
                     }
                     update.name.object = req.files.dataSourceObject[0].originalname;
-                    update.object = `${dataSource._id}-data-object`;
+                    update.object = `${dataSource._id}-object`;
                 }
-                if (check(req.files.dataSourceKey, update.location, 'key') == true) {
+                if (check(req.files.dataSourceKey, update.location, 'key')) {
                     if (!update.name) {
                         update.name = {key: null};
                         update.location = {key: null};
@@ -320,16 +319,16 @@ class JobController {
                     console.log(update);
                     update.location.key = req.files.dataSourceKey[0].firebaseUrl
                     update.name.key = req.files.dataSourceKey[0].originalname;
-                    update.key = `${dataSource._id}-data-key`;
+                    update.key = `${dataSource._id}-key`;
                 }
-                if (check(req.files.dataSourceRequest, update.location, 'request') == true) {
+                if (check(req.files.dataSourceRequest, update.location, 'request')) {
                     if (!update.name) {
                         update.name = {request: null};
                         update.location = {request: null};
                     }
                     update.location.request = req.files.dataSourceRequest[0].firebaseUrl
                     update.name.request = req.files.dataSourceRequest[0].originalname;
-                    update.request = `${dataSource._id}-data-request`;
+                    update.request = `${dataSource._id}-request`;
                 }
                 console.log(update)
                 const result = await DataSource.updateOne({_id : dataSource._id}, update);
@@ -391,7 +390,7 @@ class JobController {
                     object: req.body.object,
                     key: req.body.key,
                     request: req.body.request,
-                    dataDestination: `${dataSource._id}-data-recommends`
+                    dataDestination: `${dataSource._id}-recommends`
                 }
                 await Job.updateOne({ _id: job._id}, updateJob);
                 return res.redirect(`/job/detail/${job._id}`);
@@ -437,10 +436,10 @@ class JobController {
         const dataSource = job.dataSource;
         Job.deleteOne({ _id : req.params.id })
             .then(async () => {
-                const request = dropCollection(`${dataSource._id}-data-request`);
-                const object = dropCollection(`${dataSource._id}-data-object`);
-                const key = dropCollection(`${dataSource._id}-data-key`);
-                const recommends = dropCollection(`${dataSource._id}-data-recommends`);
+                const request = dropCollection(`${dataSource._id}-request`);
+                const object = dropCollection(`${dataSource._id}-object`);
+                const key = dropCollection(`${dataSource._id}-key`);
+                const recommends = dropCollection(`${dataSource._id}-recommends`);
                 Promise.all([
                     request, object, key, recommends
                     , DataSource.deleteOne({_id: dataSource._id})
@@ -627,7 +626,7 @@ function addDataCollection(name, jobId, data) {
         const listCollections = await db.db.listCollections().toArray();
         const collections = (collection) => collection.name == `${jobId}-${name}`;
         if (listCollections.some(collections) == true) {
-            db.db.collection(`${jobId}-data-${name}`).insertMany(data, function(error, record){
+            db.db.collection(`${jobId}-${name}`).insertMany(data, function(error, record){
                 if (error) {
                     console.log(error);
                     return reject('error');
@@ -638,7 +637,7 @@ function addDataCollection(name, jobId, data) {
         else {
             db.db.createCollection(`${jobId}-${name}`)
             .then(collection => {
-                db.db.collection(`${jobId}-data-${name}`).insertMany(data, function(error, record){
+                db.db.collection(`${jobId}-${name}`).insertMany(data, function(error, record){
                     if (error) {
                         console.log(error);
                         return reject('error');
@@ -722,6 +721,10 @@ function dropCollection(name) {
             })
         } else return resolve();
     })
+}
+
+function hasNotDuplicatesArray(array) {
+    return (new Set(array)).size === array.length;
 }
 
 module.exports = new JobController();

@@ -6,26 +6,12 @@ const Schema = mongoose.Schema;
 const DataSource = new Schema(
     {
         jobId: { 
-            type: Schema.Types.ObjectId, 
+            type: Schema.Types.ObjectId,
+            ref: 'Job',
             required: true,
         },
         type: {
             type : Schema.Types.String,
-        },
-        server: {
-            type : Schema.Types.String,
-        },
-        database: {
-            type : Schema.Types.String,
-        },
-        user: {
-            type : Schema.Types.String,
-        },
-        password: {
-            type : Schema.Types.String,
-        },
-        port: {
-            type : Schema.Types.Number,
         },
         object: {
             type : Schema.Types.String,
@@ -33,33 +19,36 @@ const DataSource = new Schema(
         key : {
             type : Schema.Types.String,
         },
+        connection: {
+            type: Schema.Types.ObjectId,
+            ref: 'Connection'
+        },
         request : {
             type : Schema.Types.String,
         },
-        location: {
-            object: Schema.Types.String,
-            key: Schema.Types.String,
-            request: Schema.Types.String,
-        },
-        name: {
-            object: Schema.Types.String,
-            key: Schema.Types.String,
-            request: Schema.Types.String,
-        },
         queryobject: {
-            select: Schema.Types.String,
-            from: Schema.Types.String,
-            where: Schema.Types.String,
+            type: Schema.Types.ObjectId,
+            ref: 'Query'
         },
         queryrequest: {
-            select: Schema.Types.String,
-            from: Schema.Types.String,
-            where: Schema.Types.String,
+            type: Schema.Types.ObjectId,
+            ref: 'Query'
         },
         querykey: {
-            select: Schema.Types.String,
-            from: Schema.Types.String,
-            where: Schema.Types.String,
+            type: Schema.Types.ObjectId,
+            ref: 'Query'
+        },
+        fileObject: {
+            type: Schema.Types.ObjectId,
+            ref: 'File'
+        },
+        fileRequest: {
+            type: Schema.Types.ObjectId,
+            ref: 'File'
+        },
+        fileKey: {
+            type: Schema.Types.ObjectId,
+            ref: 'File'
         },
     },
     {
