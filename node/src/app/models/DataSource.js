@@ -19,22 +19,22 @@ const DataSource = new Schema(
         key : {
             type : Schema.Types.String,
         },
+        request : {
+            type : Schema.Types.String,
+        },
         connection: {
             type: Schema.Types.ObjectId,
             ref: 'Connection'
         },
-        request : {
-            type : Schema.Types.String,
-        },
-        queryobject: {
+        queryObject: {
             type: Schema.Types.ObjectId,
             ref: 'Query'
         },
-        queryrequest: {
+        queryRequest: {
             type: Schema.Types.ObjectId,
             ref: 'Query'
         },
-        querykey: {
+        queryKey: {
             type: Schema.Types.ObjectId,
             ref: 'Query'
         },

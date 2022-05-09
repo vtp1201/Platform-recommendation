@@ -5,8 +5,9 @@ const Schema = mongoose.Schema;
 
 const File = new Schema(
     {
-        DataSourceId: { 
+        dataSourceId: { 
             type: Schema.Types.ObjectId, 
+            ref: 'DataSource',
             required: true,
         },
         name : {

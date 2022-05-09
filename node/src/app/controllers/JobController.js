@@ -1,5 +1,9 @@
 const Job = require('../models/Job');
 const DataSource = require('../models/DataSource');
+const Connection = require('../models/Connection');
+const Query = require('../models/Query');
+const Files = require('../models/File');
+
 const fetch = require('cross-fetch');
 const {connect, disconnect, query} = require('../../config/db/mssql');
 const {testConnection, queryData} = require('../../config/db/mysql');
@@ -121,27 +125,40 @@ class JobController {
             const job = await Job.findOne({
                 _id: req.params.id,
                 userId: req.user._id,
-            }).populate('dataSource');
+            });
             
             if (job === null) {
                 res.redirect('back');
                 return;
             }
-            const dataSource = job.dataSource;
+            const dataSource = await DataSource.findOne({
+                _id: job.dataSource
+            }).populate([
+                'queryObject', 'queryKey', 'queryRequest'
+                , 'fileObject', 'fileKey', 'fileRequest'
+            ]);
             let dataObject = {};
             let dataKey = {};
             let dataRequest = {};
+            let files = {};
+            let query = {};
 
             if(dataSource.object) {
                 dataObject = await preViewData(dataSource.object);
+                files.object = dataSource?.fileObject;
+                query.object = dataSource?.queryObject;
             }
 
             if(dataSource.key) {
                 dataKey = await preViewData(dataSource.object);
+                files.key = dataSource?.fileKey;
+                query.key = dataSource?.queryKey;
             }
 
             if(dataSource.request) {
                 dataRequest = await preViewData(dataSource.request);
+                files.request = dataSource?.fileRequest;
+                query.request = dataSource?.queryRequest;
             }
             //console.log(dataObject);
 
@@ -149,11 +166,13 @@ class JobController {
             res.render('job/previewData', {
                 messageType: req.flash('messageType'),
                 message: req.flash('message'),
-                job: job,
-                dataSource: dataSource,
-                dataObject: dataObject,
-                dataKey: dataKey,
-                dataRequest: dataRequest,
+                job,
+                dataSource,
+                dataObject,
+                dataKey,
+                dataRequest,
+                files,
+                query,
             });
         } catch (error) {
             console.log(error);
@@ -188,12 +207,12 @@ class JobController {
             }
 
             for (let key in req.body) {
-                if (key == 'queryobject' || key == 'querykey' || key == 'queryrequest') {
+                if (key == 'queryObject' || key == 'queryKey' || key == 'queryRequest') {
                     let query = {
                         ...req.body[key],
                     };
                     let name = key.split('query')[1];
-                    if (!query.select || !query.from || dataSource[name]) {
+                    if (!query.select || !query.from || dataSource[name.toLowerCase()]) {
                         break;
                     }
                     let data = [];
@@ -207,17 +226,25 @@ class JobController {
                     if ( data == false ) {
                         break;
                     }
+                    const newQuery = new Query({
+                        dataSourceId: dataSource._id,
+                        ...key,
+                    })
+
+                    const querySuccess = await newQuery.save(); 
+                    
                     const [addData, update] = await Promise.all([
                         addDataCollection(name, dataSource._id, data),
                         DataSource.updateOne(
                             { 
                                 _id: dataSource._id,
                             }, {
-                                [key] : query,
+                                [key] : querySuccess._id,
                                 [name] : `${dataSource._id}-${name}`,
                             }
                         )
                     ]);
+                    
                 }
             }
             res.redirect(`job/preview-data/${job._id}`);
@@ -265,11 +292,18 @@ class JobController {
                 jobId: job._id,
                 type: req.body.dataSourceType,
                 ...req.body,
-            })
+            });
             const dataSource = await newDataSource.save();
             await Job.updateOne({ _id: job._id}, {
                 dataSource: dataSource._id,
             });
+            if (req.body.dataSourceType != 'file') {
+                const newConnection = new Connection({
+                    dataSourceId: dataSource._id,
+                    ...req.body,
+                })
+                await newConnection.save();
+            }
             return res.redirect(`/job/preview-data/${job._id}`);
         } catch (error) {
             console.log(error);
@@ -304,32 +338,23 @@ class JobController {
                     return res.redirect('back');
                 }
                 const update = {};
-                if (check(req.files.dataSourceObject, update.location, 'object')) {
-                    if (!update.name) {
-                        update.name = {object: null};
+                await Promise.all( Object.key(req.files).map((key) => {
+                    const name = key.split('dataSource')[1];
+                    if (
+                        key == 'dataSourceObject' ||
+                        key == 'dataSourceKey' ||
+                        key == 'dataSourceRequest'
+                    ) {
+                        const newFile = new Files({
+                            dataSourceId: dataSource._id,
+                            name: req.files[key][0].originalname,
+                            location: req.files[key][0].firebaseUrl
+                        })
+                        const file = await newFile.save();
+                        update[`file${name}`] = file._id;
+                        update[`${name.toLowerCase()}`] = `${dataSource._id}-${name.toLowerCase()}`;
                     }
-                    update.name.object = req.files.dataSourceObject[0].originalname;
-                    update.object = `${dataSource._id}-object`;
-                }
-                if (check(req.files.dataSourceKey, update.location, 'key')) {
-                    if (!update.name) {
-                        update.name = {key: null};
-                        update.location = {key: null};
-                    }
-                    console.log(update);
-                    update.location.key = req.files.dataSourceKey[0].firebaseUrl
-                    update.name.key = req.files.dataSourceKey[0].originalname;
-                    update.key = `${dataSource._id}-key`;
-                }
-                if (check(req.files.dataSourceRequest, update.location, 'request')) {
-                    if (!update.name) {
-                        update.name = {request: null};
-                        update.location = {request: null};
-                    }
-                    update.location.request = req.files.dataSourceRequest[0].firebaseUrl
-                    update.name.request = req.files.dataSourceRequest[0].originalname;
-                    update.request = `${dataSource._id}-request`;
-                }
+                }))
                 console.log(update)
                 const result = await DataSource.updateOne({_id : dataSource._id}, update);
                 console.log(result);
@@ -366,10 +391,7 @@ class JobController {
             }
             const jobApi = {
                 jobId: dataSource._id,
-                service: req.body.service,
-                object: req.body.object,
-                key: req.body.key,
-                request: req.body.request,
+                ...req.body,
             };
             const url = `http://${pyHost}:${pyPort}/api/update-recommend`;
             fetch(url, {
@@ -386,10 +408,7 @@ class JobController {
                 }
                 // renameCollection('recommends', job._id);
                 const updateJob = {
-                    service: req.body.service,
-                    object: req.body.object,
-                    key: req.body.key,
-                    request: req.body.request,
+                    ...req.body,
                     dataDestination: `${dataSource._id}-recommends`
                 }
                 await Job.updateOne({ _id: job._id}, updateJob);

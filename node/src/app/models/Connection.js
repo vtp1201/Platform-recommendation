@@ -5,8 +5,9 @@ const Schema = mongoose.Schema;
 
 const Connection = new Schema(
     {
-        DataSourceId: { 
-            type: Schema.Types.ObjectId, 
+        dataSourceId: { 
+            type: Schema.Types.ObjectId,
+            ref: 'DataSource',  
             required: true,
         },
         server: {

@@ -70,7 +70,7 @@
                               <% if (dataSource.object) { %>
                                 <div class="my-3">
                                   <label for="dataSourceObject" class="form-label">Data source user</label>
-                                  <a href="<%= dataSource.location.object %>" download="<%= dataSource.name.object %>"><%= dataSource.name.object %></a>
+                                  <a href="<%= files.object.location %>" download="<%= files.object.name %>"><%= files.object.name %></a>
                                 </div>
                               <% } else { %>
                                 <div class="my-3">
@@ -82,7 +82,7 @@
                               <% if (dataSource.key) { %>
                                 <div class="mb-3">
                                   <label for="dataSource" class="form-label">Data source interactions</label>
-                                  <a href="<%= dataSource.location.key %>" download="<%= dataSource.name.key %>"><%= dataSource.name.key %></a>
+                                  <a href="<%= files.key.location %>" download="<%= files.key.name %>"><%= files.key.name %></a>
                                 </div>
                               <% } else { %>
                                 <div class="mb-3">
@@ -94,7 +94,7 @@
                               <% if (dataSource.request) { %>
                                 <div id="dt_request" class="mb-3">
                                   <label for="dataSourceRequest" class="form-label">Data source items/contents</label>
-                                  <a href="<%= dataSource.location.request %>" download="<%= dataSource.name.request %>"><%= dataSource.name.request %></a>
+                                  <a href="<%= files.request.location %>" download="<%= files.request.name %>"><%= files.request.name %></a>
                                 </div>
                               <% } else { %>
                                 <div id="dt_request" class="mb-3">
@@ -111,24 +111,24 @@
                                 <h5>Data source user</h5>
                                   <div class="input-group mb-3">
                                     <span class="input-group-text" id="basic-addon1">SELECT</span>
-                                    <% if(dataSource.queryobject && dataSource.queryobject.select) { %>
-                                      <input type="text" class="form-control" placeholder="EX: *" name="object.select" value="<%= dataSource.queryobject.select %>" aria-describedby="basic-addon1">
+                                    <% if(query.object && query.object.select) { %>
+                                      <input type="text" class="form-control" placeholder="EX: *" name="object.select" value="<%= query.object.select %>" aria-describedby="basic-addon1">
                                     <% } else { %>
                                       <input type="text" class="form-control" placeholder="EX: *" name="object.select" aria-describedby="basic-addon1">
                                     <% } %>
                                   </div>
                                   <div class="input-group mb-3">
                                     <span class="input-group-text" id="basic-addon1">FROM</span>
-                                    <% if(dataSource.queryobject && dataSource.queryobject.from) { %>
-                                      <input type="text" class="form-control" placeholder="EX: USER" name="object.from" value="<%= dataSource.queryobject.from %>" aria-describedby="basic-addon1">
+                                    <% if(query.object && query.object.from) { %>
+                                      <input type="text" class="form-control" placeholder="EX: USER" name="object.from" value="<%= query.object.from %>" aria-describedby="basic-addon1">
                                     <% } else { %>
                                       <input type="text" class="form-control" placeholder="EX: USER" name="object.from" aria-describedby="basic-addon1">
                                     <% } %>
                                   </div>
                                   <div class="input-group mb-3">
                                     <span class="input-group-text" id="basic-addon1">WHERE</span>
-                                    <% if(dataSource.queryobject && dataSource.queryobject.where) { %>
-                                      <input type="text" class="form-control" placeholder="EX: " name="object.where" value="<%= dataSource.queryobject.where %>" aria-describedby="basic-addon1">
+                                    <% if(query.object && query.object.where) { %>
+                                      <input type="text" class="form-control" placeholder="EX: " name="object.where" value="<%= query.object.where %>" aria-describedby="basic-addon1">
                                     <% } else { %>
                                       <input type="text" class="form-control" placeholder="EX: " name="object.where" aria-describedby="basic-addon1">
                                     <% } %>
@@ -138,24 +138,24 @@
                                 <h5>Data source interactions</h5>
                                   <div class="input-group mb-3">
                                     <span class="input-group-text" id="basic-addon1">SELECT</span>
-                                    <% if(dataSource.querykey && dataSource.querykey.select) { %>
-                                    <input type="text" class="form-control" placeholder="EX: *" name="key.select" value="<%= dataSource.querykey.select %>" aria-describedby="basic-addon1">
+                                    <% if(query.key && query.key.select) { %>
+                                    <input type="text" class="form-control" placeholder="EX: *" name="key.select" value="<%= query.key.select %>" aria-describedby="basic-addon1">
                                     <% } else { %>
                                     <input type="text" class="form-control" placeholder="EX: *" name="key.select" aria-describedby="basic-addon1">
                                     <% } %>
                                   </div>
                                   <div class="input-group mb-3">
                                     <span class="input-group-text" id="basic-addon1">FROM</span>
-                                    <% if(dataSource.querykey && dataSource.querykey.from) { %>
-                                      <input type="text" class="form-control" placeholder="EX: USER, CONTENT" name="key.from" value="<%= dataSource.querykey.from %>" aria-describedby="basic-addon1">
+                                    <% if(query.key && query.key.from) { %>
+                                      <input type="text" class="form-control" placeholder="EX: USER, CONTENT" name="key.from" value="<%= query.key.from %>" aria-describedby="basic-addon1">
                                     <% } else { %>
                                       <input type="text" class="form-control" placeholder="EX: USER, CONTENT" name="key.from" aria-describedby="basic-addon1">
                                     <% } %>
                                   </div>
                                   <div class="input-group mb-3">
                                     <span class="input-group-text" id="basic-addon1">WHERE</span>
-                                    <% if(dataSource.querykey && dataSource.querykey.where) { %>
-                                      <input type="text" class="form-control" placeholder="EX: USER.id = CONTENT.userId" name="key.where" value="<%= dataSource.querykey.where %>" aria-describedby="basic-addon1">
+                                    <% if(query.key && query.key.where) { %>
+                                      <input type="text" class="form-control" placeholder="EX: USER.id = CONTENT.userId" name="key.where" value="<%= query.key.where %>" aria-describedby="basic-addon1">
                                     <% } else { %>
                                       <input type="text" class="form-control" placeholder="EX: USER.id = CONTENT.userId" name="key.where" aria-describedby="basic-addon1">
                                     <% } %>
@@ -165,24 +165,24 @@
                                 <h5>Data source items/contents</h5>
                                 <div class="input-group mb-3">
                                   <span class="input-group-text" id="basic-addon1">SELECT</span>
-                                  <% if(dataSource.queryrequest && dataSource.queryrequest.select) { %>
-                                    <input type="text" class="form-control" placeholder="EX: *" name="request.select" value="<%= dataSource.queryrequest.select %>" aria-describedby="basic-addon1">
+                                  <% if(query.request && query.request.select) { %>
+                                    <input type="text" class="form-control" placeholder="EX: *" name="request.select" value="<%= query.request.select %>" aria-describedby="basic-addon1">
                                   <% } else { %>
                                     <input type="text" class="form-control" placeholder="EX: *" name="request.select" aria-describedby="basic-addon1">
                                   <% } %>
                                 </div>
                                 <div class="input-group mb-3">
                                   <span class="input-group-text" id="basic-addon1">FROM</span>
-                                  <% if(dataSource.queryrequest && dataSource.queryrequest.from) { %>
-                                    <input type="text" class="form-control" placeholder="EX: CONTENT" name="request.from" value="<%= dataSource.queryrequest.from %>" aria-describedby="basic-addon1">
+                                  <% if(query.request && query.request.from) { %>
+                                    <input type="text" class="form-control" placeholder="EX: CONTENT" name="request.from" value="<%= query.request.from %>" aria-describedby="basic-addon1">
                                   <% } else { %>
                                     <input type="text" class="form-control" placeholder="EX: CONTENT" name="request.from" aria-describedby="basic-addon1">
                                   <% } %>
                                 </div>
                                 <div class="input-group mb-3">
                                   <span class="input-group-text" id="basic-addon1">WHERE</span>
-                                  <% if(dataSource.queryrequest && dataSource.queryrequest.where) { %>
-                                    <input type="text" class="form-control" placeholder="EX: " name="request.where" value="<%= dataSource.queryrequest.where %>" aria-describedby="basic-addon1">
+                                  <% if(query.request && query.request.where) { %>
+                                    <input type="text" class="form-control" placeholder="EX: " name="request.where" value="<%= query.request.where %>" aria-describedby="basic-addon1">
                                   <% } else { %>
                                     <input type="text" class="form-control" placeholder="EX: " name="request.where" aria-describedby="basic-addon1">
                                   <% } %>
@@ -347,15 +347,15 @@
               })
             }
             Promise.all([
-              checkNull('input[name="object.select"]', 'queryobject', 'select'),
-              checkNull('input[name="object.from"]', 'queryobject', 'from'),
-              checkNull('input[name="object.where"]', 'queryobject', 'where'),
-              checkNull('input[name="key.select"]', 'querykey', 'select'),
-              checkNull('input[name="key.from"]', 'querykey', 'from'),
-              checkNull('input[name="key.where"]', 'querykey', 'where'),
-              checkNull('input[name="request.select"]', 'queryrequest', 'select'),
-              checkNull('input[name="request.from"]', 'queryrequest', 'from'),
-              checkNull('input[name="request.where"]', 'queryrequest', 'where'),
+              checkNull('input[name="object.select"]', 'queryObject', 'select'),
+              checkNull('input[name="object.from"]', 'queryObject', 'from'),
+              checkNull('input[name="object.where"]', 'queryObject', 'where'),
+              checkNull('input[name="key.select"]', 'queryKey', 'select'),
+              checkNull('input[name="key.from"]', 'queryKey', 'from'),
+              checkNull('input[name="key.where"]', 'queryKey', 'where'),
+              checkNull('input[name="request.select"]', 'queryRequest', 'select'),
+              checkNull('input[name="request.from"]', 'queryRequest', 'from'),
+              checkNull('input[name="request.where"]', 'queryRequest', 'where'),
             ]).then(async ()=> {
               var jobId = document.getElementById('my-h1').innerHTML.split('Job id: ')[1];           
               let response = await fetch(`http://localhost:5000/job/add-query/${jobId}`, {
