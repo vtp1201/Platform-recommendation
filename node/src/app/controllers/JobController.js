@@ -16,6 +16,10 @@ const pyPort = process.env.PYTHON_PORT || 8000;
 
 function check(dataSource, obj, toObj) {
     if(dataSource) {
+        if (!obj) {
+            obj = {[toObj]: null};
+            console.log(obj)
+        }
         obj[toObj] = dataSource[0].firebaseUrl;
         return true;
     }
@@ -70,12 +74,16 @@ class JobController {
                 _id: req.params.id,
                 userId: req.user._id,
             }).populate('dataSource');
-            
+            const dataSource = job.dataSource;
             if (job === null) {
                 res.redirect('back');
                 return;
             }
-            const dataSource = job.dataSource;
+            if (!dataSource.key && !dataSource.request) {
+                res.redirect(`/job/preview-data/${job._id}`);
+                return;
+            }
+            
             let dataObject = {};
             let dataKey = {};
             let dataRequest = {};
@@ -138,7 +146,7 @@ class JobController {
             }
             //console.log(dataObject);
 
-            job.createdAt = job.createdAt.toLocaleString("en-US");
+            // job.createdAt = job.createdAt.toLocaleString("en-US");
             res.render('job/previewData', {
                 messageType: req.flash('messageType'),
                 message: req.flash('message'),
@@ -201,7 +209,7 @@ class JobController {
                         break;
                     }
                     const [addData, update] = await Promise.all([
-                        addDataCollection(`data-${name}`, dataSource._id, data),
+                        addDataCollection(name, dataSource._id, data),
                         DataSource.updateOne(
                             { 
                                 _id: dataSource._id,
@@ -273,15 +281,17 @@ class JobController {
         
     }
     // [POST] job/add-file/:id
-    async addFile(req, res) {
+    async addFile(req, res, next) {
         try {
-            const job = await Job.findById(req.params.id);
+            const job = await Job.findById(req.params.id).populate('dataSource');
+            let dataSource = job.dataSource;
             await uploadMutipleFiles(req, res, next);
             const jobApi = {}
             check(req.files.dataSourceObject, jobApi, 'dataSourceObject');
             check(req.files.dataSourceKey, jobApi, 'dataSourceKey');
             check(req.files.dataSourceRequest, jobApi, 'dataSourceRequest');
-            const url = `http://${pyHost}:${pyPort}/api/addfile`;
+            const url = `http://${pyHost}:${pyPort}/api/add-files`;
+            console.log(url);
             fetch(url, {
                 method: 'POST',
                 body: JSON.stringify(jobApi),
@@ -296,21 +306,39 @@ class JobController {
                 }
                 const update = {};
                 if (check(req.files.dataSourceObject, update.location, 'object') == true) {
+                    if (!update.name) {
+                        update.name = {object: null};
+                    }
                     update.name.object = req.files.dataSourceObject[0].originalname;
+                    update.object = `${dataSource._id}-data-object`;
                 }
-                if (check(req.files.dataSourceObject, update.location, 'key') == true) {
-                    update.name.key = req.files.dataSourceObject[0].originalname;
+                if (check(req.files.dataSourceKey, update.location, 'key') == true) {
+                    if (!update.name) {
+                        update.name = {key: null};
+                        update.location = {key: null};
+                    }
+                    console.log(update);
+                    update.location.key = req.files.dataSourceKey[0].firebaseUrl
+                    update.name.key = req.files.dataSourceKey[0].originalname;
+                    update.key = `${dataSource._id}-data-key`;
                 }
                 if (check(req.files.dataSourceRequest, update.location, 'request') == true) {
+                    if (!update.name) {
+                        update.name = {request: null};
+                        update.location = {request: null};
+                    }
+                    update.location.request = req.files.dataSourceRequest[0].firebaseUrl
                     update.name.request = req.files.dataSourceRequest[0].originalname;
+                    update.request = `${dataSource._id}-data-request`;
                 }
-                const result = await DataSource.updateOne({_id : job.dataSource}, update);
+                console.log(update)
+                const result = await DataSource.updateOne({_id : dataSource._id}, update);
                 console.log(result);
-                const dataSource = await DataSource.findOne({_id : job.dataSource});
+                dataSource = await DataSource.findOne({_id : dataSource._id});
                 const keys = Object.keys(dataSource);
                 keys.forEach(key => {
                     if (key == 'key' || key == 'object' || key == 'request') {
-                        renameCollection(key, dataSource._id);
+                        renameCollection(key, dataSource[key]);
                     }       
                 });
                 //renameCollection('recommends', job._id);
@@ -323,6 +351,7 @@ class JobController {
                 return res.redirect('back');
             })
         } catch (error) {
+            console.log(error);
             req.flash('messageType', 'danger');
             req.flash('message', "can't add file. Try again.");
             return res.redirect('back');
@@ -337,34 +366,32 @@ class JobController {
                 return res.redirect('back');
             }
             const jobApi = {
+                jobId: dataSource._id,
                 service: req.body.service,
                 object: req.body.object,
                 key: req.body.key,
                 request: req.body.request,
-                dataSourceObject: dataSource.object || null,
-                dataSourceKey: dataSource.key,
-                dataSourceRequest: dataSource.request,
             };
-            const url = `http://${pyHost}:${pyPort}/api/recommend`;
+            const url = `http://${pyHost}:${pyPort}/api/update-recommend`;
             fetch(url, {
                 method: 'POST',
                 body: JSON.stringify(jobApi),
                 headers: { 'Content-Type': 'application/json' }
             })
             .then( res => res.json())
-            .then( json => {
+            .then( async json => {
                 if(json.message != 'Done') {
                     req.flash('messageType', 'danger');
                     req.flash('message', json.message + ", Try again.");
                     return res.redirect('back');
                 }
-                renameCollection('recommends', job._id);
+                // renameCollection('recommends', job._id);
                 const updateJob = {
                     service: req.body.service,
                     object: req.body.object,
                     key: req.body.key,
                     request: req.body.request,
-                    dataDestination: `${job._id}-data-recommends`
+                    dataDestination: `${dataSource._id}-data-recommends`
                 }
                 await Job.updateOne({ _id: job._id}, updateJob);
                 return res.redirect(`/job/detail/${job._id}`);
@@ -405,14 +432,19 @@ class JobController {
             .catch(next);
     }
     // [DELETE] job/:id/destroy
-    destroy(req, res, next) {
+    async destroy(req, res, next) {
+        const job = await Job.findOne({ _id : req.params.id}).populate('dataSource');
+        const dataSource = job.dataSource;
         Job.deleteOne({ _id : req.params.id })
-            .then(() => {
-                const request = dropCollection(`${req.params.id}-request`);
-                const object = dropCollection(`${req.params.id}-object`);
-                const key = dropCollection(`${req.params.id}-key`);
-                const recommends = dropCollection(`${req.params.id}-recommends`);
-                Promise.all([request, object, key, recommends])
+            .then(async () => {
+                const request = dropCollection(`${dataSource._id}-data-request`);
+                const object = dropCollection(`${dataSource._id}-data-object`);
+                const key = dropCollection(`${dataSource._id}-data-key`);
+                const recommends = dropCollection(`${dataSource._id}-data-recommends`);
+                Promise.all([
+                    request, object, key, recommends
+                    , DataSource.deleteOne({_id: dataSource._id})
+                ])
                 .finally(() => {
                     res.redirect('back');
                 });
@@ -486,6 +518,23 @@ class JobController {
                 });
                 return;
             })
+    }
+    // [GET] /job/api/auto-update/:id
+    async autoUpdate(req, res) {
+        try {
+            const job = await Job.findOne({ _id: req.params.id }).populate('dataSource');
+            if(!job || job == null || !job.dataDestination) {
+                return res.status(404).json({
+                    msg: "Job Not found",
+                })
+            }
+            const dataSource = job.dataSource;
+
+        } catch (error) {
+            return res.status(404).json({
+                msg: "Job Not found",
+            })
+        }
     }
     // POST /job/api/update
     updateData(req, res) {
@@ -561,11 +610,12 @@ class JobController {
     }
 }
 
-async function renameCollection(name, jobId) {
+async function renameCollection(name, newName) {
     const listCollections = await db.db.listCollections().toArray();
     listCollections.forEach( collection => {
         if (collection.name == `${name}`) {
-            db.collection(name).rename(`${jobId}-data-${name}`);
+            console.log(`${newName}`);
+            db.collection(name).rename(`${newName}`);
             return true;
         }
     });
@@ -588,7 +638,7 @@ function addDataCollection(name, jobId, data) {
         else {
             db.db.createCollection(`${jobId}-${name}`)
             .then(collection => {
-                db.db.collection(`${jobId}-${name}`).insertMany(data, function(error, record){
+                db.db.collection(`${jobId}-data-${name}`).insertMany(data, function(error, record){
                     if (error) {
                         console.log(error);
                         return reject('error');

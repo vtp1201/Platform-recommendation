@@ -66,7 +66,7 @@
                                 </div>
                             <% } %>
                             <% if (dataSource.type == 'file') { %>
-                            <form method="POST" action="/job/add-file/<%= job._id %>" class="form-horizontal">
+                            <form method="POST" action="/job/add-file/<%= job._id %>" class="form-horizontal" novalidate="" enctype="multipart/form-data">
                               <% if (dataSource.object) { %>
                                 <div class="my-3">
                                   <label for="dataSourceObject" class="form-label">Data source user</label>
@@ -75,13 +75,13 @@
                               <% } else { %>
                                 <div class="my-3">
                                   <label for="dataSourceObject" class="form-label">Data source user</label>
-                                  <input type="file" name="dataSourceObject" id="dataSourceObject" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
+                                  <input type="file" name="dataSourceObject" id="dataSourceObject" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example">
                                   <div class="invalid-feedback">Example invalid form file feedback</div>
                                 </div>
                               <% } %>
                               <% if (dataSource.key) { %>
                                 <div class="mb-3">
-                                  <label for="dataSource" class="form-label">Data source key</label>
+                                  <label for="dataSource" class="form-label">Data source interactions</label>
                                   <a href="<%= dataSource.location.key %>" download="<%= dataSource.name.key %>"><%= dataSource.name.key %></a>
                                 </div>
                               <% } else { %>
@@ -103,7 +103,7 @@
                                   <div class="invalid-feedback">Example invalid form file feedback</div>
                                 </div>
                               <% } %>
-                              <button class="mx-5 btn btn-primary btn-sm" type="submit">Submit file</button>
+                              <button id="btn-submit" class="mx-5 btn btn-primary btn-sm" type="submit">Submit file</button>
                             </form>
                             <% } else {%>
                             <form id="add-query" class="needs-validation" novalidate="" enctype="">
@@ -322,6 +322,9 @@
                 </div>	
             </div>
         </div>
+        <div class ="hide" id="loading-page">
+          <img src="/img/1_CsJ05WEGfunYMLGfsT2sXA.gif" alt="" srcset="">
+        </div>
         <div class="footer">
             <%- include('../layouts/footer') -%>
         </div>
@@ -365,6 +368,14 @@
               location.reload();
             })
           }
+          $(document).ready(function(){
+            $('#btn-submit').click(function(){
+                $('body').addClass("preloading body-hide");
+                $('.footer').hide();
+                $('#loading-page').show();
+            });
+          });
+          
         </script>
     </body>
 </html>

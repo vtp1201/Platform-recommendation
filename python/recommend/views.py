@@ -34,7 +34,7 @@ def update(request):
         'message': 'Bad request',
     }, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
+""" @api_view(['POST'])
 def post(request):
     service = ''.join(request.data.get('service', ''))
     object = ''.join(request.data.get('object', ''))
@@ -61,6 +61,23 @@ def post(request):
         'dataDestination': "recommends.json",
         'DDLocation' : DDLocation,
     }, status=status.HTTP_201_CREATED)
+ """
+@api_view(['POST'])
+def addNewFile(request):
+    dataSourceObject = ''.join(request.data.get('dataSourceObject', ''))
+    dataSourceKey = ''.join(request.data.get('dataSourceKey', ''))
+    dataSourceRequest = ''.join(request.data.get('dataSourceRequest', ''))
+
+    result = addFile(dataSourceObject, dataSourceKey ,dataSourceRequest)
+
+    if result == 'error':
+        return JsonResponse({
+            'message': 'bad request'
+        }, status = status.HTTP_400_BAD_REQUEST)
+    return JsonResponse({
+        'message': 'Done',
+    }, status=status.HTTP_201_CREATED)
+
 
 firebase = pyrebase.initialize_app(firebasekey.config)
 storage = firebase.storage()
@@ -96,7 +113,43 @@ def checkTypeFile(filename):
     name, extension = os.path.splitext(filename)
     return extension
 
-def newRecommend(service, Object, key, request, dataSourceObject, dataSourceKey, dataSourceRequest):
+def addFile(dataSourceObject, dataSourceKey, dataSourceRequest):
+    path = os.path.dirname(os.path.abspath(__file__)) + "/files"
+    if (os.path.isdir(path) == False):
+        os.mkdir(path)
+    else:
+        shutil.rmtree(path)
+        os.mkdir(path)
+    users_df = ''
+    interactions_df = ''
+    articles_df = ''
+    try:
+        if dataSourceObject != "":
+            users_df = checkTypeFile(dataSourceObject)
+            downloadFile(dataSourceObject, "users_df"+ users_df)
+        if dataSourceKey != "":
+            interactions_df = checkTypeFile(dataSourceKey)
+            downloadFile(dataSourceKey, "interactions_df" + interactions_df)
+        if dataSourceRequest != "":
+            articles_df = checkTypeFile(dataSourceRequest)
+            downloadFile(dataSourceRequest, "articles_df" + articles_df)
+    except :
+        print("cant download files")
+        return "error"
+    
+    fileLocation = engine.insertDataMongo(users_df, interactions_df, articles_df)
+
+    if fileLocation.split(',')[0] == 'error':
+        print(fileLocation)
+        shutil.rmtree(path)
+        return 'error'
+
+    shutil.rmtree(path)
+
+    return 'complete'
+
+
+""" def newRecommend(service, Object, key, request, dataSourceObject, dataSourceKey, dataSourceRequest):
     path = os.path.dirname(os.path.abspath(__file__)) + "/files"
     if (os.path.isdir(path) == False):
         os.mkdir(path)
@@ -135,4 +188,4 @@ def newRecommend(service, Object, key, request, dataSourceObject, dataSourceKey,
 
     shutil.rmtree(path)
 
-    return DDLocation
+    return DDLocation """

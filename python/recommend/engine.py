@@ -128,7 +128,7 @@ def addMongo(name, data):
     except:
         print ('can`t add df to mongo')
 
-def get_recommendations(service, userDf, interactionsDf, articlesDf):
+def insertDataMongo(userDf, interactionsDf, articlesDf):
     path = os.path.dirname(os.path.abspath(__file__)) + "/files/"
     try:
         user_df = ''
@@ -153,17 +153,6 @@ def get_recommendations(service, userDf, interactionsDf, articlesDf):
     except:
         return "error, can't read files"
 
-    recommend_list = engine(service, articles_df, interactions_df)
-
-    if  isinstance(recommend_list, str):
-        return recommend_list
-    
-    exportFile = path + "recommends.json" 
-    json_string = json.dumps(recommend_list)
-    jsonFile = open(exportFile, "w")
-    jsonFile.write(json_string)
-    jsonFile.close()
-
     try:
         addMongo('object', user_df)
     except:
@@ -178,12 +167,7 @@ def get_recommendations(service, userDf, interactionsDf, articlesDf):
         addMongo('key', interactions_df)
     except:
         print ("Waring, cant add interactions_df")
-    
-    try:
-        addMongo('recommends', recommend_list)
-    except:
-        print ("Waring, cant add recommends")
-    
+
     return "complete"
 
 def mongoToDf(name):
@@ -200,9 +184,9 @@ def mongoToDf(name):
 
 def updateRecommendations(jobId, service):
     try:
-        articles_df = mongoToDf(jobId + "-request")
-        user_df = mongoToDf(jobId + "-object")
-        interactions_df = mongoToDf(jobId + "-key")
+        articles_df = mongoToDf(jobId + "-data-request")
+        user_df = mongoToDf(jobId + "-data-object")
+        interactions_df = mongoToDf(jobId + "-data-key")
     except:
         return "error, cant read data"
 
@@ -214,7 +198,7 @@ def updateRecommendations(jobId, service):
     if isinstance(recommend_list, str):
         return recommend_list
 
-    addMongo(name = jobId + "-recommends", data = recommend_list)
+    addMongo(name = jobId + "-data-recommends", data = recommend_list)
     return "complete"
 
 def engine(service, articles_df, interactions_df):
