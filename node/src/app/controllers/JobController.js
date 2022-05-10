@@ -255,6 +255,58 @@ class JobController {
             return res.redirect('back');
         }
     }
+    // [POST] check/unique/:id
+    async checkUnique(req, res) {
+        try {
+            const job = await Job.findOne({_id: req.params.id});
+            const dataSource = await DataSource.findOne({
+                _id: job.dataSource,
+            }).populate([
+                'queryObject', 'queryKey', 'queryRequest'
+            ])
+
+            if (!dataSource || dataSource.type == 'file' 
+                || !dataSource.queryKey ||  !dataSource.queryRequest
+            ) {
+                return res.redirect('back');
+            }
+            
+            await Promise.all(
+                Object.keys(req.body).map( async key => {
+                    if(
+                        key == 'uniqueObject' ||
+                        key == 'uniqueKey' ||
+                        key == 'uniqueRequest'
+                    ) {
+                        const isUnique = []
+                        const name = key.split('unique')[1];
+                        const data = preViewData(dataSource[`${name.toLowerCase()}`, 'full']);
+                        req.body[key].forEach( item => {
+                            if (!data[0][item]) {
+                                return null;
+                            }
+                            const newData = data.map(i => i[item])
+                            if (hasNotDuplicatesArray(newData) === false) {
+                                return null;
+                            }
+                            isUnique.push(item)
+                        });
+                        if (isUnique.length > 0) {
+                            await Query.updateOne({
+                                _id: dataSource[name.toLowerCase()]._id
+                            },{
+                                unique: isUnique,
+                            })
+                        }
+                    }
+                })
+            )
+            return res.redirect('back');
+        } catch (error) {
+            console.log(error);
+            return res.redirect('back');
+        }
+    }
     // [POST] job/new-job
     async createNewJob(req, res) {
         try {
@@ -338,7 +390,7 @@ class JobController {
                     return res.redirect('back');
                 }
                 const update = {};
-                await Promise.all( Object.key(req.files).map((key) => {
+                await Promise.all( Object.keys(req.files).map((key) => {
                     const name = key.split('dataSource')[1];
                     if (
                         key == 'dataSourceObject' ||
@@ -672,13 +724,16 @@ function addDataCollection(name, jobId, data) {
     });
 }
 
-async function preViewData(collection) {
+async function preViewData(collection, limit = 20) {
     try {
+        if (limit == 'full') {
+            limit = undefined;
+        }
         let [count, data] = await Promise.all([
             db.db.collection(collection).countDocuments(),
             db.db.collection(collection).find({},{
                 _id: false,
-            }).limit(20).toArray()
+            }).limit(limit).toArray()
         ]);
 
         let current = 20 ;
