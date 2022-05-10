@@ -255,7 +255,7 @@ class JobController {
             return res.redirect('back');
         }
     }
-    // [POST] check/unique/:id
+    // [POST] check-unique/:id
     async checkUnique(req, res) {
         try {
             const job = await Job.findOne({_id: req.params.id});
@@ -270,7 +270,6 @@ class JobController {
             ) {
                 return res.redirect('back');
             }
-            
             await Promise.all(
                 Object.keys(req.body).map( async key => {
                     if(
@@ -278,22 +277,38 @@ class JobController {
                         key == 'uniqueKey' ||
                         key == 'uniqueRequest'
                     ) {
-                        const isUnique = []
+                        
                         const name = key.split('unique')[1];
                         const data = preViewData(dataSource[`${name.toLowerCase()}`, 'full']);
-                        req.body[key].forEach( item => {
-                            if (!data[0][item]) {
-                                return null;
-                            }
-                            const newData = data.map(i => i[item])
+                        let isUnique = [];
+                        if (req.body[key].length == 1) {
+                            const newData = data.map(i => i[item]);
                             if (hasNotDuplicatesArray(newData) === false) {
                                 return null;
                             }
-                            isUnique.push(item)
-                        });
+                            isUnique.push(item);
+                        } else {
+                            req.body[key].forEach( item => {
+                                if (!data[0][item]) {
+                                    return null;
+                                }
+                                isUnique.push(item);
+                            })
+                            const newData = data.map(item => {
+                                let string = `${item[isUnique[0]]}`
+                                for (let index = 1; index < isUnique.length; index++) {
+                                    string = `${string}_${item[isUnique[index]]}`;
+                                }
+                                return string;
+                            })
+                            if (hasNotDuplicatesArray(newData) === false) {
+                                isUnique = [];
+                            }
+                        }
+                        console.log(isUnique);
                         if (isUnique.length > 0) {
                             await Query.updateOne({
-                                _id: dataSource[name.toLowerCase()]._id
+                                _id: dataSource[`query${name}`]._id
                             },{
                                 unique: isUnique,
                             })
@@ -305,6 +320,45 @@ class JobController {
         } catch (error) {
             console.log(error);
             return res.redirect('back');
+        }
+    }
+    // [GET] job/update-data/:id
+    async updateDataByQuery(req, res, next) {
+        try {
+            const job = await Job.findOne({ _id : req.params.id });
+            const dataSource = await DataSource.findOne({
+                _id : job.dataSource 
+            }).populate([
+                'queryObject', 'queryKey', 'queryRequest'
+            ])
+            if (dataSource.type == 'file') {
+                return res.status(403).json({
+                    msg: "Can't update data by query",
+                })
+            }
+            Object.keys(dataSource).map(async key => {
+                if(
+                    key !== 'queryObject' &&
+                    key !== 'queryKey' &&
+                    key !== 'queryRequest'
+                ) {
+                    return null;
+                }
+                if (!dataSource[key].unique) {
+                    return null;
+                }
+                const name = key.split('unique')[1];
+                let queryString = `SELECT ${dataSource[key].select} FROM ${dataSource[key].from} WHERE`;
+                if (dataSource[key].where) {
+                    queryString += `${queryString} dataSource[key].where`;
+                }
+                // WHERE NOT EXISTS (
+                //     SELECT * FROM (VALUES (1), (4), (3)) AS V(c1)
+                //     WHERE PHAN_CONG.MaNV = c1 
+                //   )
+            })
+        } catch (error) {
+            
         }
     }
     // [POST] job/new-job
