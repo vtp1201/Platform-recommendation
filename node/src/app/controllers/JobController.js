@@ -348,10 +348,20 @@ class JobController {
                     return null;
                 }
                 const name = key.split('unique')[1];
+                const data = preViewData(dataSource[`${name.toLowerCase()}`, 'full']);
                 let queryString = `SELECT ${dataSource[key].select} FROM ${dataSource[key].from} WHERE`;
                 if (dataSource[key].where) {
                     queryString += `${queryString} dataSource[key].where`;
                 }
+                queryString += `${queryString} NOT EXISTS (
+                    SELECT * FROM (VALUES (1), (4), (3) `;
+                data.forEach( dt => {
+                    dataSource[key].unique.forEach( u => {
+                        queryString = `${queryString} (${dt[u]})`;
+                    })
+                })
+                queryString += `${queryString} ) AS V(c1)
+                WHERE PHAN_CONG.MaNV = c1 )`
                 // WHERE NOT EXISTS (
                 //     SELECT * FROM (VALUES (1), (4), (3)) AS V(c1)
                 //     WHERE PHAN_CONG.MaNV = c1 
