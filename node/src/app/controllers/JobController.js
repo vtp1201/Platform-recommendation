@@ -355,13 +355,31 @@ class JobController {
                 }
                 queryString += `${queryString} NOT EXISTS (
                     SELECT * FROM (VALUES (1), (4), (3) `;
-                data.forEach( dt => {
+                data.forEach((dt, index) => {
+                    if (index > 0) {
+                        queryString = `${queryString} ,`;
+                    }
+                    queryString = `${queryString} ( `;
                     dataSource[key].unique.forEach( u => {
-                        queryString = `${queryString} (${dt[u]})`;
+                        if ((typeof dt.u) === 'number') {
+                            queryString = `${queryString} ${dt[u]}`;
+                        } else {
+                            queryString = `${queryString} '${dt[u]}'`;
+                        }
                     })
+                    queryString = ` ${queryString} )`;
                 })
-                queryString += `${queryString} ) AS V(c1)
-                WHERE PHAN_CONG.MaNV = c1 )`
+
+                queryString = ` ${queryString} AS V (`;
+                dataSource[key].unique.forEach( (u, index) => {
+                    if (index === 0) {
+                        queryString = ` ${queryString} c${index})`;
+                    } else {
+                        queryString = ` ${queryString} , c${index})`;
+                    }
+                })
+                queryString = `${queryString} ) 
+                WHERE '${dataSource[key].from}.' = c1 )`
                 // WHERE NOT EXISTS (
                 //     SELECT * FROM (VALUES (1), (4), (3)) AS V(c1)
                 //     WHERE PHAN_CONG.MaNV = c1 
