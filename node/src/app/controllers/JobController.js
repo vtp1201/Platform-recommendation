@@ -188,7 +188,11 @@ class JobController {
                 userId: req.user._id
             }).populate('dataSource');
 
-            const dataSource = job.dataSource;
+            const dataSource = await DataSource.findOne({
+                _id : job.dataSource
+            }).populate('connection');
+
+            const connection = dataSource.connection;
 
             let server = 'server';
             if (dataSource.type == 'mysql') {
@@ -196,14 +200,14 @@ class JobController {
             } 
 
             const config = {
-                database: dataSource.database,
-                [server]: dataSource.server,
-                user: dataSource.user,
-                password: dataSource.password,
+                database: connection.database,
+                [server]: connection.server,
+                user: connection.user,
+                password: connection.password,
             }
 
-            if (dataSource.port) {
-                config.port = dataSource.port;
+            if (connection.port) {
+                config.port = connection.port;
             }
 
             for (let key in req.body) {
@@ -216,6 +220,8 @@ class JobController {
                         break;
                     }
                     let data = [];
+                    console.log(config),
+                    console.log(query)
                     if (dataSource.type == 'sqlS') {
                         data = await query(query);
                     } else if (dataSource.type == 'mysql') {
@@ -228,7 +234,8 @@ class JobController {
                     }
                     const newQuery = new Query({
                         dataSourceId: dataSource._id,
-                        ...key,
+                        data: `${dataSource._id}-${name}`,
+                        ...query,
                     })
 
                     const querySuccess = await newQuery.save(); 
@@ -351,10 +358,9 @@ class JobController {
                 const data = preViewData(dataSource[`${name.toLowerCase()}`, 'full']);
                 let queryString = `SELECT ${dataSource[key].select} FROM ${dataSource[key].from} WHERE`;
                 if (dataSource[key].where) {
-                    queryString += `${queryString} dataSource[key].where`;
+                    queryString += `${queryString} ${dataSource[key].where}`;
                 }
-                queryString += `${queryString} NOT EXISTS (
-                    SELECT * FROM (VALUES (1), (4), (3) `;
+                queryString += `${queryString} NOT EXISTS ( SELECT * FROM (VALUES ( `;
                 data.forEach((dt, index) => {
                     if (index > 0) {
                         queryString = `${queryString} ,`;
@@ -373,20 +379,29 @@ class JobController {
                 queryString = ` ${queryString} AS V (`;
                 dataSource[key].unique.forEach( (u, index) => {
                     if (index === 0) {
-                        queryString = ` ${queryString} c${index})`;
+                        queryString = `${queryString} c${index + 1}`;
                     } else {
-                        queryString = ` ${queryString} , c${index})`;
+                        queryString = `${queryString}, c${index + 1}`;
                     }
                 })
-                queryString = `${queryString} ) 
-                WHERE '${dataSource[key].from}.' = c1 )`
-                // WHERE NOT EXISTS (
-                //     SELECT * FROM (VALUES (1), (4), (3)) AS V(c1)
-                //     WHERE PHAN_CONG.MaNV = c1 
-                //   )
+                queryString = `${queryString} ) WHERE `
+                dataSource[key].unique.forEach( (u, index) => {
+                    if (index === 0) {
+                        queryString = `${queryString} ${u} = c${index+1}`;
+                    } else {
+                        queryString = `${queryString} AND ${u} = c${index+1}`;
+                    }
+                })
+                queryString = `${queryString} )`;
+                console.log(queryString);
+                res.status(200).json({
+                    msg: 'OK',
+                });
             })
         } catch (error) {
-            
+            res.status(200).json({
+                msg: 'TOANG',
+            });
         }
     }
     // [POST] job/new-job
@@ -436,7 +451,13 @@ class JobController {
                     dataSourceId: dataSource._id,
                     ...req.body,
                 })
-                await newConnection.save();
+                const connection = await newConnection.save();
+                await DataSource.updateOne({
+                    _id: dataSource._id
+                }, 
+                {
+                    connection: connection._id
+                })
             }
             return res.redirect(`/job/preview-data/${job._id}`);
         } catch (error) {
@@ -472,7 +493,7 @@ class JobController {
                     return res.redirect('back');
                 }
                 const update = {};
-                await Promise.all( Object.keys(req.files).map((key) => {
+                await Promise.all( Object.keys(req.files).map(async (file) => {
                     const name = key.split('dataSource')[1];
                     if (
                         key == 'dataSourceObject' ||

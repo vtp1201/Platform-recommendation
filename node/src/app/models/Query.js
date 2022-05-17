@@ -10,6 +10,9 @@ const Query = new Schema(
             ref: 'DataSource', 
             required: true,
         },
+        data: {
+            type: Schema.Types.String,
+        },
         select: { 
             type: Schema.Types.String,
         },
@@ -21,7 +24,10 @@ const Query = new Schema(
         },
         unique: [
             Schema.Types.String,
-        ]
+        ],
+        autoUpdate: {
+            type: Schema.Types.Number,
+        }
     },
     {
         timestamps: true,

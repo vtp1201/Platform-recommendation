@@ -331,11 +331,12 @@
         <%- include('../layouts/scripts')  -%>
         <script>
           function onSubmit() {
+            console.log("first")
             var form = document.querySelector("#add-query");
             var formData = {
-              queryobject: {},
-              querykey: {},
-              queryrequest: {},
+              queryObject: {},
+              queryKey: {},
+              queryRequest: {},
             };
             function checkNull(input, data, query) {
               return new Promise(function(resolve) {
