@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
     <%- include('../layouts/header') -%>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <style>
         textarea {
         height: 70px !important;
@@ -52,7 +51,7 @@
                 <div class="row d-flex justify-content-lg-between">
                     <div class="col-md-4">
                         <div class="row mt-3">
-                          <div class="card border rounded-5 p-3" style="width: 100%; height: 1100px; background-color: #F7F7F7; overflow: auto;">
+                          <div class="card border rounded-5 p-3" style="width: 100%; height: 1070px; background-color: #F7F7F7; overflow: auto;">
                             <% if(messageType == 'success') { %>
                                 <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
                                     <strong><%= message %></strong>
@@ -65,36 +64,81 @@
                                     <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             <% } %>
-                            <form method="POST" action="" class="form-horizontal">
-                              <div class="col-sm-6">
-                                <label for="object" class="form-label">object</label>
-                                <input type="text" class="form-control" id="object" name="object" placeholder="Title" required>
-                                <div class="invalid-feedback">
-                                    Valid title is required.
+                            <div class="card border rounded-5 p-1 m-1 row gx-4 gx-lg-5" style="width: 98%;">
+                              <form method="POST" action="" class="form-horizontal">
+                                <div class="justify-content-center p-4">
+                                  <div class="col-sm-12">
+                                    <label for="object" class="form-label">object</label>
+                                    <input type="text" class="form-control" id="object" name="object" placeholder="Title" required>
+                                    <div class="invalid-feedback">
+                                        Valid title is required.
+                                    </div>
+                                  </div>
+                                  <div class="col-sm-12">
+                                    <label for="title" class="form-label">key</label>
+                                    <input type="key" class="form-control" id="key" name="key" placeholder="key" required>
+                                    <div class="invalid-feedback">
+                                        Valid title is required.
+                                    </div>
+                                  </div>
+                                  <div class="col-sm-12 pb-4">
+                                    <label for="request" class="form-label">request</label>
+                                    <input type="text" class="form-control" id="request" name="request" placeholder="request" required>
+                                    <div class="invalid-feedback">
+                                        Valid title is required.
+                                    </div>
+                                  </div>
+                                  <button class="mx-6 btn btn-primary btn" type="submit">Create recommendations</button>
                                 </div>
-                              </div>
-                              <div class="col-sm-6">
-                                <label for="title" class="form-label">key</label>
-                                <input type="key" class="form-control" id="key" name="key" placeholder="key" required>
-                                <div class="invalid-feedback">
-                                    Valid title is required.
+                              </form>
+                            </div>
+                            <div class="card border rounded-5 p-1 m-1 row gx-4 gx-lg-5" style="width: 98%;">
+                              <form method="POST" action="" class="form-horizontal">
+                                <div class="justify-content-center p-4">
+                                  <div class="col-sm-12 mb-1">
+                                    <label for="unique" class="form-label">Unique rows</label>
+                                    <input type="text" class="form-control mb-2" id="unique1" name="unique1" placeholder="Primary key" required>
+                                    <input type="text" class="form-control mb-2" id="unique2" name="unique2" placeholder="Primary key" required>
+                                    <input type="text" class="form-control d-none mb-2" id="unique3" name="unique3" placeholder="Primary key" required>
+                                    <div class="invalid-feedback">
+                                        Valid unique is required.
+                                    </div>
+                                  </div>
+                                  <div class="col-md-9 mb-2">
+                                    <label for="autoUpdate" class="form-label">Data source</label>
+                                    <select class="form-select" id="dataSource" name="dataSource" required>
+                                        <option value="">Choose...</option>
+                                        <option value="object">Data source User</option>
+                                        <option value="key">Data source Interactions</option>
+                                        <option value="request">Data source items/contents</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select a Data source.
+                                    </div>
+                                  </div>
+                                  <div class="col-md-9 mb-4">
+                                    <label for="autoUpdate" class="form-label">Auto update</label>
+                                    <select class="form-select" id="autoUpdate" name="autoUpdate" required>
+                                        <option value="">Choose...</option>
+                                        <option value="1">1 day</option>
+                                        <option value="5">5 days</option>
+                                        <option value="10">10 days</option>
+                                        <option value="15">15 days</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select a auto update.
+                                    </div>
+                                  </div>
+                                  <button class="mx-6 btn btn-primary btn" type="submit">Submit unique</button>
                                 </div>
-                              </div>
-                              <div class="col-sm-6">
-                                <label for="request" class="form-label">request</label>
-                                <input type="text" class="form-control" id="request" name="request" placeholder="request" required>
-                                <div class="invalid-feedback">
-                                    Valid title is required.
-                                </div>
-                              </div>
-                              <button class="mx-5 btn btn-primary btn-sm" type="submit">Create recommendations</button>
-                            </form>
+                              </form>
+                            </div>
                         </div>
                       </div>	
                     </div>
                     <div class="col-md-8 p-3">
                         <div class="text-left">
-                            <div class="card border rounded-5 p-1" style="width: 100%; height: 1100px; background-color: #F7F7F7; overflow: auto;">
+                            <div class="card border rounded-5 p-1" style="width: 100%; height: 1070px; background-color: #F7F7F7; overflow: auto;">
                               <h5 class="mt-2">Data source user</h5>  
                               <div class="card border rounded-5 p-1 m-1" style="width: 99%; height: 300px; overflow: auto;">
                                 <table id="table" class="table table-hover table-borderless align-middle caption-top p-2">
@@ -176,9 +220,9 @@
                                 <table id="table" class="table table-hover table-borderless align-middle caption-top p-2">
                                   <caption>
                                     <% if (dataRequest.data) { %>
-                                      Data source user <%= dataRequest.current %> / <%= dataRequest.count %>
+                                      Data source items/contents <%= dataRequest.current %> / <%= dataRequest.count %>
                                     <% } else { %>
-                                      Data source user
+                                      Data source items/contents
                                     <% } %>
                                   </caption>
                                   <thead class="table-dark">
@@ -209,11 +253,6 @@
                                   <% } %>
                                 </table>
                               </div>
-                              <% if (dataKey.data && dataRequest.data) { %>
-                                <button class="mt-2 mx-5 btn btn-primary btn-sm" type="submit">Submit Data</button>
-                              <% } else { %>
-                                <button class="mt-2 mx-5 btn btn-primary btn-sm disabled" type="submit">Submit Data</button>
-                              <% } %>
                             </div>
                         </div>
                     </div>

@@ -217,11 +217,9 @@ class JobController {
                     };
                     let name = key.split('query')[1];
                     if (!query.select || !query.from || dataSource[name.toLowerCase()]) {
-                        break;
+                        continue;
                     }
                     let data = [];
-                    console.log(config),
-                    console.log(query)
                     if (dataSource.type == 'sqlS') {
                         data = await query(query);
                     } else if (dataSource.type == 'mysql') {
@@ -234,20 +232,20 @@ class JobController {
                     }
                     const newQuery = new Query({
                         dataSourceId: dataSource._id,
-                        data: `${dataSource._id}-${name}`,
+                        data: `${dataSource._id}-${name.toLowerCase()}`,
                         ...query,
                     })
 
                     const querySuccess = await newQuery.save(); 
                     
                     const [addData, update] = await Promise.all([
-                        addDataCollection(name, dataSource._id, data),
+                        addDataCollection(name.toLowerCase(), dataSource._id, data),
                         DataSource.updateOne(
                             { 
                                 _id: dataSource._id,
                             }, {
                                 [key] : querySuccess._id,
-                                [name] : `${dataSource._id}-${name}`,
+                                [name.toLowerCase()] : `${dataSource._id}-${name.toLowerCase()}`,
                             }
                         )
                     ]);

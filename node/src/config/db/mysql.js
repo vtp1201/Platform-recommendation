@@ -19,7 +19,7 @@ module.exports = {
                 queryString += ` WHERE ${query.where}`;
             }
             const [rows, fields] = await connection.execute(queryString);
-            await connection.close();
+            connection.close();
             return rows;
         } catch (error) {
             console.log(error);

@@ -1,5 +1,5 @@
 const admin = require('firebase-admin')
-const serviceAccount = require("../../../.vscode/serviceAccountKey.json");
+const serviceAccount = require("./serviceAccountKey.json");
 const BUCKET = "platform-recommedation.appspot.com";
 // Initialize firebase admin SDK
 

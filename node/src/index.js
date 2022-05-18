@@ -5,6 +5,7 @@ const flash = require('connect-flash');
 const expressSession = require('express-session');
 const methodOverride = require('method-override');
 const passport = require('passport');
+const morgan = require('morgan');
 
 const app = express();
 
@@ -12,6 +13,7 @@ const db = require('./config/db/index');
 const route = require('./routes/index');
 require('./config/passport/passport')(passport);
 
+app.use(morgan('tiny'));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
