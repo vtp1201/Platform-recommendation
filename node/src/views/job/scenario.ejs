@@ -52,18 +52,62 @@
                     <div class="col-md-4">
                         <div class="row mt-3">
                           <div class="card border rounded-5 p-3" style="width: 100%; height: 1070px; background-color: #F7F7F7; overflow: auto;">
+                            <div id="alert-parent">
                             <% if(messageType == 'success') { %>
-                                <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
-                                    <strong><%= message %></strong>
-                                    <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
+                              <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
+                                  <strong><%= message %></strong>
+                                  <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                              </div>
                             <% } %>
                             <% if(messageType == 'danger') { %>
-                                <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
-                                    <strong><%= message %></strong>
-                                    <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
+                              <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
+                                  <strong><%= message %></strong>
+                                  <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                              </div>
                             <% } %>
+                          </div>
+                            <div class="card border rounded-5 p-1 m-1 row gx-4 gx-lg-5" style="width: 98%;">
+                              <form id="add-unique" class="form-horizontal">
+                                <div class="justify-content-center p-4">
+                                  <div class="col-sm-12 mb-1">
+                                    <label for="unique" class="form-label">Unique rows</label>
+                                    <input type="text" class="form-control mb-2" id="unique1" name="unique1" placeholder="Primary key" required>
+                                    <input type="text" class="form-control d-none mb-2" id="unique2" name="unique2" placeholder="Primary key" required>
+                                    <input type="text" class="form-control d-none mb-2" id="unique3" name="unique3" placeholder="Primary key" required>
+                                    <div class="invalid-feedback">
+                                        Valid unique is required.
+                                    </div>
+                                  </div>
+                                  <button id="btn-add" class="btn btn-outline-primary btn-floating btn-sm" type="button" onclick="onAdd()">+</button>
+                                  <div class="col-md-9 mb-2">
+                                    <label for="autoUpdate" class="form-label">Data source</label>
+                                    <select class="form-select" id="targetUnique" name="targetUnique" required>
+                                        <option value="">Choose...</option>
+                                        <option value="object">Data source User</option>
+                                        <option value="key">Data source Interactions</option>
+                                        <option value="request">Data source items/contents</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select a Data source.
+                                    </div>
+                                  </div>
+                                  <div class="col-md-9 mb-4">
+                                    <label for="autoUpdate" class="form-label">Auto update</label>
+                                    <select class="form-select" id="timeUpdate" name="timeUpdate" required>
+                                        <option value="">Choose...</option>
+                                        <option value="1">1 day</option>
+                                        <option value="5">5 days</option>
+                                        <option value="10">10 days</option>
+                                        <option value="15">15 days</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select a auto update.
+                                    </div>
+                                  </div>
+                                  <button id="btn-unique" class="mx-6 btn btn-primary" type="button" onclick="onSubmitUnique()">Submit unique</button>
+                                </div>
+                              </form>
+                            </div>
                             <div class="card border rounded-5 p-1 m-1 row gx-4 gx-lg-5" style="width: 98%;">
                               <form method="POST" action="" class="form-horizontal">
                                 <div class="justify-content-center p-4">
@@ -88,48 +132,7 @@
                                         Valid title is required.
                                     </div>
                                   </div>
-                                  <button class="mx-6 btn btn-primary btn" type="submit">Create recommendations</button>
-                                </div>
-                              </form>
-                            </div>
-                            <div class="card border rounded-5 p-1 m-1 row gx-4 gx-lg-5" style="width: 98%;">
-                              <form method="POST" action="" class="form-horizontal">
-                                <div class="justify-content-center p-4">
-                                  <div class="col-sm-12 mb-1">
-                                    <label for="unique" class="form-label">Unique rows</label>
-                                    <input type="text" class="form-control mb-2" id="unique1" name="unique1" placeholder="Primary key" required>
-                                    <input type="text" class="form-control mb-2" id="unique2" name="unique2" placeholder="Primary key" required>
-                                    <input type="text" class="form-control d-none mb-2" id="unique3" name="unique3" placeholder="Primary key" required>
-                                    <div class="invalid-feedback">
-                                        Valid unique is required.
-                                    </div>
-                                  </div>
-                                  <div class="col-md-9 mb-2">
-                                    <label for="autoUpdate" class="form-label">Data source</label>
-                                    <select class="form-select" id="dataSource" name="dataSource" required>
-                                        <option value="">Choose...</option>
-                                        <option value="object">Data source User</option>
-                                        <option value="key">Data source Interactions</option>
-                                        <option value="request">Data source items/contents</option>
-                                    </select>
-                                    <div class="invalid-feedback">
-                                        Please select a Data source.
-                                    </div>
-                                  </div>
-                                  <div class="col-md-9 mb-4">
-                                    <label for="autoUpdate" class="form-label">Auto update</label>
-                                    <select class="form-select" id="autoUpdate" name="autoUpdate" required>
-                                        <option value="">Choose...</option>
-                                        <option value="1">1 day</option>
-                                        <option value="5">5 days</option>
-                                        <option value="10">10 days</option>
-                                        <option value="15">15 days</option>
-                                    </select>
-                                    <div class="invalid-feedback">
-                                        Please select a auto update.
-                                    </div>
-                                  </div>
-                                  <button class="mx-6 btn btn-primary btn" type="submit">Submit unique</button>
+                                  <button class="mx-6 btn btn-primary" type="submit">Create recommendations</button>
                                 </div>
                               </form>
                             </div>
@@ -263,5 +266,66 @@
             <%- include('../layouts/footer') -%>
         </div>
         <%- include('../layouts/scripts')  -%>
+      <script>
+        function onAdd() {
+          let open = true;
+          for(let i=1; i < 4; i++) {
+            if( $(`#unique${i}`).hasClass('d-none')) {
+              $(`#unique${i}`).removeClass('d-none');
+              if( i === 3){
+                open = false;
+              }
+              break;
+            }
+          }
+          if( open === false ) {
+            $(`#btn-add`).addClass('d-none');
+          }
+        }
+
+        function onSubmitUnique() {
+          var form = document.querySelector("#add-unique");
+          let formData = {
+            unique: [],
+            target: $("#targetUnique").val(),
+            autoUpdate: Number($("#timeUpdate").val()),
+          };
+          function checkNull(input, id) {
+            return new Promise(function(resolve) {
+              if (form.querySelector(input).value.length == 0) {
+                return resolve();
+              }
+              formData.unique.push(form.querySelector(input).value);
+              resolve();
+            })
+          }
+          Promise.all([
+            checkNull('input[name="unique1"]', 'unique1'),
+            checkNull('input[name="unique2"]', 'unique2'),
+            checkNull('input[name="unique3"]', 'unique2'),
+          ]).then(async ()=> {
+              const jobId = document.getElementById('my-h1').innerHTML.split('Job id: ')[1];
+              const response = await fetch(`/job/scenario/${jobId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+              })
+              const result = await response.json();
+              let message = result.message;
+              let type = result.type;
+              $(`#alert-parent`).append(`
+                <div id='alert' class="alert alert-${type} alert-dismissible fade show" role="alert">
+                  <strong>${message}</strong>
+                  <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`
+              )
+              $(`#unique2`).addClass('d-none');
+              $(`#unique3`).addClass('d-none');
+              form.reset();
+          })
+        }
+      </script>
     </body>
 </html>

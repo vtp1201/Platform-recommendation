@@ -275,52 +275,41 @@ class JobController {
             ) {
                 return res.redirect('back');
             }
-            await Promise.all(
-                Object.keys(req.body).map( async key => {
-                    if(
-                        key == 'uniqueObject' ||
-                        key == 'uniqueKey' ||
-                        key == 'uniqueRequest'
-                    ) {
-                        
-                        const name = key.split('unique')[1];
-                        const data = preViewData(dataSource[`${name.toLowerCase()}`, 'full']);
-                        let isUnique = [];
-                        if (req.body[key].length == 1) {
-                            const newData = data.map(i => i[item]);
-                            if (hasNotDuplicatesArray(newData) === false) {
-                                return null;
-                            }
-                            isUnique.push(item);
-                        } else {
-                            req.body[key].forEach( item => {
-                                if (!data[0][item]) {
-                                    return null;
-                                }
-                                isUnique.push(item);
-                            })
-                            const newData = data.map(item => {
-                                let string = `${item[isUnique[0]]}`
-                                for (let index = 1; index < isUnique.length; index++) {
-                                    string = `${string}_${item[isUnique[index]]}`;
-                                }
-                                return string;
-                            })
-                            if (hasNotDuplicatesArray(newData) === false) {
-                                isUnique = [];
-                            }
-                        }
-                        console.log(isUnique);
-                        if (isUnique.length > 0) {
-                            await Query.updateOne({
-                                _id: dataSource[`query${name}`]._id
-                            },{
-                                unique: isUnique,
-                            })
-                        }
+            const name = req.body.target;
+            const data = preViewData(dataSource[`${name.toLowerCase()}`, 'full']);
+            let isUnique = [];
+            if (req.body.unique.length == 1) {
+                const newData = data.map(i => i[item]);
+                if (hasNotDuplicatesArray(newData) === false) {
+                    return null;
+                }
+                isUnique.push(item);
+            } else {
+                req.body.unique.forEach( item => {
+                    if (!data[0][item]) {
+                        return null;
                     }
+                    isUnique.push(item);
                 })
-            )
+                const newData = data.map(item => {
+                    let string = `${item[isUnique[0]]}`
+                    for (let index = 1; index < isUnique.length; index++) {
+                        string = `${string}_${item[isUnique[index]]}`;
+                    }
+                    return string;
+                })
+                if (hasNotDuplicatesArray(newData) === false) {
+                    isUnique = [];
+                }
+            }
+            console.log(isUnique);
+            if (isUnique.length > 0) {
+                await Query.updateOne({
+                    _id: dataSource[`query${name}`]._id
+                },{
+                    unique: isUnique,
+                })
+            }
             return res.redirect('back');
         } catch (error) {
             console.log(error);
