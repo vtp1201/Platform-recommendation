@@ -315,7 +315,6 @@ class JobController {
                     isUnique = [...unique];
                 }
             }
-            console.log(isUnique);
             if (isUnique.length > 0) {
                 await Query.updateOne({
                     _id: dataSource[`query${target}`]._id
@@ -339,11 +338,11 @@ class JobController {
             });
         }
     }
-    // [GET] job/update-data/:id
+    // [GET] job/api/update-data/:id
     async updateDataByQuery(req, res, next) {
         try {
             const job = await Job.findOne({ _id : req.params.id });
-            const dataSource = await DataSource.findOne({
+            let dataSource = await DataSource.findOne({
                 _id : job.dataSource 
             }).populate([
                 'queryObject', 'queryKey', 'queryRequest'
@@ -353,40 +352,44 @@ class JobController {
                     msg: "Can't update data by query",
                 })
             }
-            Object.keys(dataSource).map(async key => {
+            dataSource = JSON.parse(JSON.stringify(dataSource));
+            await Promise.all(Object.keys(dataSource).map(async key => {
                 if(
-                    key !== 'queryObject' &&
-                    key !== 'queryKey' &&
-                    key !== 'queryRequest'
+                    key == 'queryObject' &&
+                    key == 'queryKey' &&
+                    key == 'queryRequest'
                 ) {
                     return null;
                 }
-                if (!dataSource[key].unique) {
+                if (dataSource[key]?.unique === undefined) {
                     return null;
                 }
-                const name = key.split('unique')[1];
-                const data = preViewData(dataSource[`${name.toLowerCase()}`, 'full']);
+                const name = key.split('query')[1];
+                const { data } = await preViewData(dataSource[`${name.toLowerCase()}`], 'full');
                 let queryString = `SELECT ${dataSource[key].select} FROM ${dataSource[key].from} WHERE`;
                 if (dataSource[key].where) {
-                    queryString += `${queryString} ${dataSource[key].where}`;
+                    queryString += `${queryString} ${dataSource[key].where} AND`;
                 }
-                queryString += `${queryString} NOT EXISTS ( SELECT * FROM (VALUES ( `;
+                queryString = `${queryString} NOT EXISTS ( SELECT * FROM (VALUES ( `;
                 data.forEach((dt, index) => {
                     if (index > 0) {
                         queryString = `${queryString} ,`;
                     }
-                    queryString = `${queryString} ( `;
-                    dataSource[key].unique.forEach( u => {
-                        if ((typeof dt.u) === 'number') {
-                            queryString = `${queryString} ${dt[u]}`;
+                    queryString = `${queryString} (`;
+                    dataSource[key].unique.forEach((k, i)=> {
+                        if (i > 0) {
+                            queryString = `${queryString},`;
+                        }
+                        if ((typeof dt[k]) == 'number') {
+                            queryString = `${queryString} ${dt[k]}`;
                         } else {
-                            queryString = `${queryString} '${dt[u]}'`;
+                            queryString = `${queryString} '${dt[k]}'`;
                         }
                     })
-                    queryString = ` ${queryString} )`;
+                    queryString = `${queryString} )`;
                 })
 
-                queryString = ` ${queryString} AS V (`;
+                queryString = `${queryString} ) ) AS V (`;
                 dataSource[key].unique.forEach( (u, index) => {
                     if (index === 0) {
                         queryString = `${queryString} c${index + 1}`;
@@ -404,11 +407,13 @@ class JobController {
                 })
                 queryString = `${queryString} )`;
                 console.log(queryString);
-                res.status(200).json({
-                    msg: 'OK',
-                });
-            })
+                return queryString;
+            }))
+            res.status(200).json({
+                msg: 'OK',
+            });
         } catch (error) {
+            console.log(error)
             res.status(200).json({
                 msg: 'TOANG',
             });

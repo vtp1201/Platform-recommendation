@@ -25,5 +25,16 @@ module.exports = {
             console.log(error);
             return false;
         }
-    }
+    },
+    getDataByQuery: async function(config, query){
+        try {
+            const connection  = await mysql.createConnection(config);
+            const [rows, fields] = await connection.execute(query);
+            connection.close();
+            return rows;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    },
 } 

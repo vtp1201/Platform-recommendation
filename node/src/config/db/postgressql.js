@@ -26,5 +26,16 @@ module.exports = {
             console.log(error);
             return false;
         }
+    },
+    DataByQueryPG: async function(config, query){
+        try {
+            const client = new Client(config)
+            const rows = await client.query(query);
+            await client.end();
+            return rows;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
     }
 } 

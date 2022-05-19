@@ -39,5 +39,17 @@ module.exports = {
             console.log(error);
             return false;
         }
+    },
+
+    dataByQuery: async function (query) {
+        try {
+            let sqlRequest = new sql.Request();
+            const data = await sqlRequest.query(query);
+            console.log(data);
+            return data;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
     }
 }
