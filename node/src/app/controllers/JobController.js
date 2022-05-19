@@ -76,8 +76,13 @@ class JobController {
             const job = await Job.findOne({
                 _id: req.params.id,
                 userId: req.user._id,
-            }).populate('dataSource');
-            const dataSource = job.dataSource;
+            });
+            const dataSource = await DataSource.findOne({
+                _id: job.dataSource,
+            }).populate([
+                'queryObject', 'queryKey', 'queryRequest'
+                , 'fileObject', 'fileKey', 'fileRequest'
+            ]);
             if (job === null) {
                 res.redirect('back');
                 return;
@@ -93,16 +98,19 @@ class JobController {
 
             if(dataSource.object) {
                 dataObject = await preViewData(dataSource.object);
+                dataObject.unique = dataSource?.queryObject?.unique || [];
             }
 
             if(dataSource.key) {
                 dataKey = await preViewData(dataSource.object);
+                dataKey.unique = dataSource?.queryKey?.unique || [];
             }
 
             if(dataSource.request) {
                 dataRequest = await preViewData(dataSource.request);
+                dataRequest.unique = dataSource?.queryRequest?.unique || [];
             }
-            //console.log(dataObject);
+            //console.log(dataSource);
 
             job.createdAt = job.createdAt.toLocaleString("en-US");
             res.render('job/scenario', {
@@ -263,6 +271,7 @@ class JobController {
     // [POST] check-unique/:id
     async checkUnique(req, res) {
         try {
+            const { unique, target, autoUpdate} = req.body;
             const job = await Job.findOne({_id: req.params.id});
             const dataSource = await DataSource.findOne({
                 _id: job.dataSource,
@@ -273,47 +282,61 @@ class JobController {
             if (!dataSource || dataSource.type == 'file' 
                 || !dataSource.queryKey ||  !dataSource.queryRequest
             ) {
-                return res.redirect('back');
+                return res.status(200).json({
+                    message: 'Cant not check unique for this job',
+                    type: 'danger'
+                });
             }
-            const name = req.body.target;
-            const data = preViewData(dataSource[`${name.toLowerCase()}`, 'full']);
+            const name = target.toLowerCase();
+            const collection = dataSource[`${name}`];
+            const { data } = await preViewData(collection, 'full');
             let isUnique = [];
-            if (req.body.unique.length == 1) {
-                const newData = data.map(i => i[item]);
-                if (hasNotDuplicatesArray(newData) === false) {
-                    return null;
+            if (unique.length == 1) {
+                const newData = data.map(i => i[unique[0]]);
+                if (hasNotDuplicatesArray(newData) === true) {
+                    isUnique.push(unique[0]);
                 }
-                isUnique.push(item);
             } else {
-                req.body.unique.forEach( item => {
+                unique.every( item => {
                     if (!data[0][item]) {
-                        return null;
+                        isUnique = [];
+                        return false;
                     }
-                    isUnique.push(item);
+                    return true;
                 })
                 const newData = data.map(item => {
-                    let string = `${item[isUnique[0]]}`
-                    for (let index = 1; index < isUnique.length; index++) {
-                        string = `${string}_${item[isUnique[index]]}`;
+                    let string = `${item[unique[0]]}`
+                    for (let index = 1; index < unique.length; index++) {
+                        string = `${string}__${item[unique[index]]}__`;
                     }
                     return string;
                 })
-                if (hasNotDuplicatesArray(newData) === false) {
-                    isUnique = [];
+                if (hasNotDuplicatesArray(newData) === true) {
+                    isUnique = [...unique];
                 }
             }
             console.log(isUnique);
             if (isUnique.length > 0) {
                 await Query.updateOne({
-                    _id: dataSource[`query${name}`]._id
+                    _id: dataSource[`query${target}`]._id
                 },{
                     unique: isUnique,
+                    autoUpdate,
+                })
+                return res.status(200).json({
+                    message: 'OK',
                 })
             }
-            return res.redirect('back');
+            return res.status(200).json({
+                message: 'Columns not unique. Please try another columns!',
+                type: 'danger'
+            });
         } catch (error) {
             console.log(error);
-            return res.redirect('back');
+            return res.status(200).json({
+                message: 'Something went wrong. Try later!',
+                type: 'danger'
+            });
         }
     }
     // [GET] job/update-data/:id
@@ -816,16 +839,24 @@ function addDataCollection(name, jobId, data) {
 
 async function preViewData(collection, limit = 20) {
     try {
+        let count;
+        let data;
         if (limit == 'full') {
-            limit = undefined;
+            [count, data] = await Promise.all([
+                db.db.collection(collection).countDocuments(),
+                db.db.collection(collection).find({},{
+                    _id: false,
+                }).toArray()
+            ]);
         }
-        let [count, data] = await Promise.all([
-            db.db.collection(collection).countDocuments(),
-            db.db.collection(collection).find({},{
-                _id: false,
-            }).limit(limit).toArray()
-        ]);
-
+        else {
+            [count, data] = await Promise.all([
+                db.db.collection(collection).countDocuments(),
+                db.db.collection(collection).find({},{
+                    _id: false,
+                }).limit(limit).toArray()
+            ]);
+        }
         let current = 20 ;
         if (count <= 20 ) {
             current = count;
@@ -837,7 +868,6 @@ async function preViewData(collection, limit = 20) {
             }
             return data;
         })
-
         return { 
             count, 
             current, 
@@ -845,7 +875,7 @@ async function preViewData(collection, limit = 20) {
         }
     } catch (error) {
         console.log(error);
-        return {};
+        return { data: []};
     }
 }
 

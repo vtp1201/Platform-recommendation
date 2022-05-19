@@ -24,6 +24,7 @@ router.post('/scenario/:id', checkNotLogged, jobController.createRecommendation)
 router.get('/new-job', checkNotLogged, jobController.newJob);
 router.post('/new-job', checkNotLogged, jobController.createNewJob);
 router.get('/preview-data/:id', checkNotLogged, jobController.preview);
+router.post('/check-unique/:id', checkNotLogged, jobController.checkUnique);
 router.post('/add-query/:id', checkNotLogged, jobController.createNewQuery);
 router.post('/add-file/:id', checkNotLogged, uploadMutiple, jobController.addFile);
 router.delete('/:id', checkNotLogged, jobController.delete);
