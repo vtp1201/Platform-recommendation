@@ -6,12 +6,13 @@ const Files = require('../models/File');
 
 const fetch = require('cross-fetch');
 const {connect, disconnect, query} = require('../../config/db/mssql');
-const {testConnection, queryData} = require('../../config/db/mysql');
+const {testConnection, queryData, getDataByQuery} = require('../../config/db/mysql');
 const {testConnectionPG, queryDataPG} = require('../../config/db/postgressql');
 
 const { mutipleMongooseToObject, mongooseToObject } = require('../../util/mongoose');
 const uploadMutipleFiles = require('../../config/firebase/firebase');
 const mongoose   = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 mongoose.Promise = Promise;
 let db = mongoose.connection;
 
@@ -335,6 +336,79 @@ class JobController {
             return res.status(200).json({
                 message: 'Something went wrong. Try later!',
                 type: 'danger'
+            });
+        }
+    }
+    async updateDataSchedule(req, res) {
+        try {
+            const query = await Query.findOne({
+                _id: req.body.id
+            });
+            const dataSource = await DataSource.findOne({
+                _id : ObjectId(query.dataSourceId),
+            }).populate('connection');
+            
+            const connection = dataSource.connection;
+
+            let server = 'server';
+            if (dataSource.type == 'mysql') {
+                server = 'host';
+            }
+
+            const config = {
+                database: connection.database,
+                [server]: connection.server,
+                user: connection.user,
+                password: connection.password,
+            }
+
+            if (connection.port) {
+                config.port = connection.port;
+            }
+
+            const { data } = await preViewData(query.data, 'full');
+
+            let queryString = `SELECT ${query.select} FROM ${query.from} WHERE`;
+            if (query.where) {
+                queryString += `${queryString} ${query.where} AND`;
+            }
+
+            queryString = `${queryString} CONCAT(`;
+
+            query.unique.forEach( (u, index) => {
+                if (index > 0) {
+                    queryString = `${queryString} ,`;
+                } 
+                queryString = `${queryString} ${u}, '__'`;
+            })
+            queryString = `${queryString} ) NOT IN (`
+            data.forEach((dt, index) => {
+                if (index > 0) {
+                    queryString = `${queryString} ,`;
+                }
+                queryString = `${queryString} CONCAT(`;
+                query.unique.forEach((k, i)=> {
+                    if (i > 0) {
+                        queryString = `${queryString},`;
+                    }
+                    if ((typeof dt[k]) == 'number') {
+                        queryString = `${queryString} ${dt[k]}, '__'`;
+                    } else {
+                        queryString = `${queryString} '${dt[k]}', '__'`;
+                    }
+                })
+                queryString = `${queryString} )`;
+            })
+            queryString = `${queryString} )`;
+            const result = await getDataByQuery(config, queryString)
+            console.log(result);
+            res.status(200).json({
+                msg: 'OK',
+            });
+        } catch (error) {
+            console.log(error)
+            res.status(200).json({
+                msg: 'TOANG',
             });
         }
     }
