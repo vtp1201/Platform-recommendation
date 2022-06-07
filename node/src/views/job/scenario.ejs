@@ -118,13 +118,26 @@
                             </div>
                           <% } %>
                             <div class="card border rounded-5 p-1 m-1 row gx-4 gx-lg-5" style="width: 98%;">
-                              <form method="POST" action="" class="form-horizontal">
+                              <form method="POST" action="job/new-recommend/<%=job._id%>" class="form-horizontal">
                                 <div class="logo mt-4">
                                   <div class="col-md-12 text-center">
                                     <h2 style="font-size: 20px;">Recommendations</h2>
                                   </div>
                                 </div>
+                                
                                 <div class="justify-content-center px-4 pb-4">
+                                  <div class="col-md-9 py-2 mb-2">
+                                    <label for="service" class="form-label">Service</label>
+                                    <select class="form-select" id="service" name="service" placeholder="" aria-disabled="true">
+                                      <option>Choose...</option>
+                                      <option value="item to user">Item to user</option>
+                                      <option value="user to user">User to user</option>
+                                      <option value="content to user">Content to user</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select a valid country.
+                                    </div>
+                                  </div>
                                   <div class="col-sm-12">
                                     <label for="object" class="form-label">object</label>
                                     <input type="text" class="form-control" id="object" name="object" placeholder="Title" required>
