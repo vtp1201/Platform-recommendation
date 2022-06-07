@@ -625,10 +625,13 @@ class JobController {
             return res.redirect('back');
         }
     }
-    // [POST] job/scenario/:id
+    // [POST] job/new-recommend/:id
     async createRecommendation (req, res, next) {
         try {
-            const job = await Job.findOne({_id : req.params.id}).populate('dataSource');
+            const job = await Job.findOne({
+                _id : req.params.id,
+                userId: req.user._id,
+            }).populate('dataSource');
             const dataSource = job.dataSource;
             if (!job) {
                 return res.redirect('back');
