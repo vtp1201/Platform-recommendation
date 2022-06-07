@@ -10,6 +10,9 @@ const Query = new Schema(
             ref: 'DataSource', 
             required: true,
         },
+        category: {
+            type: Schema.Types.String,
+        },
         data: {
             type: Schema.Types.String,
         },

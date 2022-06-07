@@ -12,6 +12,9 @@ const app = express();
 const db = require('./config/db/index');
 const route = require('./routes/index');
 require('./config/passport/passport')(passport);
+const schedule = require('./config/schedule');
+
+
 
 app.use(morgan('tiny'));
 app.use(methodOverride('_method'));
@@ -69,4 +72,5 @@ const host = process.env.PORT || 5000
 
 app.listen(host, () => {
     console.log(`listening on port ${host}`);
+    schedule.scheduleJob();
 });

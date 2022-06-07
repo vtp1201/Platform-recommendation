@@ -242,6 +242,7 @@ class JobController {
                     const newQuery = new Query({
                         dataSourceId: dataSource._id,
                         data: `${dataSource._id}-${name.toLowerCase()}`,
+                        category: name.toLowerCase(),
                         ...query,
                     })
 
@@ -339,7 +340,82 @@ class JobController {
             });
         }
     }
-    async updateDataSchedule(req, res) {
+    // service schedule
+    async updateDataSchedule(query) {
+        try {
+            const dataSource = await DataSource.findOne({
+                _id : ObjectId(query.dataSourceId),
+            }).populate('connection');
+            
+            const connection = dataSource.connection;
+
+            let server = 'server';
+            if (dataSource.type == 'mysql') {
+                server = 'host';
+            }
+
+            const config = {
+                database: connection.database,
+                [server]: connection.server,
+                user: connection.user,
+                password: connection.password,
+            }
+
+            if (connection.port) {
+                config.port = connection.port;
+            }
+
+            const { data } = await preViewData(query.data, 'full');
+
+            let queryString = `SELECT ${query.select} FROM ${query.from} WHERE`;
+            if (query.where) {
+                queryString += `${queryString} ${query.where} AND`;
+            }
+
+            queryString = `${queryString} CONCAT(`;
+
+            query.unique.forEach( (u, index) => {
+                if (index > 0) {
+                    queryString = `${queryString} ,`;
+                } 
+                queryString = `${queryString} ${u}, '__'`;
+            })
+            queryString = `${queryString} ) NOT IN (`
+            data.forEach((dt, index) => {
+                if (index > 0) {
+                    queryString = `${queryString} ,`;
+                }
+                queryString = `${queryString} (`;
+                query.unique.forEach((k, i)=> {
+                    if (i === 0) {
+                        queryString = `${queryString} '`;
+                    }
+
+                    queryString = `${queryString}${dt[k]}__`;
+
+                    if (i === query.unique.length - 1) {
+                        queryString = `${queryString}'`;
+                    }
+                })
+                queryString = `${queryString} )`;
+            })
+            queryString = `${queryString} )`;
+            const result = await getDataByQuery(config, queryString);
+            const [addData, update] = await Promise.all([
+                addDataCollection(query.category, dataSource._id, result),
+                Query.updateOne({ 
+                    _id: query._id
+                }, {
+                    updatedAt: new Date(Date.now())
+                })
+            ])
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+    // [GET] job/api/update-data/:id
+    async updateDataByQuery(req, res, next) {
         try {
             const query = await Query.findOne({
                 _id: req.body.id
@@ -386,110 +462,38 @@ class JobController {
                 if (index > 0) {
                     queryString = `${queryString} ,`;
                 }
-                queryString = `${queryString} CONCAT(`;
+                queryString = `${queryString} (`;
                 query.unique.forEach((k, i)=> {
-                    if (i > 0) {
-                        queryString = `${queryString},`;
+                    if (i === 0) {
+                        queryString = `${queryString} '`;
                     }
-                    if ((typeof dt[k]) == 'number') {
-                        queryString = `${queryString} ${dt[k]}, '__'`;
-                    } else {
-                        queryString = `${queryString} '${dt[k]}', '__'`;
+
+                    queryString = `${queryString}${dt[k]}__`;
+
+                    if (i === query.unique.length - 1) {
+                        queryString = `${queryString}'`;
                     }
                 })
                 queryString = `${queryString} )`;
             })
             queryString = `${queryString} )`;
-            const result = await getDataByQuery(config, queryString)
-            console.log(result);
-            res.status(200).json({
-                msg: 'OK',
-            });
-        } catch (error) {
-            console.log(error)
-            res.status(200).json({
-                msg: 'TOANG',
-            });
-        }
-    }
-    // [GET] job/api/update-data/:id
-    async updateDataByQuery(req, res, next) {
-        try {
-            const job = await Job.findOne({ _id : req.params.id });
-            let dataSource = await DataSource.findOne({
-                _id : job.dataSource 
-            }).populate([
-                'queryObject', 'queryKey', 'queryRequest'
+            const result = await getDataByQuery(config, queryString);
+            const [addData, update] = await Promise.all([
+                addDataCollection(query.category, dataSource._id, result),
+                Query.updateOne({ 
+                    _id: query._id
+                }, {
+                    updatedAt: new Date(Date.now())
+                })
             ])
-            if (dataSource.type == 'file') {
-                return res.status(403).json({
-                    msg: "Can't update data by query",
-                })
-            }
-            dataSource = JSON.parse(JSON.stringify(dataSource));
-            await Promise.all(Object.keys(dataSource).map(async key => {
-                if(
-                    key == 'queryObject' &&
-                    key == 'queryKey' &&
-                    key == 'queryRequest'
-                ) {
-                    return null;
-                }
-                if (dataSource[key]?.unique === undefined) {
-                    return null;
-                }
-                const name = key.split('query')[1];
-                const { data } = await preViewData(dataSource[`${name.toLowerCase()}`], 'full');
-                let queryString = `SELECT ${dataSource[key].select} FROM ${dataSource[key].from} WHERE`;
-                if (dataSource[key].where) {
-                    queryString += `${queryString} ${dataSource[key].where} AND`;
-                }
-                queryString = `${queryString} NOT EXISTS ( SELECT * FROM (VALUES ( `;
-                data.forEach((dt, index) => {
-                    if (index > 0) {
-                        queryString = `${queryString} ,`;
-                    }
-                    queryString = `${queryString} (`;
-                    dataSource[key].unique.forEach((k, i)=> {
-                        if (i > 0) {
-                            queryString = `${queryString},`;
-                        }
-                        if ((typeof dt[k]) == 'number') {
-                            queryString = `${queryString} ${dt[k]}`;
-                        } else {
-                            queryString = `${queryString} '${dt[k]}'`;
-                        }
-                    })
-                    queryString = `${queryString} )`;
-                })
-
-                queryString = `${queryString} ) ) AS V (`;
-                dataSource[key].unique.forEach( (u, index) => {
-                    if (index === 0) {
-                        queryString = `${queryString} c${index + 1}`;
-                    } else {
-                        queryString = `${queryString}, c${index + 1}`;
-                    }
-                })
-                queryString = `${queryString} ) WHERE `
-                dataSource[key].unique.forEach( (u, index) => {
-                    if (index === 0) {
-                        queryString = `${queryString} ${u} = c${index+1}`;
-                    } else {
-                        queryString = `${queryString} AND ${u} = c${index+1}`;
-                    }
-                })
-                queryString = `${queryString} )`;
-                console.log(queryString);
-                return queryString;
-            }))
             res.status(200).json({
                 msg: 'OK',
+                updates: result.length,
             });
         } catch (error) {
             console.log(error)
             res.status(200).json({
-                msg: 'TOANG',
+                msg: 'Something went wrong',
             });
         }
     }
@@ -582,7 +586,7 @@ class JobController {
                     return res.redirect('back');
                 }
                 const update = {};
-                await Promise.all( Object.keys(req.files).map(async (file) => {
+                await Promise.all( Object.keys(req.files).map(async key => {
                     const name = key.split('dataSource')[1];
                     if (
                         key == 'dataSourceObject' ||

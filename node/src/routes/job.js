@@ -33,6 +33,6 @@ router.patch('/:id/restore', checkNotLogged, jobController.restore);
 router.get('/trash', checkNotLogged, jobController.trash);
 router.post('/api/extract', jobController.extract);
 router.post('/api/update', jobController.updateData);
-router.post('/api/update-data', jobController.updateDataSchedule);
+router.post('/api/update-data', jobController.updateDataByQuery);
 
 module.exports = router;
