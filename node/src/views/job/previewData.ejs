@@ -56,13 +56,13 @@
                             <% if(messageType == 'success') { %>
                               <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
                                 <strong><%= message %></strong>
-                                <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                <button id='btn-alert' onclick="onCloseAlert()" type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                               </div>
                             <% } %>
                             <% if(messageType == 'danger') { %>
                               <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
                                 <strong><%= message %></strong>
-                                <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                <button id='btn-alert' onclick="onCloseAlert()" type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                               </div>
                             <% } %>
                             <div class="card border rounded-5 p-1 m-1 row gx-4 gx-lg-5" style="width: 98%;">
@@ -72,7 +72,7 @@
                                 </div>
                               </div>
                               <% if (dataSource.type == 'file') { %>
-                            <form method="POST" action="/job/add-file/<%= job._id %>" class="form-horizontal" novalidate="" enctype="multipart/form-data">
+                            <form method="POST" action="/job/add-file/<%= job._id %>" class="needs-validation" novalidate="" enctype="multipart/form-data">
                               <% if (dataSource.object) { %>
                               <div class="my-3">
                                 <label for="dataSourceObject" class="form-label">Data source user</label>
@@ -93,7 +93,7 @@
                               <% } else { %>
                               <div class="mb-3">
                                 <label for="dataSourceKey" class="form-label">Data source interactions</label>
-                                <input type="file" name="dataSourceKey" id="dataSourceKey" accept=".csv, .xml, .xlsx, .json"class="form-control" aria-label="file example" required>
+                                <input type="file" name="dataSourceKey" id="dataSourceKey" accept=".csv, .xml, .xlsx, .json" class="form-control" aria-label="file example" required>
                                 <div class="invalid-feedback">Example invalid form file feedback</div>
                               </div>
                               <% } %>
@@ -200,8 +200,8 @@
                             <div class="col-md-12 pb-4 text-center">
                               <button class="mx-5 btn btn-primary btn-sm" onclick="onSubmit()" >Submit Query</button>
                             </div>
+                            <% } %>  
                           </div>
-                          <% } %>
                         </div>
                       </div>	
                     </div>

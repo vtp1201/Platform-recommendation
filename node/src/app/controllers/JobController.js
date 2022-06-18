@@ -16,7 +16,7 @@ const ObjectId = mongoose.Types.ObjectId;
 mongoose.Promise = Promise;
 let db = mongoose.connection;
 
-const pyHost = process.env.PYTHON_HOST || '127.0.0.1';
+const pyHost = process.env.PYTHON_HOST || 'localhost';
 const pyPort = process.env.PYTHON_PORT || 8000;
 
 function check(dataSource, obj, toObj) {
@@ -50,19 +50,77 @@ class JobController {
             }));
     }
     // [GET] job/detail/:id
-    showJob(req, res, next) {
-        Job.findById(req.params.id)
-            .then( job => {
-                job = mongooseToObject(Job(job));
-                job.createdAt = job.createdAt.toLocaleString("en-US");
-                if (job.userId != req.user._id) {
-                    return res.render('notfound');
-                }
-                res.render('job/detail', {
-                    job: job,
-                })
-            })
-            .catch(next);
+    async showJob(req, res, next) {
+        try {
+            const job = await Job.findOne({
+                _id: req.params.id,
+                userId: req.user._id,
+            });
+            
+            if (job === null) {
+                res.redirect('back');
+                return;
+            }
+
+            const dataSource = await DataSource.findOne({
+                _id: job.dataSource,
+            }).populate([
+                'queryObject', 'queryKey', 'queryRequest'
+                , 'fileObject', 'fileKey', 'fileRequest'
+            ]);
+
+            if (!dataSource?.key && !dataSource?.request) {
+                res.redirect(`/job/preview-data/${job._id}`);
+                return;
+            }
+            
+            let dataObject = {};
+            let dataKey = {};
+            let dataRequest = {};
+            let dataRecommend = {};
+            let files = {};
+            let query = {};
+
+            if(dataSource.object) {
+                dataObject = await preViewData(dataSource.object, 300);
+                files.object = dataSource?.fileObject;
+                query.object = dataSource?.queryObject;
+            }
+
+            if(dataSource.key) {
+                dataKey = await preViewData(dataSource.key, 300);
+                files.key = dataSource?.fileKey;
+                query.key = dataSource?.queryKey;
+            }
+
+            if(dataSource.request) {
+                dataRequest = await preViewData(dataSource.request, 300);
+                files.request = dataSource?.fileRequest;
+                query.request = dataSource?.queryRequest;
+            }
+
+            if(job.dataDestination) {
+                dataRecommend = await preViewData(job.dataDestination, 300);
+            }
+            //console.log(dataSource);
+
+            job.createdAt = job.createdAt.toLocaleString("en-US");
+            res.render('job/detail', {
+                messageType: req.flash('messageType'),
+                message: req.flash('message'),
+                job: job,
+                dataSource: dataSource,
+                dataObject,
+                dataKey,
+                dataRequest,
+                dataRecommend,
+                files,
+                query,
+            });
+        } catch (error) {
+            console.log(error);
+            res.redirect('back');
+        } 
     }
     // [GET] job/new-job
     newJob(req, res, next) {
@@ -103,7 +161,7 @@ class JobController {
             }
 
             if(dataSource.key) {
-                dataKey = await preViewData(dataSource.object);
+                dataKey = await preViewData(dataSource.key);
                 dataKey.unique = dataSource?.queryKey?.unique || [];
             }
 
@@ -159,7 +217,7 @@ class JobController {
             }
 
             if(dataSource.key) {
-                dataKey = await preViewData(dataSource.object);
+                dataKey = await preViewData(dataSource.key);
                 files.key = dataSource?.fileKey;
                 query.key = dataSource?.queryKey;
             }
@@ -565,14 +623,13 @@ class JobController {
     async addFile(req, res, next) {
         try {
             const job = await Job.findById(req.params.id).populate('dataSource');
-            let dataSource = job.dataSource;
+            const dataSource = job.dataSource;
             await uploadMutipleFiles(req, res, next);
             const jobApi = {}
             check(req.files.dataSourceObject, jobApi, 'dataSourceObject');
             check(req.files.dataSourceKey, jobApi, 'dataSourceKey');
             check(req.files.dataSourceRequest, jobApi, 'dataSourceRequest');
             const url = `http://${pyHost}:${pyPort}/api/add-files`;
-            console.log(url);
             fetch(url, {
                 method: 'POST',
                 body: JSON.stringify(jobApi),
@@ -603,16 +660,13 @@ class JobController {
                         update[`${name.toLowerCase()}`] = `${dataSource._id}-${name.toLowerCase()}`;
                     }
                 }))
-                console.log(update)
-                const result = await DataSource.updateOne({_id : dataSource._id}, update);
-                console.log(result);
-                dataSource = await DataSource.findOne({_id : dataSource._id});
-                const keys = Object.keys(dataSource);
-                keys.forEach(key => {
-                    if (key == 'key' || key == 'object' || key == 'request') {
-                        renameCollection(key, dataSource[key]);
-                    }       
-                });
+                await DataSource.updateOne({_id : dataSource._id}, update);
+                const newDataSource = await DataSource.findOne({_id : dataSource._id});
+                for (const key in newDataSource) {
+                    if (key === 'key' || key === 'object' || key === 'request') {
+                        renameCollection(key, String(newDataSource[key]));
+                    }    
+                }
                 //renameCollection('recommends', job._id);
                 return res.redirect(`/job/preview-data/${job._id}`);
             })
@@ -948,6 +1002,13 @@ async function preViewData(collection, limit = 20) {
             current = count;
         }
 
+        if (limit && typeof limit === 'number') {
+            current = limit;
+            if (count <= limit ) {
+                current = count;
+            }
+        }
+        
         data = data.map(data => {
             if (data._id) {
                 delete data._id

@@ -47,259 +47,349 @@
             </div>
         </header>
         <div class="container-fluid">
-            <div class="px-3 my-1 mx-2">
+            <div class="px-2 my-1 mx-1">
                 <div class="row d-flex justify-content-lg-between">
-                    <div class="col-md-4">
-                        <div class="row mt-3">
-                            <div class="card border rounded-5 p-3" style="width: 100%; height: 1070px; background-color: #F7F7F7; overflow: auto;">
-                            <div id="alert-parent">
-                                <% if(messageType == 'success') { %>
-                                <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
-                                    <strong><%= message %></strong>
-                                    <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                                <% } %>
-                                <% if(messageType == 'danger') { %>
-                                <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
-                                    <strong><%= message %></strong>
-                                    <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                                <% } %>
-                            </div>
+                  <div class="col-md-4">
+                      <div class="row mt-3">
+                          <div class="card border rounded-5 p-3" style="width: 100%; height: 1070px; background-color: #F7F7F7; overflow: auto;">
                             <div class="card border rounded-5 p-1 m-1 row gx-4 gx-lg-5" style="width: 98%;">
-                                <form method= "POST" action="/job/<%= job._id %>?_method=DELETE" class="needs-validation" novalidate="">
-                                <div class="logo mt-4">
-                                    <div class="col-md-12 text-center">
-                                    <h2 style="font-size: 20px;">Recommendations</h2>
-                                    </div>
+                              <form method= "POST" action="/job/<%= job._id %>?_method=DELETE" class="needs-validation" novalidate="">
+                              <div class="logo mt-4">
+                                  <div class="col-md-12 text-center">
+                                  <h2 style="font-size: 20px;">Recommendations</h2>
+                                  </div>
+                              </div>
+                              <div class="justify-content-center px-4 pb-4">
+                                <div class="col-md-6">
+                                  <label for="title" class="form-label">Title</label>
+                                  <input type="text" class="form-control" id="title" name="title" value="<%=job.title%>" placeholder="Title" disabled>
                                 </div>
-                                
-                                <div class="justify-content-center px-4 pb-4">
-                                    <div class="col-md-9 py-2 mb-2">
-                                    <label for="service" class="form-label">Service</label>
-                                    <select class="form-select" id="service" name="service" placeholder="" aria-disabled="true" disabled>
-                                        <option><%= job.service %></option>
-                                    </select>
-                                    <div class="invalid-feedback">
-                                        Please select a valid country.
-                                    </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                    <label for="object" class="form-label">object</label>
-                                    <input type="text" class="form-control" id="object" name="object" placeholder="Title" value="<%= job.object %>" disabled>
-                                    <div class="invalid-feedback">
-                                        Valid title is required.
-                                    </div>
-                                    </div>
-                                    <div class="col-sm-12 py-2">
-                                    <label for="title" class="form-label">key</label>
-                                    <input type="key" class="form-control" id="key" name="key" placeholder="key" value="<%= job.key %>" disabled>
-                                    <div class="invalid-feedback">
-                                        Valid title is required.
-                                    </div>
-                                    </div>
-                                    <div class="col-sm-12 py-2 mb-2">
-                                    <label for="request" class="form-label">request</label>
-                                    <input type="text" class="form-control" id="request" name="request" placeholder="request" value="<%= job.request %>" disabled>
-                                    <div class="invalid-feedback">
-                                        Valid title is required.
-                                    </div>
-                                    </div>
-                                    <div class="col-md-12 text-center">
-                                    <button class="mx-6 btn btn-danger" type="submit">Delete recommendations</button>
-                                    </div>
+                                <div class="col-md-12">
+                                  <label for="description" class="form-label">Description</label>
+                                  <input type="text" class="form-control" id="description" name="description" value="<%=job.description%>" placeholder="Description" disabled>
                                 </div>
-                                </form>
+                                <div class="col-md-9 py-2 mb-2">
+                                  <label for="service" class="form-label">Service</label>
+                                  <select class="form-select" id="service" name="service" placeholder="" aria-disabled="true" disabled>
+                                      <option><%= job.service %></option>
+                                  </select>
+                                </div>
+                                <div class="col-md-9">
+                                  <label for="object" class="form-label">object</label>
+                                  <input type="text" class="form-control" id="object" name="object" placeholder="Title" value="<%= job.object %>" disabled>
+                                </div>
+                                <div class="col-md-9">
+                                  <label for="title" class="form-label">key</label>
+                                  <input type="key" class="form-control" id="key" name="key" placeholder="key" value="<%= job.key %>" disabled>
+                                </div>
+                                <div class="col-md-9 py-2 mb-2">
+                                  <label for="request" class="form-label">request</label>
+                                  <input type="text" class="form-control" id="request" name="request" placeholder="request" value="<%= job.request %>" disabled>
+                                </div>
+                                <div class="col-md-12 text-center">
+                                  <button class="mx-3 btn btn-danger" type="submit">Delete recommendations</button>
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+                          <div class="card border rounded-5 p-1 py-2 m-1 mt-3 row gx-4 gx-lg-5" style="width: 98%;">
+                            <div class="logo mt-4">
+                              <div class="col-md-12 text-center">
+                                <h2 style="font-size: 20px;">Preview Data</h2>
+                              </div>
                             </div>
+                            <div class="justify-content-center px-4 pb-4">
+                              <div class="mb-2">
+                                <label for="dataObject" class="form-label">Data source user</label>
+                                <div class="d-flex justify-content-between">
+                                  <div class="">
+                                    <button id="btn-unique" class="btn btn-primary" type="button" onclick="onPreviewData(1)">Preview</button>
+                                  </div>
+                                  <div class="dropdown">
+                                    <button
+                                      class="btn btn-light dropdown-toggle"
+                                      type="button"
+                                      id="dropdownMenuButton"
+                                      data-mdb-toggle="dropdown"
+                                      aria-expanded="false"
+                                    >
+                                      Export Data
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                      <li><a class="dropdown-item" href="#">.Json</a></li>
+                                      <li><a class="dropdown-item" href="#">.Csv</a></li>
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="mb-2">
+                                <label for="dataObject" class="form-label">Data source interactions</label>
+                                <div class="d-flex justify-content-between">
+                                  <div class="">
+                                    <button id="btn-unique" class="btn btn-primary" type="button" onclick="onPreviewData(2)">Preview</button>
+                                  </div>
+                                  <div class="dropdown">
+                                    <button
+                                      class="btn btn-light dropdown-toggle"
+                                      type="button"
+                                      id="dropdownMenuButton"
+                                      data-mdb-toggle="dropdown"
+                                      aria-expanded="false"
+                                    >
+                                      Export Data
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                      <li><a class="dropdown-item" href="#">.Json</a></li>
+                                      <li><a class="dropdown-item" href="#">.Csv</a></li>
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="mb-2">
+                                <label for="dataObject" class="form-label">Data source items/contents</label>
+                                <div class="d-flex justify-content-between">
+                                  <div class="">
+                                    <button id="btn-unique" class="btn btn-primary" type="button" onclick="onPreviewData(3)">Preview</button>
+                                  </div>
+                                  <div class="dropdown">
+                                    <button
+                                      class="btn btn-light dropdown-toggle"
+                                      type="button"
+                                      id="dropdownMenuButton"
+                                      data-mdb-toggle="dropdown"
+                                      aria-expanded="false"
+                                    >
+                                      Export Data
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                      <li><a class="dropdown-item" href="#">.Json</a></li>
+                                      <li><a class="dropdown-item" href="#">.Csv</a></li>
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="mb-2">
+                                <label for="dataObject" class="form-label">Data recommends</label>
+                                <div class="d-flex justify-content-between">
+                                  <div class="">
+                                    <button id="btn-unique" class="btn btn-primary" type="button" onclick="onPreviewData(4)">Preview</button>
+                                  </div>
+                                  <div class="dropdown">
+                                    <button
+                                      class="btn btn-light dropdown-toggle"
+                                      type="button"
+                                      id="dropdownMenuButton"
+                                      data-mdb-toggle="dropdown"
+                                      aria-expanded="false"
+                                    >
+                                      Export Data
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                      <li><a class="dropdown-item" href="#">.Json</a></li>
+                                      <li><a class="dropdown-item" href="#">.Csv</a></li>
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                        </div>	
-                    </div>
-                    <div class="col-md-8 p-3">
+                          </div>
+                        </div>
+                      </div>
+                    </div>	
+                    <div class="col-md-8 py-3 px-1 ps-2">
                         <div class="text-left">
                             <div class="card border rounded-5 p-1" style="width: 100%; height: 1070px; background-color: #F7F7F7; overflow: auto;">
-                              <div class="col-md-12 text-center mt-2">
-                                <h2 style="font-size: 20px;">Data source user</h2>
-                              </div>
-                              <div class="card border rounded-5 p-1 m-1" style="width: 99%; height: 300px; overflow: auto;">
-                                <table id="table" class="table table-hover table-borderless align-middle caption-top p-2">
-                                  <caption>
-                                    <% if (dataObject.data) { %>
-                                      Data source user <%= dataObject.current %> / <%= dataObject.count %>
-                                    <% } else { %>
-                                      Data source user
-                                    <% } %>
-                                  </caption>
-                                  <thead class="table-dark">
-                                    <tr>
+                              <div id="table-1" class="card border rounded-5 p-1 mt-3" style="width: 99%; height: 1020px;">
+                                <div class="col-md-12 text-center mt-2">
+                                  <h2 style="font-size: 20px;">Data source user</h2>
+                                </div>
+                                <div class="table-responsive">
+                                  <table id="table" class="table table-hover table-borderless align-middle caption-top p-2" style=" overflow: auto;">
+                                    <caption>
                                       <% if (dataObject.data) { %>
-                                        <th scope="col">#</th>
-                                        <% Object.keys(dataObject.data[0]).forEach(function(key, index) { %>
-                                          <th scope="col">
-                                            <% if(dataObject.unique && dataObject.unique.includes(key)){%>
-                                              <i class="fas fa-key"><%= key %></i>
-                                            <% } else { %>
-                                              <%= key %>
-                                            <% } %>
-                                          </th>
-                                        <% }) %>
+                                        Data source user <%= dataObject.current %> / <%= dataObject.count %>
                                       <% } else { %>
-                                      <td colspan="5" class="text-center">
-                                          You don't have data yet.
-                                      </td>
+                                        Data source user
                                       <% } %>
-                                    </tr>
-                                  </thead>
-                                  <% if (dataObject.data) { %>
-                                    <tbody>
-                                      <% dataObject.data.forEach(function(data, index) { %>
-                                        <tr>
-                                          <th scope="row"><%= index +1 %></th>
-                                          <% Object.keys(dataObject.data[0]).forEach(function(key, index) { %>
-                                            <td><%= data[key] %></td>
-                                          <% }) %>
-                                        </tr>
-                                      <% }) %>
-                                    </tbody>
-                                  <% } %>
-                                </table>
-                              </div>
-                              <div class="col-md-12 text-center mt-2">
-                                <h2 style="font-size: 20px;">Data source interactions</h2>
-                              </div>
-                              <div class="card border rounded-5 p-1 m-1" style="width: 99%; height: 300px; overflow: auto;">
-                                <table id="table" class="table table-hover table-borderless align-middle caption-top p-2">
-                                  <caption>
-                                    <% if (dataKey.data) { %>
-                                      Data source interactions <%= dataKey.current %> / <%= dataKey.count %>
-                                    <% } else { %>
-                                      Data source interactions
-                                    <% } %>
-                                  </caption>
-                                  <thead class="table-dark">
-                                    <tr>
-                                      <% if (dataKey.data) { %>
-                                        <th scope="col">#</th>
-                                        <% Object.keys(dataKey.data[0]).forEach(function(key, index) { %>
-                                          <th scope="col d-inline">
-                                            <% if(dataKey.unique && dataKey.unique.includes(key)){ %>
-                                              <i class="fas fa-key"><%= key %></i>
-                                            <% } else { %>
-                                              <%= key %>
-                                            <% } %>
-                                          </th>
-                                        <% }) %>
-                                      <% } else { %>
-                                      <td colspan="5" class="text-center">
-                                          You don't have data yet.
-                                      </td>
-                                      <% } %>
-                                    </tr>
-                                  </thead>
-                                <% if (dataKey.data) { %>
-                                  <tbody>
-                                    <% dataKey.data.forEach(function(data, index) { %>
+                                    </caption>
+                                    <thead class="table-dark">
                                       <tr>
-                                        <th scope="row"><%= index + 1 %></th>
-                                        <% Object.keys(dataKey.data[0]).forEach(function(key, index) { %>
-                                          <td><%= data[key] %></td>
-                                        <% }) %>
+                                        <% if (dataObject.data) { %>
+                                          <th scope="col">#</th>
+                                          <% Object.keys(dataObject.data[0]).forEach(function(key, index) { %>
+                                            <th scope="col">
+                                              <% if(dataObject.unique && dataObject.unique.includes(key)){%>
+                                                <i class="fas fa-key"><%= key %></i>
+                                              <% } else { %>
+                                                <%= key %>
+                                              <% } %>
+                                            </th>
+                                          <% }) %>
+                                        <% } else { %>
+                                        <td colspan="5" class="text-center">
+                                            You don't have data yet.
+                                        </td>
+                                        <% } %>
                                       </tr>
-                                    <% }) %>
-                                  </tbody>
-                                <% } %>
-                                </table>
-                              </div>
-                              <div class="col-md-12 text-center mt-2">
-                                <h2 style="font-size: 20px;">Data source items/contents</h2>
-                              </div>
-                              <div class="card border rounded-5 p-1 m-1" style="width: 99%; height: 300px; overflow: auto;">
-                                <table id="table" class="table table-hover table-borderless align-middle caption-top p-2">
-                                  <caption>
-                                    <% if (dataRequest.data) { %>
-                                      Data source items/contents <%= dataRequest.current %> / <%= dataRequest.count %>
-                                    <% } else { %>
-                                      Data source items/contents
-                                    <% } %>
-                                  </caption>
-                                  <thead class="table-dark">
-                                    <tr>
-                                      <% if (dataRequest.data) { %>
-                                        <th scope="col">#</th>
-                                        <% Object.keys(dataRequest.data[0]).forEach(function(key, index) { %>
-                                          <th scope="col">
-                                            <% if(dataRequest.unique && dataRequest.unique.includes(key)) { %>
-                                              <i class="fas fa-key"><%= key %></i>
-                                            <% } else { %>
-                                              <%= key %>
-                                            <% } %>
-                                          </th>
+                                    </thead>
+                                    <% if (dataObject.data) { %>
+                                      <tbody>
+                                        <% dataObject.data.forEach(function(data, index) { %>
+                                          <tr>
+                                            <th scope="row"><%= index +1 %></th>
+                                            <% Object.keys(dataObject.data[0]).forEach(function(key, index) { %>
+                                              <td><%= data[key] %></td>
+                                            <% }) %>
+                                          </tr>
                                         <% }) %>
+                                      </tbody>
+                                    <% } %>
+                                  </table>
+                                </div>
+                              </div>
+                              <div id="table-2" class="card border rounded-5 p-1 mt-3 d-none" style="width: 99%; height: 1020px;">
+                                <div class="col-md-12 text-center mt-2">
+                                  <h2 style="font-size: 20px;">Data source interactions</h2>
+                                </div>
+                                <div class="table-responsive">
+                                  <table id="table" class="table table-hover table-borderless align-middle caption-top p-2" >
+                                    <caption>
+                                      <% if (dataKey.data) { %>
+                                        Data source interactions <%= dataKey.current %> / <%= dataKey.count %>
                                       <% } else { %>
-                                      <td colspan="5" class="text-center">
-                                          You don't have data yet.
-                                      </td>
+                                        Data source interactions
                                       <% } %>
-                                    </tr>
-                                  </thead>
-                                  <% if (dataRequest.data) { %>
+                                    </caption>
+                                    <thead class="table-dark">
+                                      <tr>
+                                        <% if (dataKey.data) { %>
+                                          <th scope="col">#</th>
+                                          <% Object.keys(dataKey.data[0]).forEach(function(key, index) { %>
+                                            <th scope="col d-inline">
+                                              <% if(dataKey.unique && dataKey.unique.includes(key)){ %>
+                                                <i class="fas fa-key"><%= key %></i>
+                                              <% } else { %>
+                                                <%= key %>
+                                              <% } %>
+                                            </th>
+                                          <% }) %>
+                                        <% } else { %>
+                                        <td colspan="5" class="text-center">
+                                            You don't have data yet.
+                                        </td>
+                                        <% } %>
+                                      </tr>
+                                    </thead>
+                                  <% if (dataKey.data) { %>
                                     <tbody>
-                                      <% dataRequest.data.forEach(function(data, index) { %>
+                                      <% dataKey.data.forEach(function(data, index) { %>
                                         <tr>
                                           <th scope="row"><%= index + 1 %></th>
-                                          <% Object.keys(dataRequest.data[0]).forEach(function(key, index) { %>
+                                          <% Object.keys(dataKey.data[0]).forEach(function(key, index) { %>
                                             <td><%= data[key] %></td>
                                           <% }) %>
                                         </tr>
                                       <% }) %>
                                     </tbody>
                                   <% } %>
-                                </table>
+                                  </table>
+                                </div>
                               </div>
-                              <div class="col-md-12 text-center mt-2">
-                                <h2 style="font-size: 20px;">Data recommends</h2>
-                              </div>
-                              <div class="card border rounded-5 p-1 m-1" style="width: 99%; height: 300px; overflow: auto;">
-                                <table id="table" class="table table-hover table-borderless align-middle caption-top p-2">
-                                  <caption>
-                                    <% if (dataRecommend.data) { %>
-                                      Data recommends <%= dataRecommend.current %> / <%= dataRecommend.count %>
-                                    <% } else { %>
-                                      Data recommends
-                                    <% } %>
-                                  </caption>
-                                  <thead class="table-dark">
-                                    <tr>
-                                      <% if (dataRecommend.data) { %>
-                                        <th scope="col">#</th>
-                                        <% Object.keys(dataRecommend.data[0]).forEach(function(key, index) { %>
-                                          <th scope="col d-inline">
-                                            <% if(dataRecommend.unique && dataRecommend.unique.includes(key)){ %>
-                                              <i class="fas fa-key"><%= key %></i>
-                                            <% } else { %>
-                                              <%= key %>
-                                            <% } %>
-                                          </th>
-                                        <% }) %>
+                              <div id="table-3" class="card border rounded-5 p-1 mt-3 d-none" style="width: 99%; height: 1020px;">
+                                <div class="col-md-12 text-center mt-2">
+                                  <h2 style="font-size: 20px;">Data source items/contents</h2>
+                                </div>
+                                <div class="table-responsive">
+                                  <table id="table" class="table table-hover table-borderless align-middle caption-top p-2">
+                                    <caption>
+                                      <% if (dataRequest.data) { %>
+                                        Data source items/contents <%= dataRequest.current %> / <%= dataRequest.count %>
                                       <% } else { %>
-                                      <td colspan="5" class="text-center">
-                                          You don't have data yet.
-                                      </td>
+                                        Data source items/contents
                                       <% } %>
-                                    </tr>
-                                  </thead>
-                                <% if (dataRecommend.data) { %>
-                                  <tbody>
-                                    <% dataRecommend.data.forEach(function(data, index) { %>
+                                    </caption>
+                                    <thead class="table-dark">
                                       <tr>
-                                        <th scope="row"><%= index + 1 %></th>
-                                        <% Object.keys(dataRecommend.data[0]).forEach(function(key, index) { %>
-                                          <td><%= data[key] %></td>
-                                        <% }) %>
+                                        <% if (dataRequest.data) { %>
+                                          <th scope="col">#</th>
+                                          <% Object.keys(dataRequest.data[0]).forEach(function(key, index) { %>
+                                            <th scope="col">
+                                              <% if(dataRequest.unique && dataRequest.unique.includes(key)) { %>
+                                                <i class="fas fa-key"><%= key %></i>
+                                              <% } else { %>
+                                                <%= key %>
+                                              <% } %>
+                                            </th>
+                                          <% }) %>
+                                        <% } else { %>
+                                        <td colspan="5" class="text-center">
+                                            You don't have data yet.
+                                        </td>
+                                        <% } %>
                                       </tr>
-                                    <% }) %>
-                                  </tbody>
-                                <% } %>
-                                </table>
+                                    </thead>
+                                    <% if (dataRequest.data) { %>
+                                      <tbody>
+                                        <% dataRequest.data.forEach(function(data, index) { %>
+                                          <tr>
+                                            <th scope="row"><%= index + 1 %></th>
+                                            <% Object.keys(dataRequest.data[0]).forEach(function(key, index) { %>
+                                              <td><%= data[key] %></td>
+                                            <% }) %>
+                                          </tr>
+                                        <% }) %>
+                                      </tbody>
+                                    <% } %>
+                                  </table>
+                                </div>
+                              </div>
+                              <div id="table-4" class="card border rounded-5 p-1 mt-3 d-none" style="width: 99%; height: 1020px;">
+                                <div class="col-md-12 text-center mt-2">
+                                  <h2 style="font-size: 20px;">Data recommends</h2>
+                                </div>
+                                <div class="table-responsive">
+                                  <table id="table" class="table table-hover table-borderless align-middle caption-top p-2">
+                                    <caption>
+                                      <% if (dataRecommend.data) { %>
+                                        Data recommends <%= dataRecommend.current %> / <%= dataRecommend.count %>
+                                      <% } else { %>
+                                        Data recommends
+                                      <% } %>
+                                    </caption>
+                                    <thead class="table-dark">
+                                      <tr>
+                                        <% if (dataRecommend.data) { %>
+                                          <th scope="col">#</th>
+                                          <% Object.keys(dataRecommend.data[0]).forEach(function(key, index) { %>
+                                            <th scope="col d-inline">
+                                              <% if(dataRecommend.unique && dataRecommend.unique.includes(key)) { %>
+                                                <i class="fas fa-key"><%= key %></i>
+                                              <% } else { %>
+                                                <%= key %>
+                                              <% } %>
+                                            </th>
+                                          <% }) %>
+                                        <% } else { %>
+                                        <td colspan="5" class="text-center">
+                                            You don't have data yet.
+                                        </td>
+                                        <% } %>
+                                      </tr>
+                                    </thead>
+                                  <% if (dataRecommend.data) { %>
+                                    <tbody>
+                                      <% dataRecommend.data.forEach(function(data, index) { %>
+                                        <tr>
+                                          <th scope="row"><%= index + 1 %></th>
+                                          <% Object.keys(dataRecommend.data[0]).forEach(function(key, index) { %>
+                                            <td><%= data[key] %></td>
+                                          <% }) %>
+                                        </tr>
+                                      <% }) %>
+                                    </tbody>
+                                  <% } %>
+                                  </table>
+                                </div>
                               </div>
                             </div>
                         </div>
@@ -312,23 +402,21 @@
         </div>
         <%- include('../layouts/scripts')  -%>
       <script>
-        function onAdd() {
-          let open = true;
-          for(let i=1; i < 4; i++) {
-            if( $(`#unique${i}`).hasClass('d-none')) {
-              $(`#unique${i}`).removeClass('d-none');
-              if( i === 3){
-                open = false;
+        function onPreviewData(num) {
+          for (let i = 1; i < 5; i++) {
+            if(i == num) {
+              if( $(`#table-${i}`).hasClass('d-none')) {
+                $(`#table-${i}`).removeClass('d-none');
               }
-              break;
+            }
+            else {
+              if( $(`#table-${i}`).hasClass('d-none')) {
+                continue;
+              } else {
+                $(`#table-${i}`).addClass('d-none');
+              }
             }
           }
-          if( open === false ) {
-            $(`#btn-add`).addClass('d-none');
-          }
-        }
-        function onCloseAlert(){
-          $('#alert').hide();
         }
       </script>
     </body>
