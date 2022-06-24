@@ -21,6 +21,9 @@ const Job = new Schema(
         service: { 
             type: Schema.Types.String,
         },
+        status: { 
+            type: Schema.Types.String,
+        },
         object: { 
             type: Schema.Types.String,
         },

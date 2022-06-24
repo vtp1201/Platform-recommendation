@@ -160,7 +160,7 @@
                                     </div>
                                   </div>
                                   <div class="col-md-12 text-center">
-                                    <button class="mx-6 btn btn-primary" type="submit">Create recommendations</button>
+                                    <button id="btn-submit" class="mx-6 btn btn-primary" type="submit">Create recommendations</button>
                                   </div>
                                 </div>
                               </form>
@@ -315,6 +315,9 @@
                 </div>	
             </div>
         </div>
+        <div class ="hide" id="loading-page">
+          <img src="/img/1_CsJ05WEGfunYMLGfsT2sXA.gif" alt="" srcset="">
+        </div>
         <div class="footer">
             <%- include('../layouts/footer') -%>
         </div>
@@ -387,6 +390,13 @@
         function onCloseAlert(){
           $('#alert').hide();
         }
+        $(document).ready(function(){
+            $('#btn-submit').click(function(){
+                $('body').addClass("preloading body-hide");
+                $('.footer').hide();
+                $('#loading-page').show();
+            });
+          });
         $(document).ready(function () {
           if (window.location.hash == '#reload') {
             history.replaceState(null, null, ' ');

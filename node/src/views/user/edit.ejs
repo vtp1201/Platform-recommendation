@@ -4,6 +4,9 @@
         .mb-10 {
             margin-bottom: 40px;
         }
+        a, a:hover{
+            color:#333
+        }
     </style>
 <%- include('../layouts/header') -%>
 <%- include('../layouts/navbar') -%>
@@ -22,7 +25,7 @@
         </header>
         <div id= "main" class="container px-4 px-lg-5 my-2">
             <div class="row gx-4 gx-lg-5 justify-content-center">
-                <div class="col-md-10 col-lg-8 col-xl-7 pt-2 pb-4 bg-white border rounded-5">
+                <div class="col-md-10 col-lg-8 col-xl-7 pt-2 pb-4 bg-white border rounded-5 mt-3">
                     <% if(messageType == 'success') { %>
                         <div id='alert' class="alert alert-<%=messageType%> alert-dismissible fade show" role="alert">
                             <strong><%= message %></strong>
@@ -35,15 +38,30 @@
                           <button id='btn-alert' type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     <% } %>
-                    <div class="row g-3">
-                        <div class="col-sm-8">
+                    <div class="row g-3 mx-2">
+                        <div class="col-sm-8 mt-4 mb-1">
                             <label for="_id" class="form-label">User ID</label>
                             <input type="text" class="form-control" id="_id" name="_id" value="<%=user._id%>" disabled>
                         </div>
-                        <div class="col-sm-8">
+                        <div class="col-sm-8 mb-1">
                             <label for="username" class="form-label">User name</label>
                             <input type="text" class="form-control" id="username" name="username" value="<%=user.username%>" disabled>
                         </div>
+                        <form method= "POST" action="/user/gen-key?_method=PUT" class="row g-3 mb-1">
+                            <div class="col-7">
+                                <div class="input-group" id="show_hide_password">
+                                    <input class="form-control" type="password" value="<%=user.key%>" disabled>
+                                    <div class="input-group-text">
+                                        <a href=""><i class="fa fa-eye-slash" aria-hidden="true"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary">Change key</button>
+                            </div>
+                        </form>
+                        
+                        <% if(password == true) { %>
                         <div class="accordion" id="accordionExample">
                             <div class="accordion-item">
                               <h2 class="accordion-header" id="headingOne">
@@ -85,6 +103,7 @@
                               </div>
                             </div>
                         </div>
+                        <% } %>
                     </div>
                 </div>
             </div>
@@ -103,6 +122,20 @@
         $(document).ready(function() {
             $("#btn-alert").click(function(){
             $('#alert').hide();
+            });
+        });
+        $(document).ready(function() {
+            $("#show_hide_password a").on('click', function(event) {
+                event.preventDefault();
+                if($('#show_hide_password input').attr("type") == "text"){
+                    $('#show_hide_password input').attr('type', 'password');
+                    $('#show_hide_password i').addClass( "fa-eye-slash" );
+                    $('#show_hide_password i').removeClass( "fa-eye" );
+                }else if($('#show_hide_password input').attr("type") == "password"){
+                    $('#show_hide_password input').attr('type', 'text');
+                    $('#show_hide_password i').removeClass( "fa-eye-slash" );
+                    $('#show_hide_password i').addClass( "fa-eye" );
+                }
             });
         });
     </script>

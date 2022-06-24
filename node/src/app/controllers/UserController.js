@@ -2,6 +2,7 @@ const { mutipleMongooseToObject, mongooseToObject } = require('../../util/mongoo
 const User = require('../models/User');
 const Job = require('../models/Job');
 const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
 
 class UserController {
     // [GET] user/home
@@ -23,8 +24,13 @@ class UserController {
     showEdit(req, res, next) {
         User.findById(req.user._id)
             .then((user) => {
+                let password = false;
+                if (user?.local?.password) {
+                    password = true;
+                }
                 user.username = loggedName;
                 res.render('user/edit', {
+                    password,
                     user: user,
                     message: req.flash('message'),
                     messageType: req.flash('messageType'),
@@ -41,7 +47,7 @@ class UserController {
         }
         User.findById(req.user._id)
             .then((user) => {
-                bcrypt.compare(req.body.old_password, user.password, (err, same) => {
+                bcrypt.compare(req.body.old_password, user.local.password, (err, same) => {
                     if (!same) {
                         req.flash('messageType', 'danger');
                         req.flash('message', "Current password is wrong.");
@@ -52,7 +58,11 @@ class UserController {
             }).then(()=> {
                 bcrypt.hash(req.body.password, 10, (err, hash) => {
                     req.body.password = hash;
-                    User.findByIdAndUpdate(req.user._id, req.body)
+                    User.findByIdAndUpdate(req.user._id, {
+                        local: {
+                            password: req.body.password,
+                        }
+                    })
                     .then(() => {
                         req.flash('messageType', 'success');
                         req.flash('message', 'update complete');
@@ -69,6 +79,21 @@ class UserController {
                 req.flash('message', `Can't update, please try again later`);
                 res.redirect('back');
             });
+    }
+    async updateKey(req, res) {
+        try {
+            const newKey = uuidv4();
+            await User.updateOne({ _id: req.user._id}, {
+                key: newKey
+            })
+            req.flash('messageType', 'success');
+            req.flash('message', 'Gen new key complete');
+            res.redirect('back');
+        } catch (error) {
+            req.flash('messageType', 'danger');
+            req.flash('message', `Can't update, please try again later`);
+            res.redirect('back');
+        }
     }
 }
 

@@ -12,6 +12,7 @@
   "dependencies": {
     "bcrypt": "^5.0.1",
     "connect-flash": "^0.1.1",
+    "cron": "^2.0.0",
     "cross-fetch": "^3.1.4",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
@@ -26,13 +27,13 @@
     "mssql": "^8.1.0",
     "multer": "^1.4.3",
     "mysql2": "^2.3.3",
-    "node-schedule": "^2.1.0",
     "passport": "^0.5.2",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.4",
-    "pg": "^8.7.3"
+    "pg": "^8.7.3",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "ejs-lint": "^1.2.1",

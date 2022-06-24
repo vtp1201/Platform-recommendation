@@ -12,7 +12,8 @@ const app = express();
 const db = require('./config/db/index');
 const route = require('./routes/index');
 require('./config/passport/passport')(passport);
-const schedule = require('./config/schedule');
+const MigrateService = require('./cron/migrate');
+// const schedule = require('./config/schedule');
 
 
 
@@ -29,6 +30,8 @@ app.use(expressSession({
     saveUninitialized: true,
 }));
 app.use(flash());
+
+MigrateService.migrateTest()
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -72,5 +75,5 @@ const host = process.env.PORT || 5000
 
 app.listen(host, () => {
     console.log(`listening on port ${host}`);
-    schedule.scheduleJob();
+    // schedule.scheduleJob();
 });

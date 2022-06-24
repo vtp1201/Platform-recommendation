@@ -9,6 +9,9 @@ const User = new Schema(
             username     : Schema.Types.String,
             password     : Schema.Types.String,
         },
+        key: {
+            type:  Schema.Types.String,
+        },
         facebook         : {
             id           : Schema.Types.String,
             token        : Schema.Types.String,
