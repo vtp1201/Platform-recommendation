@@ -13,8 +13,6 @@ const db = require('./config/db/index');
 const route = require('./routes/index');
 require('./config/passport/passport')(passport);
 const MigrateService = require('./cron/migrate');
-// const schedule = require('./config/schedule');
-
 
 
 app.use(morgan('tiny'));
@@ -31,7 +29,7 @@ app.use(expressSession({
 }));
 app.use(flash());
 
-MigrateService.migrateTest()
+// MigrateService.migrateTest()
 
 app.use(passport.initialize());
 app.use(passport.session());

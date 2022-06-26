@@ -3,6 +3,8 @@ const { checkNotLogged } = require('../app/middleware/authMiddleware');
 const router = express.Router();
 const multer = require('multer');
 
+const { directPage } = require('../app/middleware/jobStatusMiddleware')
+
 const upload = multer({
     storage: multer.memoryStorage()
 })
@@ -18,9 +20,9 @@ const uploadMutiple = upload.fields(
 const jobController = require('../app/controllers/JobController');
 
 router.get('/managers', checkNotLogged, jobController.showManager);
-router.get('/detail/:id', checkNotLogged, jobController.showJob);
-router.get('/scenario/:id', checkNotLogged, jobController.showScenario);
-router.post('/new-recommend/:id', checkNotLogged, jobController.createRecommendation);
+router.get('/detail/:id', checkNotLogged, directPage, jobController.showJob);
+router.get('/scenario/:id', checkNotLogged, directPage, jobController.showScenario);
+router.post('/new-recommend/:id', checkNotLogged, directPage, jobController.createRecommendation);
 router.get('/new-job', checkNotLogged, jobController.newJob);
 router.post('/new-job', checkNotLogged, jobController.createNewJob);
 router.get('/preview-data/:id', checkNotLogged, jobController.preview);

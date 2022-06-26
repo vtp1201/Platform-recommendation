@@ -4,6 +4,8 @@ const Connection = require('../models/Connection');
 const Query = require('../models/Query');
 const Files = require('../models/File');
 
+const { STATUS_JOB } = require('../../util/constants')
+
 const fetch = require('cross-fetch');
 const {connect, disconnect, query} = require('../../config/db/mssql');
 const {testConnection, queryData, getDataByQuery} = require('../../config/db/mysql');
@@ -596,6 +598,7 @@ class JobController {
             const dataSource = await newDataSource.save();
             await Job.updateOne({ _id: job._id}, {
                 dataSource: dataSource._id,
+                status: STATUS_JOB.PREVIEW_DATA,
             });
             if (req.body.dataSourceType != 'file') {
                 const newConnection = new Connection({
@@ -714,6 +717,7 @@ class JobController {
                 // renameCollection('recommends', job._id);
                 const updateJob = {
                     ...req.body,
+                    status: STATUS_JOB.DETAIL,
                     dataDestination: `${dataSource._id}-recommends`
                 }
                 await Job.updateOne({ _id: job._id}, updateJob);

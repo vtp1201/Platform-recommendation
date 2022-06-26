@@ -1,7 +1,7 @@
 exports.STATUS_JOB = {
-    PREVIEW_DATA: 'PREVIEW_DATA',
-    SCENARIO: 'SCENARIO',
-    DETAIL: 'DETAIL',
+    PREVIEW_DATA: 'preview-data',
+    SCENARIO: 'scenario',
+    DETAIL: 'detail',
   }
   
   
