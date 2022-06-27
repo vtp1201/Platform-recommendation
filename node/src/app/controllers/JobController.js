@@ -3,6 +3,7 @@ const DataSource = require('../models/DataSource');
 const Connection = require('../models/Connection');
 const Query = require('../models/Query');
 const Files = require('../models/File');
+const { Parser } = require('json2csv');
 
 const { STATUS_JOB } = require('../../util/constants')
 
@@ -786,13 +787,13 @@ class JobController {
     }
     // [POST] job/api/extract
     extract(req, res) {
-        if (req.body.object === undefined || req.body.jobId === undefined) {
+        if (req.query.object === undefined) {
             res.status(500).json({
-                message: "jobId or object is undefined!"
+                message: " object is undefined!"
             });
             return;
         }
-        Job.findOne({ _id : req.body.jobId, deleted : false})
+        Job.findOne({ _id : req.query.jobId, deleted : false})
             .then(async job => {
                 if (job == null) {
                     res.status(401).json({
@@ -800,7 +801,7 @@ class JobController {
                     });
                     return;
                 }
-                db.collection(`${job._id}-recommends`).find({}, { projection: { _id: 0 } }).toArray(function(err, result) {
+                db.collection(`${job.dataDestination}`).find({}, { projection: { _id: 0 } }).toArray(function(err, result) {
                     if (err) {
                         res.status(400).json({
                             message: "jobId does not have recommends-data!"
@@ -816,7 +817,7 @@ class JobController {
                     const key = Object.keys(result[0]);
                     const personId = key[0];
                     function isUser(Id) {
-                        return Id[`${personId}`] == req.body.object;
+                        return Id[`${personId}`] == req.query.object;
                     }
                     
                     const dt = result.find(isUser)
@@ -832,11 +833,11 @@ class JobController {
                         }
                         return data;
                     });
-                    if (req.body.limits === undefined || Number.isInteger(req.body.limits) === false) {
+                    if (req.query.limits === undefined || Number.isInteger(req.query.limits) === false) {
                         res.status(200).json(df)
                         return;
                     }
-                    res.status(200).json(df.slice(0,req.body.limits));
+                    res.status(200).json(df.slice(0,req.query.limits));
                 });
             })
             .catch(err => {
@@ -863,14 +864,58 @@ class JobController {
             })
         }
     }
+    // GET  /job/extract-csv/:id?data=object
+    async extractCsv(req, res) {
+        try {
+            const { dataName } = req.query
+            const job = await Job.findOne({
+                _id: req.params.id,
+                userId: req.user._id
+            }).populate('dataSource')
+            if (!dataName) {
+                return res.status(404).json({
+                    msg: "Job Not found",
+                })
+            }
+            let data = []
+            if ( dataName == 'object' || dataName == 'key' || dataName == 'request') {
+                if (!job.dataSource[dataName]) {
+                    return res.status(404).json({
+                        msg: "Job Not found",
+                    })
+                }
+                data = await preViewData(job.dataSource[dataName], 'full')
+            }
+            if ( dataName == 'recommends') {
+                if (!job.dataDestination) {
+                    return res.status(404).json({
+                        msg: "Job Not found",
+                    })
+                }
+                data = await preViewData(job.dataDestination, 'full')
+            }
+            const fields = Object.keys(data[0]);
+            const opts = { fields };
+            const csv = Parser(data, opts);
+            res.header('Content-Type', 'text/csv')
+            res.attachment('report.csv')
+            res.send({
+                data: csv,
+            });
+        } catch (error) {
+            return res.status(404).json({
+                msg: "Something went wrong",
+            })
+        }
+    }
     // POST /job/api/update
     updateData(req, res) {
-        if (!req.body.jobId) {
-            return res.status(401).json({
-                message: "add jobId"
-            });
-        }
-        Job.findOne({ _id : req.body.jobId, deleted : false })
+        // if (!req.body.jobId) {
+        //     return res.status(401).json({
+        //         message: "add jobId"
+        //     });
+        // }
+        Job.findOne({ _id : req.query.jobId, deleted : false })
             .then(async (job) => {
                 if (job == null) {
                     res.status(401).json({
@@ -879,12 +924,12 @@ class JobController {
                     return;
                 }
                 const keys = Object.keys(req.body);
-                addMany(keys, job._id, req.body)
+                addMany(keys, String(job.dataSource), req.body)
                 .then((message) => {
                     message.message = "Done";
-                    if(req.body.newRecommends || req.body.newRecommends === true) {
+                    if(req.body.newRecommends && req.body.newRecommends === true) {
                         const jobApi = {
-                            jobId: job._id,
+                            jobId: String(job.dataSource),
                             service: job.service,
                             object: job.object,
                             key: job.key,
