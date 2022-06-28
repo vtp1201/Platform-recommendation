@@ -42,9 +42,9 @@
                         <th scope="col">#</th>
                         <th scope="col">Title</th>
                         <th scope="col">Description</th>
+                        <th scope="col">Type</th>
                         <th scope="col">Service</th>
-                        <th scope="col">Source</th>
-                        <th scope="col">Destination</th>
+                        <th scope="col">Status</th>
                         <th class="text-center" scope="col">Action</th>
                     </tr>
                 </thead>
@@ -55,21 +55,9 @@
                             <th scope="row"><%= current*4+index-3 %></th>
                             <td><%= job.title %></td>
                             <td><%= job.description %></td>
+                            <td><%= job.dataSource %></td>
                             <td><%= job.service %></td>
-                            <td>
-                                <% if (job.dataSource.object) { %>
-                                <a href="<%= job.DSLocation.object %>" download="<%= job.DSLocation.object %>"><%= job.dataSource.object %></a> ||
-                                <% } %>
-                                <% if (job.dataSource.key) { %>
-                                <a href="<%= job.DSLocation.key %>" download="<%= job.DSLocation.key %>"><%= job.dataSource.key %></a> ||
-                                <% } %>
-                                <% if (job.dataSource.request) { %>
-                                <a href="<%= job.DSLocation.request %>" download="<%= job.DSLocation.request %>"><%= job.dataSource.request %></a>
-                                <% } %>
-                            </td>
-                            <td>
-                                <a href="<%= job.DDLocation %>" download="<%= job.dataDestination %>"><%= job.dataDestination %></a>
-                            </td>
+                            <td><%= job.status %></td>
                             <td>
                                 <div class="d-flex justify-content-evenly">
                                     <a href="/job/detail/<%= job._id %>" class="btn btn-link">Detail</a>

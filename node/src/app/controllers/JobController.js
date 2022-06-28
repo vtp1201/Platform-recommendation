@@ -761,21 +761,21 @@ class JobController {
     }
     // [DELETE] job/:id/destroy
     async destroy(req, res, next) {
-        const job = await Job.findOne({ _id : req.params.id}).populate('dataSource');
-        const dataSource = job.dataSource;
+        const job = await Job.findOne({ _id : req.params.id, userId: req.user._id}).populate('dataSource');
+        const dataSource = job?.dataSource;
         Job.deleteOne({ _id : req.params.id })
             .then(async () => {
-                const request = dropCollection(`${dataSource._id}-request`);
-                const object = dropCollection(`${dataSource._id}-object`);
-                const key = dropCollection(`${dataSource._id}-key`);
-                const recommends = dropCollection(`${dataSource._id}-recommends`);
-                Promise.all([
-                    request, object, key, recommends
-                    , DataSource.deleteOne({_id: dataSource._id})
-                ])
-                .finally(() => {
-                    res.redirect('back');
-                });
+                if (dataSource) {
+                    const request = dropCollection(`${dataSource._id}-request`);
+                    const object = dropCollection(`${dataSource._id}-object`);
+                    const key = dropCollection(`${dataSource._id}-key`);
+                    const recommends = dropCollection(`${dataSource._id}-recommends`);
+                    await Promise.all([
+                        request, object, key, recommends
+                        , DataSource.deleteOne({_id: dataSource._id})
+                    ])
+                }
+                res.redirect('back');
             })
             .catch(next);
     }
@@ -898,7 +898,7 @@ class JobController {
             const opts = { fields };
             const csv = Parser(data, opts);
             res.header('Content-Type', 'text/csv')
-            res.attachment('report.csv')
+            res.attachment(`${dataName}.csv`)
             res.send({
                 data: csv,
             });
@@ -950,7 +950,7 @@ class JobController {
                                     message[`newRecommends`] = 'update failed';
                                 }
                             })
-                            .catch( error => {
+                            .catch(error => {
                                 message[`newRecommends`] = 'server failed';
                             })
                             .finally(() => {
