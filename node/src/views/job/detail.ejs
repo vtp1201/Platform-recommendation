@@ -116,8 +116,12 @@
                                       Export Data
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                      <li><a class="dropdown-item" href="#">.Json</a></li>
-                                      <li><a class="dropdown-item" href="#">.Csv</a></li>
+                                      <% if (dataObject.data) { %>
+                                        <li><a class="dropdown-item" href="/job/extractFile/<%=job._id%>?dataName=object&type=json">.Json</a></li>
+                                        <li><a class="dropdown-item" href="/job/extractFile/<%=job._id%>?dataName=object&type=csv">.Csv</a></li>
+                                      <% } else { %>
+                                        <li><a class="dropdown-item" href="#">No data</a></li>
+                                      <% } %>
                                     </ul>
                                   </div>
                                 </div>
@@ -139,8 +143,12 @@
                                       Export Data
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                      <li><a class="dropdown-item" href="#">.Json</a></li>
-                                      <li><a class="dropdown-item" href="#">.Csv</a></li>
+                                      <% if (dataKey.data) { %>
+                                        <li><a class="dropdown-item" href="/job/extractFile/<%=job._id%>?dataName=key&type=json">.Json</a></li>
+                                        <li><a class="dropdown-item" href="/job/extractFile/<%=job._id%>?dataName=key&type=csv">.Csv</a></li>
+                                      <% } else { %>
+                                        <li><a class="dropdown-item" href="#">No data</a></li>
+                                      <% } %>
                                     </ul>
                                   </div>
                                 </div>
@@ -162,8 +170,12 @@
                                       Export Data
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                      <li><a class="dropdown-item" href="#">.Json</a></li>
-                                      <li><a class="dropdown-item" href="#">.Csv</a></li>
+                                      <% if (dataRequest.data) { %>
+                                        <li><a class="dropdown-item" href="/job/extractFile/<%= job._id %>?dataName=request&type=json">.Json</a></li>
+                                        <li><a class="dropdown-item" href="/job/extractFile/<%= job._id %>?dataName=request&type=csv">.Csv</a></li>
+                                      <% } else { %>
+                                        <li><a class="dropdown-item" href="#">No data</a></li>
+                                      <% } %>
                                     </ul>
                                   </div>
                                 </div>
@@ -185,8 +197,12 @@
                                       Export Data
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                      <li><a class="dropdown-item" href="#">.Json</a></li>
-                                      <li><a class="dropdown-item" href="#">.Csv</a></li>
+                                      <% if (dataRecommend.data) { %>
+                                        <li><a class="dropdown-item" href="/job/extractFile/<%=job._id%>?dataName=recommends&type=json">.Json</a></li>
+                                        <li><a class="dropdown-item" href="/job/extractFile/<%=job._id%>?dataName=recommends&type=csv">.Csv</a></li>
+                                      <% } else { %>
+                                        <li><a class="dropdown-item" href="#">No data</a></li>
+                                      <% } %>
                                     </ul>
                                   </div>
                                 </div>

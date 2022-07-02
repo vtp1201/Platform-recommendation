@@ -28,6 +28,9 @@ const Query = new Schema(
         unique: [
             Schema.Types.String,
         ],
+        update: {
+            type: Schema.Types.String,
+        },
         autoUpdate: {
             type: Schema.Types.Number,
         }

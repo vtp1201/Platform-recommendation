@@ -88,7 +88,7 @@ def smooth_user_preference(x):
 def itemsRecommend(person, cf_recommender_model):
     recommend_dict = {}
     recommend_dict[person_id] = person
-    recommend_dict['recommends'] = cf_recommender_model.recommend_items(person, topn=20, verbose=True)[content_id].tolist()
+    recommend_dict['recommends'] = cf_recommender_model.recommend_items(person, topn=50, verbose=True)[content_id].tolist()
     return recommend_dict
 
 def usersRecommend(person, cf_recommender_model, users_ids):

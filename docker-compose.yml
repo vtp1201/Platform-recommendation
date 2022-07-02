@@ -41,5 +41,21 @@ services:
     restart: unless-stopped
     depends_on:
       - db
+  # deploy:
+  #   replicas: 3                      # Số lượng container cho dịch vụ
+  #   # placement:
+  #   #   constraints:
+  #   #       - node.role == manager    # Chỉ chạy ở node manager
+  #   resources:                        # Thiết lập tài nguyên
+  #     limits:                         # Giới hạn tài nguyên
+  #       cpus: '2'                  # 50% của 1 Core
+  #       memory: 50M 
+  #     reservations:                   # Tài nguyên tối thiểu
+  #       cpus: '1'
+  #       memory: 20M
+        
+  #   restart_policy:
+  #     condition: on-failure
+
 volumes:
   mongodata:

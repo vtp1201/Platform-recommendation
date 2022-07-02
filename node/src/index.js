@@ -30,6 +30,7 @@ app.use(expressSession({
 app.use(flash());
 
 // MigrateService.migrateTest()
+MigrateService.migrateUpdateData();
 
 app.use(passport.initialize());
 app.use(passport.session());

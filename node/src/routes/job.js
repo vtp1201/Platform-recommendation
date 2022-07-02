@@ -33,8 +33,9 @@ router.delete('/:id', checkNotLogged, jobController.delete);
 router.delete('/:id/destroy', checkNotLogged, jobController.destroy);
 router.patch('/:id/restore', checkNotLogged, jobController.restore);
 router.get('/trash', checkNotLogged, jobController.trash);
-router.post('/api/extract', checkKey, jobController.extract);
+router.get('/api/extract', checkKey, jobController.extract);
 router.post('/api/update', checkKey, jobController.updateData);
 router.post('/api/update-data', jobController.updateDataByQuery);
+router.get('/extractFile/:id', checkNotLogged, jobController.extractCsv);
 
 module.exports = router;

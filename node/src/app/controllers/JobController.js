@@ -4,6 +4,7 @@ const Connection = require('../models/Connection');
 const Query = require('../models/Query');
 const Files = require('../models/File');
 const { Parser } = require('json2csv');
+const moment = require('moment');
 
 const { STATUS_JOB } = require('../../util/constants')
 
@@ -40,6 +41,7 @@ class JobController {
         Job.find({userId: req.user._id , deleted: false})
             .skip((perPage * page) - perPage)
             .limit(perPage)
+            .populate('dataSource')
             .exec((err, jobs) => 
                 Job.where({userId: req.user._id, deleted : false}).countDocuments ((err, count) => {
                 if (err) return next(err);
@@ -383,6 +385,7 @@ class JobController {
                     _id: dataSource[`query${target}`]._id
                 },{
                     unique: isUnique,
+                    update: moment().add(Number(autoUpdate), 'days').format('YYYY-MM-DD'),
                     autoUpdate,
                 })
                 return res.status(200).json({
@@ -867,42 +870,43 @@ class JobController {
     // GET  /job/extract-csv/:id?data=object
     async extractCsv(req, res) {
         try {
-            const { dataName } = req.query
+            const { dataName, type } = req.query
             const job = await Job.findOne({
                 _id: req.params.id,
                 userId: req.user._id
             }).populate('dataSource')
-            if (!dataName) {
-                return res.status(404).json({
-                    msg: "Job Not found",
-                })
+            if (!dataName || !type) {
+                return 
             }
             let data = []
             if ( dataName == 'object' || dataName == 'key' || dataName == 'request') {
                 if (!job.dataSource[dataName]) {
-                    return res.status(404).json({
-                        msg: "Job Not found",
-                    })
+                    return 
                 }
                 data = await preViewData(job.dataSource[dataName], 'full')
             }
             if ( dataName == 'recommends') {
                 if (!job.dataDestination) {
-                    return res.status(404).json({
-                        msg: "Job Not found",
-                    })
+                    return 
                 }
                 data = await preViewData(job.dataDestination, 'full')
             }
-            const fields = Object.keys(data[0]);
+            if (type == 'json') {
+                res.header('Content-Type', 'application/json')
+                res.attachment(`${dataName}.json`)
+                res.send(data.data);
+                return
+            }
+            const fields = Object.keys(data.data[0]);
             const opts = { fields };
-            const csv = Parser(data, opts);
+            const parser = new Parser(opts);
+            const csv = parser.parse(data.data);
             res.header('Content-Type', 'text/csv')
             res.attachment(`${dataName}.csv`)
-            res.send({
-                data: csv,
-            });
+            res.send(csv);
+            return
         } catch (error) {
+            console.log(error);
             return res.status(404).json({
                 msg: "Something went wrong",
             })
