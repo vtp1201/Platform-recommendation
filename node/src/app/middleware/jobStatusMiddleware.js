@@ -6,7 +6,6 @@ exports.directPage = async (req, res, next) => {
         _id: req.params.id,
         userId: req.user._id,
     });
-    console.log("first", url)
     if (url === `/${job.status}/${job._id}`) {
         return next();
     }

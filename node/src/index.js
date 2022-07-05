@@ -15,7 +15,7 @@ require('./config/passport/passport')(passport);
 const MigrateService = require('./cron/migrate');
 
 
-app.use(morgan('tiny'));
+// app.use(morgan('tiny'));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -57,7 +57,6 @@ app.use("*", (req, res, next) => {
             loggedName = req.user.facebook.name;
         }
         if (req.user.twitter.name) {
-            console.log(req.user.twitter);
             /* loggedIn = req.session.passport.user;
             loggedName = req.user.twitter.name; */
         }

@@ -29,6 +29,6 @@ RUN pipenv install --system --deploy --ignore-pipfile
 # Copy the project files into the working directory
 # COPY . /code/
 
-COPY . ./
+COPY . .
 # Open a port on the container
 EXPOSE 8000

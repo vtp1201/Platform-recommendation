@@ -134,6 +134,33 @@ class JobController {
             message: req.flash('message'),
         });
     }
+    // [GET] job/cre-scenario/:id
+    async creScenario(req, res) {
+        try {
+            const job = await Job.findOne({
+                _id: req.params.id,
+                userId: req.user._id,
+            }).populate('dataSource')
+            if (job === null) {
+                res.redirect('back');
+                return;
+            }
+            if (!job.dataSource.key || !job.dataSource.request) {
+                res.redirect(`/job/preview-data/${job._id}`);
+                return;
+            }
+            await Job.updateOne({ 
+                _id: job._id
+            }, {
+                status: STATUS_JOB.SCENARIO
+            })
+            res.redirect(`/job/scenario/${job._id}`);
+            return;
+        }  catch (err) {
+            res.redirect('back');
+            return;
+        }
+    }
     // [GET] job/scenario/:id
     async showScenario(req, res) {
         try {
@@ -151,7 +178,7 @@ class JobController {
                 res.redirect('back');
                 return;
             }
-            if (!dataSource.key && !dataSource.request) {
+            if (!dataSource.key || !dataSource.request) {
                 res.redirect(`/job/preview-data/${job._id}`);
                 return;
             }

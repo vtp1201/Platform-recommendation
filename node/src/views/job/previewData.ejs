@@ -109,9 +109,11 @@
                                 <div class="invalid-feedback">Example invalid form file feedback</div>
                               </div>
                               <% } %>
-                              <div class="col-md-12 pb-4 text-center">
-                                <button id="btn-submit" class="mx-5 btn btn-primary btn-sm" type="submit">Submit file</button>
-                              </div>
+                              <% if (!dataSource.request && !dataSource.key) { %>
+                                <div class="col-md-12 pb-4 text-center">
+                                  <button id="btn-submit" class="mx-5 btn btn-primary btn-sm" type="submit">Submit file</button>
+                                </div>
+                              <% } %>
                             </form>
                             <% } else {%>
                             <form id="add-query" class="needs-validation" novalidate="" enctype="">
@@ -329,7 +331,7 @@
                                 </table>
                               </div>
                               <% if (dataKey.data && dataRequest.data) { %>
-                                <form method="GET" action="/job/scenario/<%=job._id%>">
+                                <form method="GET" action="/job/cre-scenario/<%=job._id%>">
                                   <div class="col-md-12 text-center">
                                     <button class="mt-2 mx-5 btn btn-primary btn-sm" type="submit">Submit Data</button>
                                   </div>

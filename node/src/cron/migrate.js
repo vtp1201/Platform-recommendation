@@ -33,6 +33,8 @@ const updateJob = async () => {
     const updateQuerys = await Query.find({
         update: moment().format('YYYY-MM-DD')
     })
+    if (!updateQuerys || updateQuerys.length == 0) 
+        return
     for (const updateQuery of updateQuerys) {
         await jobController.updateDataSchedule(updateQuery)
         await Query.updateOne({
