@@ -8,6 +8,10 @@ const User = new Schema(
         local            : {
             username     : Schema.Types.String,
             password     : Schema.Types.String,
+            lastPassword : Schema.Types.Array,
+        },
+        email: {
+            type:  Schema.Types.String,
         },
         key: {
             type:  Schema.Types.String,
