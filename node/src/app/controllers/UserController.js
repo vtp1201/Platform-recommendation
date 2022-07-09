@@ -38,8 +38,9 @@ class UserController {
             })
             .catch(next);
     }
+
     update(req, res, next) {
-        if (req.body.password != req.body.re_password) {
+        if (req.body.password != req.body.re_password || req.body.password == req.body.old_password) {
             req.flash('messageType', 'danger');
             req.flash('message', "Those passwords didn't match. Try again.");
             res.redirect('back');
@@ -55,13 +56,15 @@ class UserController {
                         return;
                     }
                 });
-            }).then(()=> {
                 bcrypt.hash(req.body.password, 10, (err, hash) => {
                     req.body.password = hash;
+                    const local = {
+                        ...user.local,
+                        password: req.body.password,
+                        lastPassword: [...user.local.lastPassword, req.body.old_password]
+                    }
                     User.findByIdAndUpdate(req.user._id, {
-                        local: {
-                            password: req.body.password,
-                        }
+                        local
                     })
                     .then(() => {
                         req.flash('messageType', 'success');

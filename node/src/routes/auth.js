@@ -8,6 +8,9 @@ module.exports = function(passport){
     router.get('/sign-in', checkLogged, authController.signIn);
     router.get('/sign-up', checkLogged, authController.signUp);
 
+    router.get('/forgot-password', checkLogged, authController.showForgotPassword);
+    router.post('/forgot-password', checkLogged, authController.ForgotPassword);
+
     router.post('/sign-in', checkLogged, passport.authenticate('local-login', {
         successRedirect : '/', // redirect to the secure profile section
         failureRedirect : '/auth/sign-in', // redirect back to the signup page if there is an error

@@ -9,8 +9,6 @@ const morgan = require('morgan');
 
 const app = express();
 
-process.env.HOST = 'hello'
-
 const db = require('./config/db/index');
 const route = require('./routes/index');
 require('./config/passport/passport')(passport);

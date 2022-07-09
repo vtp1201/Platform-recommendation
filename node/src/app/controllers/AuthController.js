@@ -15,6 +15,64 @@ class AuthController {
             message: (req.flash('message')).toString()
         });
     }
+    // [GET] auth/forgot-password
+    showForgotPassword(req, res) {
+        res.render('user/forgotPassword', { 
+            messageType: (req.flash('messageType')).toString(),
+            message: (req.flash('message')).toString()
+        });
+    }
+    // [POST] auth/forgot-password
+    async ForgotPassword(req, res) {
+        const user = await User.findOne({ 
+            'local.username': req.body.username,
+        })
+        if (!user) {
+            req.flash('messageType', 'danger');
+            req.flash('message', "Can't find account.");
+            res.redirect('back');
+            return;
+        }
+        if(!user.local.lastPassword.includes(req.body.password)) {
+            let isCompare = false;
+            bcrypt.compare(req.body.password, user.local.password, (err, same) => {
+                if (same) {
+                    isCompare = true;
+                    return;
+            }})
+            if (isCompare === true) {
+                req.flash('messageType', 'success');
+                req.flash('message', 'Your password already right');
+                return res.redirect('back');
+            }
+            req.flash('messageType', 'danger');
+            req.flash('message', "Can't find old password.");
+            res.redirect('back');
+            return;
+        }
+        bcrypt.hash(req.body.password, 10, (err, hash) => {
+            req.body.password = hash;
+            const local = {
+                ...user.local,
+                password: req.body.password,
+            }
+            User.updateOne({ 
+                'local.username': req.body.username,
+            }, {
+                local
+            })
+            .then(() => {
+                req.flash('messageType', 'success');
+                req.flash('message', 'update password complete');
+                res.redirect('back');
+            })
+            .catch(() => {
+                req.flash('messageType', 'danger');
+                req.flash('message', `Can't update, please try again later`);
+                res.redirect('back');
+            });
+        })
+    }
     // [POST] auth/sign-in
     signInUser (req, res, next) {
         const { username, password } = req.body;
@@ -52,11 +110,13 @@ class AuthController {
                 req.flash('messageType', 'success');
                 req.flash('message', 'Sign up successfully');
                 res.redirect('back');
+                return;
             })
             .catch(err => {
                 req.flash('messageType', 'danger');
                 req.flash('message', 'Username has already been taken. Try again');
                 res.redirect('back');
+                return;
             }
             );
     }

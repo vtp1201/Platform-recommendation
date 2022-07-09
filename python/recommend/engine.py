@@ -18,8 +18,10 @@ import pymongo
 db_host = os.getenv('DB_HOST', 'localhost')
 db_port = os.getenv('DB_PORT', '27017')
 db_collection = os.getenv('DB_NAME', 'Platform_recommendation')
+db_user = os.getenv('MONGO_USER', '')
+db_pass = os.getenv('MONGO_PASSWORD', '')
 
-uri_db = 'mongodb://' + db_host + ':' + db_port + '/'
+uri_db = 'mongodb://' + db_user + ':' + db_pass + '@' + db_host + ':' + db_port + '/'
 
 myclient = pymongo.MongoClient(uri_db)
 mydb = myclient[db_collection]

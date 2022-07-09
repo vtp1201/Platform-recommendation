@@ -9,9 +9,7 @@ const User = new Schema(
             username     : Schema.Types.String,
             password     : Schema.Types.String,
             lastPassword : Schema.Types.Array,
-        },
-        email: {
-            type:  Schema.Types.String,
+            email : Schema.Types.String,
         },
         key: {
             type:  Schema.Types.String,
