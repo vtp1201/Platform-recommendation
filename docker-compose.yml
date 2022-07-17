@@ -18,21 +18,10 @@ services:
       - MONGO_PASSWORD=${MONGO_PASSWORD}
     ports:
       - "${PORT}:${PORT}"
-    restart: unless-stopped
+    restart: always
     depends_on:
-        - db
-        - python
-    # deploy:
-    #   replicas: 1                      # Số lượng container cho dịch vụ
-    #   resources:                        # Thiết lập tài nguyên
-    #     limits:                         # Giới hạn tài nguyên
-    #       cpus: '0.5'                  # 50% của 1 Core
-    #       memory: 150MB
-    #     reservations:                   # Tài nguyên tối thiểu
-    #       cpus: '0.5'
-    #       memory: 50MB
-    #   restart_policy:
-    #     condition: on-failure
+      - db
+      - python
   db:
     image: mongo
     volumes:
@@ -41,17 +30,6 @@ services:
     command: [--auth]
     ports: 
       - "27017:27017"
-    # deploy:
-    #   replicas: 1    
-    #   resources: 
-    #     limits:    
-    #       cpus: '0.5'            
-    #       memory: 150MB
-    #     reservations:       
-    #       cpus: '0.5'
-    #       memory: 50MB
-    #   restart_policy:
-    #     condition: on-failure
   python:
     image: python
     build: 
@@ -69,17 +47,6 @@ services:
     restart: unless-stopped
     depends_on:
       - db
-    # deploy:
-    #   replicas: 1
-    #   resources: 
-    #     limits:    
-    #       cpus: '1'            
-    #       memory: 500MB
-    #     reservations:       
-    #       cpus: '1'
-    #       memory: 250MB
-    #   restart_policy:
-    #     condition: on-failure
 
 volumes:
   mongodata:

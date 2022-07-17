@@ -863,11 +863,11 @@ class JobController {
                         }
                         return data;
                     });
-                    if (req.query.limits === undefined || Number.isInteger(req.query.limits) === false) {
+                    if (req.query.limits === undefined || Number.isInteger(Number(req.query.limits)) === false) {
                         res.status(200).json(df)
                         return;
                     }
-                    res.status(200).json(df.slice(0,req.query.limits));
+                    res.status(200).json(df.slice(0, Number(req.query.limits)));
                 });
             })
             .catch(err => {
@@ -956,7 +956,7 @@ class JobController {
                 }
                 const keys = Object.keys(req.body);
                 addMany(keys, String(job.dataSource), req.body)
-                .then((message) => {
+                .then(async (message) => {
                     message.message = "Done";
                     if(req.body.newRecommends && req.body.newRecommends === true) {
                         const jobApi = {
@@ -993,6 +993,15 @@ class JobController {
                             return;
                         }
                     } else {
+                        const update = {};
+                        for (const key in message) {
+                            if (key === 'data-object' || key === 'data-key' || key === 'data-request') {
+                                if (message[key] === 'update success') {
+                                    update[key.split('-')[1]] = `${String(job.dataSource)}-${key.split('-')[1]}`
+                                }
+                            }
+                        }
+                        await DataSource.updateOne({ _id: job.dataSource}, update);
                         res.status(200).json(message);
                         return;
                     }

@@ -26,7 +26,7 @@ const dbPort = process.env.DB_PORT || 27017
 const dbName = process.env.DB_NAME || 'Platform_recommendation'
 const dbUser = process.env.MONGO_USER || ''
 const dbPass = process.env.MONGO_PASSWORD || ''
-const mongoUrl = `mongodb://${dbUser}:${dbPass}@${dbHost}:${dbPort}/${dbName}`
+const mongoUrl = `mongodb://${dbUser}:${dbPass}@${dbHost}:${dbPort}/${dbName}?authSource=Platform_recommendation`
 
 const connectWithRetry = function () { // when using with docker, at the time we up containers. Mongodb take few seconds to starting, during that time NodeJS server will try to connect MongoDB until success.
     return mongoose.connect(mongoUrl, {

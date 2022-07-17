@@ -1,4 +1,4 @@
-# Đề tài tiểu luận chuyên ngành Kỹ thuật dữ liệu (Hệ đại trà)
+# Đề tài khóa luận tốt nghiệp chuyên ngành Kỹ thuật dữ liệu (Hệ đại trà)
 # Platform-recommedation
 ## Tên đề tài: Xây đựng trang web gợi ý
 ## GVHD: TS. Huỳnh Xuân Phụng
@@ -15,3 +15,4 @@
 (nếu có lỗi thì thực hiện : "cd node" -> "docker build -t node ." -> "cd .." -> "cd python" -> "docker build -t python ." -> "cd .." tiếp theo chạy lại lệnh ở bước 2)
 ### - Bước 3: Vào web với link: http://localhost:5000/
 ### - Bước 4: Để dừng app dùng lệnh "docker-compose down".
+

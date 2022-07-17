@@ -21,7 +21,7 @@ db_collection = os.getenv('DB_NAME', 'Platform_recommendation')
 db_user = os.getenv('MONGO_USER', '')
 db_pass = os.getenv('MONGO_PASSWORD', '')
 
-uri_db = 'mongodb://' + db_user + ':' + db_pass + '@' + db_host + ':' + db_port + '/'
+uri_db = 'mongodb://' + db_user + ':' + db_pass + '@' + db_host + ':' + db_port + '/' + db_collection + '?authSource=Platform_recommendation'
 
 myclient = pymongo.MongoClient(uri_db)
 mydb = myclient[db_collection]
@@ -115,6 +115,7 @@ def setValue(x):
     return y
 
 def addMongo(name, data):
+    
     mycol = mydb[name]
     for x in mydb.list_collection_names():
         if (x == name):

@@ -1,9 +1,5 @@
 .vscode
 serviceAccountKey.json
-<<<<<<< HEAD
 node_modules/
-=======
-node_modules/
->>>>>>> 7b12b2b51acd73998b548396ceaf96ce0aa2a73c
 
 authKey.js
